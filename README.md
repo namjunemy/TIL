@@ -19,6 +19,7 @@
 ### Database
 
 * [Windows10 환경에서 Mysql-5.7.19 설치 및 세팅 가이드](https://github.com/namjunemy/TIL/blob/master/Database/MySQL-5.7.19_Installation_Guide.md)
+* [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
 
 
 
