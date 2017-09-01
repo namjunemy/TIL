@@ -16,7 +16,9 @@
 
 ## 분류
 
+### Database
 
+* [Windows10 환경에서 Mysql-5.7.19 설치 및 세팅 가이드](https://github.com/namjunemy/TIL/blob/master/Database/MySQL-5.7.19_Installation_Guide.md)
 
 
 
