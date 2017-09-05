@@ -54,6 +54,7 @@
   >  
   >
   > apply plugin: 'java'
+  >
   > apply plugin: 'eclipse'
 
 * 프로젝트 루트에서 git bash open 후 ls 명령 입력시
@@ -65,12 +66,19 @@
   > 아래와 같은 내용 출력시 빌드 성공
   >
   > Starting a Gradle Daemon (subsequent builds will be faster)
+  >
   > :eclipseClasspath
+  >
   > :eclipseJdt
+  >
   > :eclipseProject
+  >
   > :eclipse
   >
+  > ​
+  >
   > BUILD SUCCESSFUL in 8s
+  >
   > 3 actionable tasks: 3 executed
 
 * 새로 만든 프로젝트는 eclipse ide에서 import 가능한 프로젝트가 됨
