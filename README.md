@@ -25,5 +25,6 @@
 ### Tools
 
 * [gradle 설치 및 프로젝트 생성](https://github.com/namjunemy/TIL/blob/master/Tools/gradle_project_create_windows10_eclipse.md)
+* [gradle 프로젝트 이클립스와 연동하기](https://github.com/namjunemy/TIL/blob/master/Tools/gradle_project_eclipse_import.md)
 
 
