@@ -1,4 +1,4 @@
-# gradle 프로젝트 eclipse  import
+# Gradle 프로젝트 eclipse  import
 
 [gradle 설치와 프로젝트 생성](https://github.com/namjunemy/TIL/blob/master/Tools/gradle_project_create_windows10_eclipse.md)을 끝냈다면, 이클립스와 연동을 한다.
 
