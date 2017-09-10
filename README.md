@@ -15,6 +15,8 @@
 
 
 ## 분류
+### Git
+* [gitignore 파일 생성 및 사용자 규칙 정의](https://github.com/namjunemy/TIL/blob/master/Git/gitignore_file_create_and_customizing.md)
 
 ### Database
 
