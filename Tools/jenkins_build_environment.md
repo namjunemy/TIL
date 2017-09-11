@@ -51,3 +51,5 @@
 * Git install automatically에 체크 해제 하고, Git의 Path를 입력한다. 여기서는 git.exe까지 입력해야 한다.
 * Gradle install automatically에 체크 해제 하고, GRADLE_HOME의 Path를 입력한다.
 * Tool의 Path 설정이 끝났다면 설정을 저장한다.
+
+

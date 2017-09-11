@@ -31,5 +31,6 @@
 * [jenkins란 무엇인가?](https://github.com/namjunemy/TIL/blob/master/Tools/what_is_jenkins.md)
 * [jenkins 설치 및 구동](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_install_drive.md)
 * [jenkins 빌드 환경 구축](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_build_environment.md)
+* [jenkins와 Github 연동하기](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_gitscm_github.md)
 
 
