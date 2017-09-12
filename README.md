@@ -32,5 +32,7 @@
 * [jenkins 설치 및 구동](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_install_drive.md)
 * [jenkins 빌드 환경 구축](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_build_environment.md)
 * [jenkins와 Github 연동하기](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_gitscm_github.md)
+* [jenkins  빌드 실행 및 결과 확인](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_build_result_view.md)
+* [jenkins와 GitHub Webhook을 이용한 자동 빌드 환경 구축](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_github_hook_trigger_for_gitscm_polling.md)
 
 
