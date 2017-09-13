@@ -6,10 +6,12 @@ Github 저장소와 젠킨스 프로젝트를 연동을 통해 빌드 환경을 
 
 
 
+
 ### Github프로젝트 Jenkins 서비스 추가
 
 * Github프로젝트의 Settings로 진입하여 왼쪽 메뉴의 Integrations & services 탭으로 진입하고, Add service 버튼을 클릭하여 jenkins 키워드로 검색한다. Jenkins(Github plugin)를 선택한다.
 * Jenkins hook url을 추가하는 란에 "http://{본인의 ip}:8080/jenkins/github-webhook/" 을 입력하고, Active에 체크 한 후 서비스를 추가한다.
+
 
 
 
@@ -18,6 +20,7 @@ Github 저장소와 젠킨스 프로젝트를 연동을 통해 빌드 환경을 
 * 마찬가지로 Github프로젝트의 Setting에서 Webhooks 탭으로 진입한다. Add webhook 버튼을 누른다.
 
 * Payload URL에 "http://{본인의 ip}:8080/jenkins/github-webhook/" 입력하고, Content type을 선택한다. 아래의 Just the push event에 체크한 이유는 Github repo에 push 이벤트가 일어날 경우 이 웹훅을 유발시키기 위함이다. webhook을 추가한다.
+
 
 
 ### 젠킨스 프로젝트 구성의 Build Trigger 설정 
