@@ -1,5 +1,7 @@
 # Github Webhook을 이용한 자동 빌드 환경 구축
 
+> 먼저 젠킨스프로젝트와 Github저장소가 연동되어 있어야 됩니다. ([젠킨스와 Github 연동하기](https://github.com/namjunemy/TIL/blob/master/Tools/jenkins_gitscm_github.md))
+
 Github 저장소와 젠킨스 프로젝트를 연동을 통해 빌드 환경을 구성 한 후, Github Webhook을 이용하여 Github 저장소에 push된 것이 있다면 그 때 젠킨스가 polling하여 빌드를 실행하는 자동 빌드 환경을 구축한다.
 
 *[블로그 포스팅](http://ict-nroo.tistory.com/37)을 참고하여 화면 설명과 함께 환경을 구축하는 것을 추천합니다:)*
