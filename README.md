@@ -15,7 +15,12 @@
 
 
 ## 분류
+### Java
+
+* [DI(Dependency Injection)를 이용한 빈 의존성 관리](https://github.com/namjunemy/TIL/blob/master/Java/dependency_injection_for_bean_management.md)
+
 ### Git
+
 * [gitignore 파일 생성 및 사용자 규칙 정의](https://github.com/namjunemy/TIL/blob/master/Git/gitignore_file_create_and_customizing.md)
 
 ### Database
