@@ -264,6 +264,7 @@ thread.start()
 
 
 
+
 ## 5. 스레드 상태
 
 스레드 객체를 생성하고, start() 메소드를 호출하면 곧바로 스레드가 실행되는 것처럼 보이지만 사실은 실행대기 상태가 된다. 실행 대기 상태란 아직 스케줄링 되지 않으서 실행을 기다리고 있는 상태를 말한다. 실행 대기 상태에 있는 스레드 중에서 스레드 스케줄링으로 선택된 스레드가 비로소 CPU를 점유하고 run() 메소드를 실행한다. 이 상태를 '실행(Running) 상태'라고 한다. 실행 상태의 스레드는 run() 메소드를 모두 실행하기 전에 스레드 스케줄링에 의해 다시 실행 대기 상태로 돌아 갈 수 있다. 그리고 실행 대기 상태에 있는 다른 스레드가 선택되어 실행 상태가 된다. 이렇게 스레드는 실행 대기 상태와 실행 상태를 번갈아가면서 자신의 run() 메소드를 조금씩 실행한다. 실행 상태에서 run() 메소드가 종료되면, 더 이상 실행할 코드가 없기 때문에 스레드의 실행은 멈추게 된다. 이 상태를 '종료 상태' 라고 한다.
@@ -293,9 +294,330 @@ Thread.State state = targetThread.getState();
 
 
 
+## 6. 스레드 상태 제어
+
+사용자는 미디어 플레이어에서 동영상을 보다가 일시 정지시킬 수도 있고, 종료시킬 수도 있다. 일시 정지는 조금 후 다시 동영상을 보겠다는 의미이므로 미디어 플레이어는 동영상 스레드를 일시 정지 상태로 만들어야 한다. 그리고 종료는 더 이상 동영상을 보지 않겠다는 의미 이므로 미디어 플레이어는 스레드를 종료 상태로 만들어야 한다. 이와 같이 실행 중인 스레드의 상태를 변경하는 것을 스레드 상태 제어라고 한다.
+
+멀티 스레드 프로그램을 만들기 위해서는 정교한 스레드 상태 제어가 필요한데, 상태 제어가 잘못되면 프로그램은 불안정해지고 다운된다. 멀티 스레드 프로그래밍이 어려운 이유가 여기에 있다.스레드를 잘 사용하면 약이 되지만, 잘못 사용하면 치명적인 프로그램 버그가 되기 때문에 스레드를 정확하게 제어하는 방법을 잘 알고 있어야 한다.
+
+스레드 제어를 제대로 하기 위해서는 스레드의 상태 변화를 가져오는 메소드들을 파악하고 있어야 한다. 다음 그림은 상태 변화를 가져오는 메소드의 종류를 보여준다.
+
+![img_2](https://github.com/namjunemy/TIL/blob/master/Java/img/12_2.jpg?raw=true)
+
+처음에 스레드를 생성하게 되면 실행 대기 상태가 된다. 실행 대기 상태에서 CPU 스케줄러에 의해 선택이되면 실행이 된다. 실행 상태에서 시간 할당량이 다 되면 실행 대기 상태로 가는데, 시간 할당량이 끝나기 전에 **yield()** 메소드를 호출 하게 되면 실행 대기로 만들 수도 있다. 
+
+스레드가 실행중일 때,
+
+* sleep() 메소드를 호출하게 되면 주어진 시간동안 일시 정지 상태가 되고, 시간이 지나면 실행 대기가 된다.
+* join() 메소드를 호출하게 되면, join() 메소드를 호출 한 스레드가 종료 될 때 까지 일시 정지 되었다가 실행 대기 상태로 이동한다.
+* wait() 메소드를 호출하게 되면 역시 일시 정지 상태가 된다. 하지만 wait() 메소드로 일시 정지 상태에 들어간 스레드는 자기 혼자서 실행 대기 상태로 갈 수 없다. 따라서, 다른 스레드가 notify(), notifyAll()을 실행해야 실행 대기로 갈 수 있다.
+
+일시 정지 상태에 있는 스레드에서
+
+* interrupt() 메소드가 호출 되면, Exception이 발생함과 동시에 일시 정지 상태에서 풀리면서 실행 대기 상태로 갈 수 있다.
+
+실행 중인 스레드에서
+
+* stop() 메소드를 호출하면 스레드를 종료시킬 수 있다. 하지만, Deprecated 되었다. 이유는 [블로그 포스팅](http://ict-nroo.tistory.com/22)을 참고하자.
 
 
 
+### sleep() - 주어진 시간 동안 일시정지
+
+~~~java
+try {
+  Thread.sleep(1000);
+} catch(InterruptedException e) {
+  //interrupt() 메소드가 호출되면 실행
+}
+~~~
+
+* 얼마 동안 일시 정지 상태로 있을 것인지, 밀리세컨드(1/1000) 단위로 지정
+* 일시 정지 상태에서 interrupt() 메소드가 호출되면 InterruptedException이 발생함. 따라서 try-catch로 묶여 있어야 함.
+
+
+
+### yield() - 다른 스레드에게 실행 양보
+
+실행 대기 상태에 있는 스레드A과 스레드B가 있다고 가정하자. 스레드A이 실행 중일 때, yeild() 메소드를 호출하면, 스레드A는 실행 대기 상태가 되고 동일 또는 높은 우선 순위를 가진 스레드B에게 실행을 양보한다.
+
+~~~java
+##YieldExample.java
+
+public class YieldExample {
+  public static void main(String[] args) {
+    ThreadA threadA = new ThreadA();
+    ThreadB threadB = new ThreadB();
+
+    threadA.start();
+    threadB.start();
+
+    try {
+      Thread.sleep(3000);
+    } catch (Exception e) {
+    }
+    threadA.work = false;
+
+    try {
+      Thread.sleep(3000);
+    } catch (Exception e) {
+    }
+    threadA.work = true;
+
+    try {
+      Thread.sleep(3000);
+    } catch (Exception e) {
+    }
+    threadA.stop = true;
+    threadB.stop = true;
+
+  }
+}
+
+##ThreadA.java
+public class ThreadA extends Thread {
+  public boolean stop = false;
+  public boolean work = true;
+
+  public void run() {
+    while(!stop) {
+      if(work) {
+        System.out.println("Thread A 작업중");
+      } else {
+        Thread.yield();
+      }
+    }
+    System.out.println("Thread A 종료");
+  }
+}
+
+##ThreadB.java
+public class ThreadB extends Thread {
+  public boolean stop = false;
+  public boolean work = true;
+
+  public void run() {
+    while(!stop) {
+      if(work) {
+        System.out.println("Thread B 작업중");
+      } else {
+        Thread.yield();
+      }
+    }
+    System.out.println("Thread B 종료");
+  }
+}
+
+~~~
+
+
+
+### join() - 다른 스레드의 종료를 기다림
+
+ThreadA와 ThreadB가 있다고 가정하자.
+
+**ThreadA**
+
+~~~java
+threadB.start();
+threadB.join();
+~~~
+
+**ThreadB**
+
+~~~java
+run() {
+    
+}
+~~~
+
+ThreadA에서 threadB의 start()를 호출하고, threadB.join() 메소드를 호출하면 ThreadA는 threadB의 run() 메소드의 실행이 종료 될 때 까지 일시 정지 상태가 된다. ThreadB의 run() 메소드가 종료되면 비로소 ThreadA는 다음 코드를 실행하게 된다. 헷갈리지 말자 ThreadA가 일시 정지 상태가 된다! join() 을 호출하는 쪽에서 조인하길 기다리는 것이다!
+
+보통 ThreadB의 연산 결과가 필요한 ThreadA 스레드에서 많이 사용 한다.
+
+
+
+### 스레드 간 협업 - wait(), notify(), notifyAll()
+
+이 메소드들은 스레드가 가지고 있는 메소드가 아니다. sleep(), yield(), join()은 스레드가 가지고 있는 메소드이지만, 위의 메소드들은 Object가 가지고 있는 메소드이다. 이 말은, 모든 객체가 가지고 있는 메소드라는 이야기다.
+
+* **동기화 메소드 또는 동기화 블록에서만 호출 가능한 Object 메소드이다.**
+
+* 두 개의 스레드가 교대로 번갈아 가며 실행해야 할 경우에 주로 사용한다.(공유 객체 - ex)생산자 소비자 스레드)
+
+  * 생산자 스레드가 공유 객체에 데이터를 저장하고, 소비자 스레드에서 데이터를 읽는 작업을 수행할 때를 생각해보자. 생산자 스레드에서 공유객체에 저장한 데이터를 소비자 스레드에서 두번 중복해서 처리하면 비 효율적인 처리 작업이 된다. 따라서 생산자 스레드에서 data필드에 값을 넣고 notify()를 호출해서 소비자 스레드가 data를 읽게 하고, data를 읽은 소비자 스레드는 다시 공유 객체를 비우고 notify()를 호출해서 생산자 스레드가 data필드에 값을 넣을 수 있도록 해준다. 코드로 보는 것이 이해가 빠르겠다.. **다시 한번 강조하지만 wait(), notify(), notifyAll()은 동기화 메소드 또는 동기화 블록에서만 호출 가능한 Object 메소드이다.**
+
+    ~~~java
+    ## DataBox.java
+
+    public class DataBox {
+      private String data;
+
+      public synchronized String getData() {
+        if (this.data == null) {
+          try {
+            wait();
+          } catch (InterruptedException e) {
+          }
+        }
+        String returnValue = data;
+        System.out.println("ConsummerThread가 읽은 데이터 : " + returnValue);
+        data = null;
+        notify();
+        return returnValue;
+      }
+
+      public synchronized void setData(String data) {
+        if (this.data != null) {
+          try {
+            wait();
+          } catch (InterruptedException e) {
+
+          }
+        }
+        this.data = data;
+        System.out.println("ProducerThread가 생성한 데이터 : " + data);
+        notify();
+      }
+    }
+    ~~~
+
+    ~~~java
+    ##ConsumerThread.java
+
+    public class ConsumerThread extends Thread {
+      private DataBox dataBox;
+
+      public ConsumerThread(DataBox dataBox) {
+        this.dataBox = dataBox;
+      }
+
+      @Override
+      public void run() {
+        for (int i = 1; i <= 3; i++) {
+          String data = dataBox.getData();
+        }
+      }
+    }
+    ~~~
+
+    ~~~java
+    ##ProducerThread.java
+
+    public class ProducerThread extends Thread {
+      private DataBox dataBox;
+
+      public ProducerThread(DataBox dataBox) {
+        this.dataBox = dataBox;
+      }
+
+      @Override
+      public void run() {
+        for (int i = 1; i <= 3; i++) {
+          String data = "Data=" + i;
+          dataBox.setData(data);
+        }
+      }
+    }
+    ~~~
+
+
+* wait()
+  * 호출한 스레드는 일시 정지 상태가 되어서, waiting pool에서 관리가 된다.
+  * wait()로 일시정지 상태가 된 스레드는 절대 자기 혼자서 실행 대기 상태로 갈 수 없다.
+  * 실행 상태에 있는 다른 스레드가, notify() 또는 notifyAll() 메소드를 호출 해줘야 실행 대기 상태로 갈 수 있다.
+* wait(long timeout), wait(long timeout, int nanos)
+  * wait() 메소드가 오버로딩 된 메소드로 timeout 만큼의 시간이 지난 후 실행 대기 상태로 갈 수 있고,
+  * 이 메소드들 역시 notify() 또는 notifyAll() 메소드를 호출 해주면 실행 대기 상태로 갈 수 있다.
+
+
+
+### 스레드의 안전한 종료 - stop 플래그, interrupt()
+
+해당 내용은 [블로그 포스팅](http://ict-nroo.tistory.com/22)을 참고하자.
+
+
+
+## 7. 데몬 스레드
+
+* 주 스레드의 작업을 돕는 보조적인 역할을 수행하는 스레드
+
+* 주 스레드가 종료되면 데몬 스레드는 강제적으로 자동 종료
+
+  * 워드 프로세서의 자동저장, 미디어플레이어의 동영상 및 음악 재생, 가비지 컬렉터 등
+
+* 데몬 스레드 설정
+
+  * 주 스레드가 데몬이 될 스레드의 setDaemon(true)를 호출
+
+    ~~~java
+    public static void main(String[] args) {
+      AutoSaveThread thread = new AutoSaveThread();
+      thread.setDaemon(true);
+      thread.start();
+      
+      ...
+    }
+    ~~~
+
+  * 반드시 start() 메소드 호출 전에 setDaemon(true)를 호출해야 한다.
+
+    * 그렇지 않으면 IllegalThreadStateException이 발생한다.
+
+* 데몬 레드 확인 방법
+
+  * isDamon() 메소드의 리턴값을 조사(true면 데몬스레드, false면 주 스레드)
+
+
+
+## 8. 스레드 그룹
+
+스레드 그룹은 관련된 스레드를 묶어서 관리할 목적으로 이용된다. JVM이 실행되면 system 스레드 그룹을 만들고, JVM 운영에 필요한 스레드들을 생성해서 system 스레드 그룹에 포함시킨다. 그리고 system의 하위 스레드 그룹으로 main을 만들고 메인 스레드를 main 스레드 그룹에 포함시킨다. 스레드는 반드시 하나의 스레드 그룹에 포함되는데, 명시적으로 스레드 그룹에 포함시키지 않으면 기본적으로 자신을 생성한 스레드와 같은 스레드 그룹에 속하게 된다. 우리가 생성하는 작업 스레드는 대부분 main스레드가 생성하므로 기본적으로 main 스레드 그룹에 속하게 된다. 
+
+
+
+### 스레드 그룹 이름 얻기
+
+~~~java
+ThreadGroup group = Thread.currentThread.getThreadGroup();
+
+String groupName = group.getName();
+~~~
+
+
+
+### 스레드 그룹 생성
+
+~~~java
+ThreadGroup tg = new ThreadGroup(String name);
+ThreadGroup tg = new ThreadGroup(ThreadGroup parent, String name);
+~~~
+
+* 부모 그룹을 지정하지 않으면 현재 스레드가 속한 그룹의 하위 그룹으로 생성
+
+* 스레드를 그룹에 명시적으로 포함시키는 방법
+
+  ~~~java
+  //Runnable 구현상속
+  Threat t = new Thread(ThreadGroup group, Runnable target);
+  Threat t = new Thread(ThreadGroup group, Runnable target, String name);
+  Threat t = new Thread(ThreadGroup group, Runnable target, String name, long stackSize);
+
+  //Thread 상속
+  Threat t = new Thread(ThreadGroup group, Stringtarget);
+  ~~~
+
+
+
+### 스레드 그룹의 일괄 interrupt()
+
+스레드를 스레드 그룹에 포함시키면 어떤 이점이 있을까?
+
+스레드 그룹에서 제공하는 interrupt() 메소드를 이용하면 그룹 내에 포함된 모든 스레드들을 일괄 interrupt할 수 있다. 예를 들어 10개의 스레드들을 모두 종료시키기 위해 각 스레드에서 interrupt() 메소드를 10번 호출할 수도 있지만, 이 스레드들이 같은 스레드 그룹에 소속되어 있을 경우, 스레드 그룹의 interrupt() 메소드를 한번만 호출해주면 된다. 이것이 가능한 이유는 스레드 그룹의 interrupt() 메소드는 포함된 모든 스레드의 interrupt() 메소드를 내부적으로 호출해주기 때문이다.
+
+중요한 것은, 스레드 그룹의 interrupt() 메소드는 소속된 스레드의 interrupt() 메소드를 호출만 할 뿐 개별 스레드에서 발생하는 InterruptedException에 대한 예외 처리를 하지 않는다. 따라서 안전한 종료를 위해서는 개별 스레드가 예외 처리를 해야 한다.
+
+소스코드는 this_is_java repo의 [ch12_멀티스레드/src/thread_group/interrupt](https://github.com/namjunemy/this_is_java/tree/master/ch12_%EB%A9%80%ED%8B%B0%EC%8A%A4%EB%A0%88%EB%93%9C/src/thread_group/interrupt)를 참조하자.
 
 
 
