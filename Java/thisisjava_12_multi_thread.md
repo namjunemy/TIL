@@ -2,6 +2,8 @@
 
 > '이것이 자바다' 12장 학습
 >
+> [소스코드 repo](https://github.com/namjunemy/this_is_java)
+>
 > 1절. 멀티 스레드 개념
 >
 > 2절. 작업 스레드 생성과 실행
