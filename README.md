@@ -30,6 +30,11 @@
 * [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
 
 
+### AWS
+
+* [EC2 인스턴스 생성하기](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_create_instance.md)
+* [EC2 ssh 원격 접속과 scp를 통한 파일 업로드](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
+
 ### Tools
 
 * [gradle 설치 및 프로젝트 생성](https://github.com/namjunemy/TIL/blob/master/Tools/gradle_project_create_windows10_eclipse.md)
