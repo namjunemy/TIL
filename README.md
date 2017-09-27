@@ -35,6 +35,10 @@
 * [EC2 인스턴스 생성하기](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_create_instance.md)
 * [EC2 ssh 원격 접속과 scp를 통한 파일 업로드](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
 
+### Python
+
+* [Python Jupyter Notebook on AWS EC2(ubuntu)](https://github.com/namjunemy/TIL/blob/master/Python/python_jupyter_notebook_on_aws_ec2.md)
+
 ### Tools
 
 * [gradle 설치 및 프로젝트 생성](https://github.com/namjunemy/TIL/blob/master/Tools/gradle_project_create_windows10_eclipse.md)
