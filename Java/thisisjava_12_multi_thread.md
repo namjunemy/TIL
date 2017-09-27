@@ -780,3 +780,76 @@ ThreadGroup tg = new ThreadGroup(ThreadGroup parent, String name);
     * 스레드가 종료되고 해당 스레드는 제거된다. 따라서 스레드 풀은 다른 작업 처리를 위해 새로운 스레드를 생성한다.
   * submit()
     * 스레드가 종료되지 않고 다음 작업을 위해 재사용 된다.(스레드는 재사용하는 것이 좋다. 스레드를 다시 생성하게 되면 CPU가 비효율적인 작업을 하게 된다.)
+
+
+
+### 블로킹 방식의 작업 완료 통보 받기
+
+블로킹 방식이라는 것은 무언가를 요청하고 나서, 그 요청에 대한 결과 값이 오기를 기다리는 방식이다.
+
+- ```Future<?> submit(Runnable task)```
+- ```Future<V> submit(Runnable task, V result)```
+- ```Future<V> submit(Callable<V> task)```
+  - Runnable 또는 Callable을 작업 큐에 저장
+  - 리턴 된 Future를 통해 작업 처리 결과 얻을 수 있음
+
+* Future
+
+  * 작업 결과가 아니라 지연 완료(pending completion) 객체이다.
+
+  * 작업이 완료될 때까지 기다렸다가 최종 결과를 얻기 위해서 get() 메소드를 사용한다.
+
+  * Future의 메소드 get
+
+    * ```V get()```
+      * 작업이 완료될 때까지 블로킹 되었다가 처리 결과 V를 리턴
+    * ```V get(long timeout, TimeUnit unit)``` 
+      * Timeout 시간동안 작업이 완료되면 결과 V를 리턴하지만, 작업이 완료되지 않으면 TimeoutException을 발생시킨다.
+
+    | 메소드                                   | 작업 처리 완료 후 리턴 타입             | 작업 처리 중 예외 발생         |
+    | ------------------------------------- | ---------------------------- | --------------------- |
+    | submit(Runnable task)                 | future.get() -> null         | future.get() -> 예외 발생 |
+    | submit(Runnable task, Integer result) | future.get() -> Integer 타입 값 | future.get() -> 예외 발생 |
+    | submit(Callable\<String > task)       | future.get() -> String 타입 값  | future.get() -> 예외 발생 |
+
+  * Future의 get()은 UI 스레드에 호출하면 안된다.
+
+    * UI를 변경하고 이벤트를 처리하는 스레드가 get() 메소드를 호출하면 작업을 완료하기 전까지는 UI를 변경할 수도 없고 이벤트도 처리할 수 없게 된다.
+    * 이것을 해결하려면,
+      * 새로운 스레드를 생성해서 호출하거나
+      * 스레드풀의 스레드가 호출하도록 해야한다.
+
+  * 다른 메소드
+
+    | 리턴타입    | 메소드명(매개변수)                            | 설명                   |
+    | ------- | ------------------------------------- | -------------------- |
+    | boolean | cancel(boolean mayInterruptIfRunning) | 작업 처리가 진행중일 경우 취소 시킴 |
+    | boolean | isCancelled()                         | 작업이 취소되었는지 여부        |
+    | boolean | isDone()                              | 작업 처리가 완료 되었는지 여부    |
+
+
+
+### 리턴값이 없는 작업 완료 통보
+
+```java
+Runnable task = new Runnable() {
+  @Override
+  public void run() {
+    //스레드가 처리할 작업 내용
+  }
+};
+
+Future future = executorService.submit(task);
+```
+
+```java
+try {
+  future.get();	//스레드가 작업을 완료할 때 까지 기다린다. 블로킹 된다. 스레드의 작업이 완료되면 블로킹 해제 된다.
+} catch (InterruptException e) {
+  //작업 처리 도중 스레드가 interrupt 될 경우 실행할 코드
+} catch (ExecutionExceprion e) {
+  //작업 처리 도중 예외가 발생된 경우 실행할 코드
+}
+```
+
+### 
