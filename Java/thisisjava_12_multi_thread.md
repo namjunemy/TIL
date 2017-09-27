@@ -572,6 +572,8 @@ ThreadA에서 threadB의 start()를 호출하고, threadB.join() 메소드를 �
 
 
 
+
+
 ## 8. 스레드 그룹
 
 스레드 그룹은 관련된 스레드를 묶어서 관리할 목적으로 이용된다. JVM이 실행되면 system 스레드 그룹을 만들고, JVM 운영에 필요한 스레드들을 생성해서 system 스레드 그룹에 포함시킨다. 그리고 system의 하위 스레드 그룹으로 main을 만들고 메인 스레드를 main 스레드 그룹에 포함시킨다. 스레드는 반드시 하나의 스레드 그룹에 포함되는데, 명시적으로 스레드 그룹에 포함시키지 않으면 기본적으로 자신을 생성한 스레드와 같은 스레드 그룹에 속하게 된다. 우리가 생성하는 작업 스레드는 대부분 main스레드가 생성하므로 기본적으로 main 스레드 그룹에 속하게 된다. 
@@ -623,3 +625,158 @@ ThreadGroup tg = new ThreadGroup(ThreadGroup parent, String name);
 
 
 
+## 9. 스레드 풀(ExecutorService)
+
+### 스레드 폭증
+
+* 병렬 작업 처리가 많아지면 스레드의 개수가 증가한다.
+* 스레드 생성과 스케쥴링으로 인해 CPU가 바빠지고, 메모리 사용량이 늘어난다.
+* 따라서 애플리케이션의 성능이 급격히 저하된다.
+
+
+
+### 스레드 풀(Thread Pool)
+
+* 작업 처리에 사용되는 스레드를 제한된 개수만큼 미리 생성
+* 작업 큐(Queue)에 들어오는 작업들을 하나씩 스레드가 맡아 처리한다.
+* 작업 처리가 끝난 스레드는 작업 결과를 애플리케이션으로 전달한다.
+* 스레드는 다시 작업큐에서 새로운 작업을 가져와 처리
+
+
+
+### ExecutorService 인터페이스와 Executors 클래스
+
+* 스레드풀을 생성하고 사용할 수 있도록 java.util.concurrent 패키지에서 제공
+* Executors의 정적 메소드를 이용해서 ExecutorService 구현 객체 생성
+* 스레드 풀 = ExecutorService 객체
+
+
+
+### 스레드풀 생성
+
+* 다음 두가지 메소드 중 하나로 간편 생성하는 방법
+
+  * ```newCachedThreadPool()```
+
+    * 초기 스레드 수 :  0 / 코어 스레드 수 : 0 / 최대 스레드 수 : Integer.MAX_VALUE
+
+    * Int 값이 가질 수 있는 최대 값 만큼 스레드가 추가되나, 운영체제의 상황에 따라 달라진다.
+
+    * 1개 이상의 스레드가 추가되었을 경우, 60초 동안 추가된 스레드가 아무 작업을 하지 않으면
+
+    * 추가된 스레드를 종료하고 풀에서 제거한다.
+
+      ```java
+      ExecutorService executorService = Executors.newCachedThreadPool();
+      ```
+
+  * ```newFixedThreadPool(int nThreads)```
+
+    * 초기 스레드 수 :  0 / 코어 스레드 수 : nThreads / 최대 스레드 수 : nThreads
+
+    * 코어 스레드 개수와 최대 스레드 개수가 매개값으로 준 nThread이다.
+
+    * 스레드가 작업을 처리하지 않고 놀고 있더라고 스레드 개수가 줄 지 않는다.
+
+    * 꼭 코어의 수만큼 생성할 필요 없다.
+
+      ```java
+      ExecutorService executorService = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors();	//가능한 코어의 수
+      )
+      ```
+
+* ThreadPoolExecutor을 이용한 직접 생성
+
+  * newCachedThreadPool()과 newFixedThreadPool(int nThreads)가 내부적으로 생엉
+
+  * 스레드의 수를 자동으로 관리하고 싶을 경우 직접 생성해서 사용한다.
+
+  * Ex)
+
+    * 코어 스레드 개수가 3, 최대 스레드 개수가 100인 스레드 풀을 생성
+    * 3개를 제외한 나머지 추가된 스레드가 120초 동안 놀고 있을 경우
+    * 해당 스레드를 제거해서 스레드 수를 관리
+
+    ```java
+    ExecutorService threadPool = new ThreadPoolExecutor(
+      3,  //코어 스레드 개수
+      100,  //최대 스레드 개수
+      120L,	//놀고 있는 시간
+      TimeUnit.SECONDS,	//놀고 있는 시간 단위
+      new SynchronousQueue<Runnable>()	//작업큐 객체
+    )
+    ```
+
+
+
+### 스레드풀 종료
+
+* 스레드풀의 스레드는 기본적으로 데몬 스레드가 아니다.
+  * Main 스레드가 종료되더라도 스레드풀의 스레드는 작업을 처리하기 위해 계속 실행되므로 애플리케이션은 종료되지 않는다.
+  * 따라서 스레드풀을 종료해서 모든 스레드를 종료시켜야 한다.
+* 스레드풀 종료 메소드
+  * ```void shutdown()```
+    * 현재 처리 중인 작업뿐만 아니라 작업큐에 대기하고 있는 모든 작업을 처리한 뒤에 스레드풀을 종료시킨다.
+  * ```List<Runnable> shutdownNow()```
+    * 현재 작업 처리중인 스레드를 interrupt 해서 작업 중지를 시도하고 스레드풀을 종료시킨다. 리턴값 List\<Runnable\>는 작업큐에 있는 미처리된 작업(Runnable 객체)의 목록이다.
+  * ```boolean awaitTermination(long timeout, TimeUnit unit)``` 
+    * shutdown() 메소드 호출 이후, 모든 작업 처리를 timeout 시간 내에 완료하면 true를 리턴하고, 완료하지 못하면 작업 처리 중인 스레드를 interrupt 하고 false를 리턴한다.
+
+
+
+### 작업 생성
+
+* 하나의 작업은 Runnable 또는 Callable 객체로 표현한다.
+
+* Runnable과 Callable의 차이점
+
+  * 작업 처리 완료 후 리턴값이 있느냐 없느냐이다.
+
+  * Runnable 구현 클래스
+
+    ```java
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        //스레드가 처리할 작업 내용
+      }
+    }
+    ```
+
+  * Callable 구현 클래스
+
+    ```java
+    Callable<T> task = new Callable<T> {
+      @Override
+      public T call() throws Exception {
+        //스레드가 처리할 작업 내용
+        return T;
+      }
+    }
+    ```
+
+* 스레드풀에서의 작업 처리는
+
+  * 작업 큐에서 Runnable 또는 Callable 객체를 가져와
+  * 스레드로 하여금 run()과 call메소드를 실행토록 하는 것이다.
+
+
+
+### 작업 처리 요청
+
+* ExecutorService의 작업 큐에 Runnable 또는 Callable 객체를 넣는 행위를 말한다.
+* 작업 처리 요청을 위해 ExecutorService는 다음 두 가지 종류의 메소드를 제공한다.
+  * ```void execute(Runnable command)```
+    * Runnable을 작업 큐에 저장
+    * 작업 처리 결과를 받지 못함
+  * ```Future<?> submit(Runnable task)```
+  * ```Future<V> submit(Runnable task, V result)```
+  * ```Future<V> submit(Callable<V> task)```
+    * Runnable 또는 Callable을 작업 큐에 저장
+    * 리턴 된 Future를 통해 작업 처리 결과 얻을 수 있음
+* 작업 처리 도중 예외가 발생할 경우
+  * execute()
+    * 스레드가 종료되고 해당 스레드는 제거된다. 따라서 스레드 풀은 다른 작업 처리를 위해 새로운 스레드를 생성한다.
+  * submit()
+    * 스레드가 종료되지 않고 다음 작업을 위해 재사용 된다.(스레드는 재사용하는 것이 좋다. 스레드를 다시 생성하게 되면 CPU가 비효율적인 작업을 하게 된다.)
