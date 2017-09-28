@@ -852,4 +852,255 @@ try {
 }
 ```
 
-### 
+​    
+
+### 리턴값이 있는 작업 완료 통보
+
+```java
+Callable<T> task = new Callable<T>() {
+  @Override
+  public T call() throws Exception {
+    //스레드가 처리할 작업 내용
+    return T;
+  }
+};
+
+Future<T> future = executorService.submit(task);
+```
+
+```java
+tyt {
+  T result = future.get();  //블로킹 후 작업 완료 시 리턴 값 저장.
+} catch (InterruptException e) {
+  //작업 처리 도중 스레드가 interrupt 될 경우 실행할 코드
+} catch (ExecutionExceprion e) {
+  //작업 처리 도중 예외가 발생된 경우 실행할 코드
+}
+```
+
+  
+
+### 작업 처리 결과를 외부 객체에 저장
+
+스레드가 작업 처리를 완료하고 외부 Result 객체에 작업 결과를 저장하면, 애플리케이션이 Result 객체를 사용해서 어떤 작업을 진행할 수 있을 것이다. 대게 Result 객체는 공유 객체가 되어, 두 개 이상의 스레드 작업을 취합할 목적으로 이용된다. 
+
+```java
+Result result = ...;
+Runnable task = new Task(result);
+
+Future<Result> future = executorService.submit(task, result);
+result = future.get();
+```
+
+```java
+class Task implements Runnable {
+  Result result;
+  
+  Task(Result result) {
+    this.result = result;
+  }
+  
+  @Override
+  public void run() {
+    //작업 코드
+    //처리 결과를 result에 저장
+  }
+}
+```
+
+아래의 예제를 통해서 1부터 10까지 합을 계산하는 두 개의 작업을 스레드 풀에 처리 요청하고, 각각의 스레드가 Result 객체에 결과를 누적하는 결과를 확인할 수 있다. 아래의 코드에서 future1.get() 메소드의 리턴값을 받아 오는 코드를 생략한다면, 블로킹되지 않으므로 결과값은 55 또는 110이 혼재되서 나올 것이다. 작업 완료 후의 값을 가지고 처리하는 작업이라면 get() 메소드를 통해서 꼭 블로킹을 해줘야 한다.
+
+**ResultByRunnableEx.java**
+
+```java
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class ResultByRunnableEx {
+  public static void main(String[] args) {
+    ExecutorService executorService = Executors.newFixedThreadPool(
+        Runtime.getRuntime().availableProcessors()
+    );
+
+    System.out.println("[작업 처리 요청]");
+    class Task implements Runnable {
+      private Result result;
+
+      Task(Result result) {
+        this.result = result;
+      }
+
+      @Override
+      public void run() {
+        for (int i = 1; i <= 10; i++) {
+          result.addValue(i);
+        }
+      }
+    }
+
+    Result result = new Result();
+    Runnable task1 = new Task(result);
+    Runnable task2 = new Task(result);
+
+    Future<Result> future1 = executorService.submit(task1, result);
+    Future<Result> future2 = executorService.submit(task2, result);
+
+    try {
+      result = future1.get();
+      result = future2.get();
+      System.out.println("[처리 결과] " + result.getAccumValue());
+      System.out.println("[작업 처리 완료]");
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println("[실행 예외 발생] " + e.getMessage());
+    }
+  }
+}
+
+class Result {
+  private int accumValue = 0;
+
+  synchronized void addValue(int value) {
+    accumValue += value;
+  }
+
+  public int getAccumValue() {
+    return accumValue;
+  }
+}
+```
+
+```java
+[작업 처리 요청]
+[처리 결과] 110
+[작업 처리 완료]
+```
+
+  
+
+### 작업 완료순으로 통보 받기
+
+* 작업 요청 순서대로 작업 처리가 완료되는 것은 아니다.
+  * 작업의 양과 스레드 스케쥴링에 따라서 먼저 요청한 작업이 나중에 완료되는 경우도 발생한다.
+  * 여러 개의 작업들이 순차적으로 처리될 필요성이 없고, 처리결과도 순차적으로 이용할 필요가 없다면,
+    * 작업 처리가 완료된 것부터 결과를 얻어 이용하는 것이 좋다.
+* 스레드풀에서 작업 처리가 완료된 것만 통보 받는 방법
+  * **CompletionService**는 처리 완료된 작업을 가져오는 poll()과 take() 메소드를 제공한다.
+
+| 리턴타입      | 메소드명(매개변수)                        | 설명                                       |
+| --------- | --------------------------------- | ---------------------------------------- |
+| Future<V> | poll()                            | 완료된 작업의 Future를 가져옴. 완료된 작업이 없다면 즉시 null을 리턴 |
+| Future<V> | poll(long timeout, TimeUnit unit) | 완료된 작업의 Future를 가져옴. 완료된 작업이 없다면 timeout까지 블로킹됨 |
+| Future<V> | take()                            | 완료된 작업의 Future를 가져옴. 완료된 작업이 없다면 있을 때까지 블로킹됨 |
+| Future<V> | submit(Callable<V> task)          | 스레드풀에 Callable 작업 처리 요청                  |
+| Future<V> | submit(Runnable task, V result)   | 스레드풀에 Runnable 작업 처리 요청                  |
+
+* CompletionService 객체 얻기
+
+  ```java
+  ExecutorService executorService = 
+    Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+  CompletionService<V> completionService = 
+    new ExecutorCompletionService<V>(executorService);
+  ```
+
+* 작업 처리 요청 방법
+
+  * poll()과 take() 메소드를 이용해서 처리 완료된 작업의 Future를 얻으려면 **CompletionService의 submit() 메소드로 작업 처리 요청을 해야 한다.**
+
+    ```Java
+    completionService.submit(Callable<V> task);
+    completionService.submit(Runnable<V> task, V result);
+    ```
+
+* 완료된 작업 통보 받기
+
+  * take() 메소드를 반복 실행해서 완료된 작업을 계속 통보 받을 수 있도록 한다.
+
+  * 다음은 take() 메소드를 호출하여 완료된 Callable 작업이 있을 때까지 블로킹되었다가 완료된 작업의 Future를 얻고, get() 메소드로 결과값을 얻어내는 코드이다.
+
+  * 아래에서 completionService.take()를 호출하는데 별도도 스레드풀의 스레드에서 호출 한 것은 while문이 애플리케이션이 종료될 때까지 반복 실행해야 하기 때문이다.
+
+  * take() 메소드가 리턴하는 완료된 작업은 submit()으로 처리 요청한 작업의 순서가 아님을 명심해야 한다. 작업의 내용에 따라서 먼저 요청한 작업이 나중에 완료될 수도 있기 때문이다.
+
+    ```java
+    executorService.submit(new Runnable() {
+      @Override
+      public void run() {
+        while(true) {
+          try {
+            Future<Integer> future = completionService.take();
+            int value = future.get();
+            System.out.println("[처리 결과]" + value);
+          } catch (Exception e) {
+            break;
+          }
+        }
+      }
+    });
+    ```
+
+  
+
+### 콜백 방식의 작업 완료 통보
+
+* 콜백이란
+
+  * 애플리케이션의 스레드에게 작업 처리 요청한 후 다른 기능을 수행할 동안 스레드가 작업을 완료하면 애플리케이션의 메소드를 자동 실행하는 기법을 말한다. 이 때, 자동 실행되는 메소드를 콜백 메소드라고 한다.
+  * 블로킹 방식은 작업 처리를 요청한 후 완료될 떄까지 블로킹되지만,
+  * 콜백 방식은 작업 처리를 요청한 후 결과를 기다릴 필요 없이 다른 기능을 수행할 수 있다.
+  * 그 이유는 작업 처리가 완료되면 자동적으로 콜백 메소드가 실행되어 결과를 알 수 있기 때문이다.
+
+* 콜백 객체와 콜백 하기
+
+  * 콜백 객체 : 콜백 메소드를 가지고 있는 객체
+
+    * Java.nio.channels.CompletionHandler 인터페이스를 활용해서 만들 수도 있다.
+
+    ```java
+    CompletionHandler<V, A> callback = new CompletionHanbler<V, A> {
+      @Override
+      public void complited(V result, A attachment) {
+          
+      }
+      
+      @Override
+      public void failed(Throwable exc, A attachment) {
+         
+      }
+    };
+    ```
+
+  * 콜백 하기 : 스레드에서 콜백 객체의 메소드 호출
+
+    * 메소드의 실행은 메인 스레드가 아닌 스레드풀의 스레드에서 호출해야 한다.
+
+    ```java
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          //작업 처리
+          V result = ...;
+          callback.completed(result, null);
+        } catch(Exception e) {
+          callback.failed(e, null);
+        }
+      }
+    };
+    ```
+
+* [콜백 방식의 작업 완료 통보 실습 예제 소스코드 링크](https://github.com/namjunemy/this_is_java/blob/master/ch12_%EB%A9%80%ED%8B%B0%EC%8A%A4%EB%A0%88%EB%93%9C/src/callback/CallbackEx.java)
+
+
+
+
+
+
+
+
+
+
+
