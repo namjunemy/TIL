@@ -177,8 +177,6 @@ python 개발에 많이 사용되는 IDE로
     c.NotebookApp.port = 8888
     ```
 
-    ​
-
 ## Jupyter Notebook 접속
 
 위의 config파일 수정으로 Jupyter Notebook의 설치와 설정은 끝났다. 작업디렉토리를 만들고 접속한다.
