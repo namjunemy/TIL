@@ -160,6 +160,7 @@ python 개발에 많이 사용되는 IDE로
     ```
 
 
+    ```shell
     # Notebook config
     c.NotebookApp.certfile = u'/home/ubuntu/certs/mycert.pem' 
      
@@ -174,8 +175,9 @@ python 개발에 많이 사용되는 IDE로
      
     # This is the port we opened in Step 3.
     c.NotebookApp.port = 8888
-    
+    ```
 
+    ​
 
 ## Jupyter Notebook 접속
 
