@@ -91,12 +91,12 @@ flask/ 내에 모든 파일을 포함하고 있는 testapp/ 디렉토리를 만�
 </html>
 ```
 
-단순히 일반적인 HTML 파일처럼 보이지만 {% block content %}, {% endblock %}은 생소하다. home.html을 통해 이것들의 기능에 대해 알아본다.
+단순히 일반적인 HTML 파일처럼 보이지만 {% block content %}, {% endblock %}은 생소하다. **home.html**을 통해 이것들의 기능에 대해 알아본다.
 
 #### app/templates/home.html
 
 ```html
-{% extends "layout.html"}
+{% extends "layout.html"%}
 {% block content %}
   <div class="jumbo">
     <h2>Welcome to the Flask app</h2>
@@ -104,4 +104,41 @@ flask/ 내에 모든 파일을 포함하고 있는 testapp/ 디렉토리를 만�
   </div>
 {% endblock %}
 ```
+
+**layout.html**에는 ```content``` 라는 자식 템플릿이 들어가는 블럭이 정의되어 있다. **home.html** 파일은 **layout.html** 의 자식 템플릿으로 여러가지 특징을 상속받습니다. 즉, **layout.html** 은 사이트의 공통 요소를 정의하고 각각의 자식 템플릿은 내용에 맞게 부모 템플릿으로 받은 요소들을 수정해서 사용해야 한다.
+
+이제 브라우저에서 home.html을 볼 수 있도록 URL을 맵핑한다. routes.py를 생성하고 아래와 같이 입력한다.
+
+#### app/routes.py
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+  return render_template('home.html')
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=5000, debug=True)
+```
+
+위의 코드에 대한 설명은 아래와 같다.
+
+1. 플라스크 클래스와 함수 render_template를 import한다.
+2. 플라스크 클래스에 새로운 인스턴스를 만든다.
+3. URL ```/```에 함수 home()을 매핑한다. 그러면 URL로 들어왔을때 home()이 실행된다.
+4. 함수 home()은 플라스크 함수 render_template()를 사용 하여 template/ 디렉토리에서 home.html을 렌더링하여 브라우저로 보낸다.
+5. 마지막으로 run()을 통해 서버에 앱을 실행한다. debug 모드를 true로 설정했기 때문에 오류 메세지를 볼 수 있다. 그리고 코드가 변경되면 서버는 자동으로 다시 로드한다.
+6. 추가적으로 app.run()의 host 옵션을 주지 않으면 default는 local서버에 앱을 실행한다. EC2같은 경우 외부접속이 필수 이므로 host옵션을 설정해야 한다.
+
+아래의 명령을 통해서 그동한 작업한 결과를 웹 브라우저에서 확인할 수 있다.
+
+* ```$ python3 routes.py```
+* 웹 브라우저에서 http://{EC2 Public DNS}:5000으로 접속한다.
+
+
+
+
 
