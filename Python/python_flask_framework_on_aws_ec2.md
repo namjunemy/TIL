@@ -23,7 +23,6 @@
 * AWS EC2의 Security Group 설정 중 inbound 규칙에 Flask의 기본 포트인 5000을 추가한다.
   * Type : Custom TCP / Protocol : TCP / Port Range : 5000 / Source : 0.0.0.0/0 
 
-   
 
 ## 플라스크 설치
 
@@ -31,7 +30,6 @@
 
 * ```$ sudo pip3 install Flask```
 
-  
 
 ## 프로젝트 구조 만들기
 
@@ -326,7 +324,7 @@ URL ```/about```을 함수 **about()**에 매핑한다. 이제 브라우저를 �
   display: inline;
 }
 
-.menu li {
+.menu li + li {
   margin-left: 35px;
 }
 
