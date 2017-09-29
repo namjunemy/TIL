@@ -38,6 +38,7 @@
 ### Python
 
 * [Python Jupyter Notebook on AWS EC2(ubuntu)](https://github.com/namjunemy/TIL/blob/master/Python/python_jupyter_notebook_on_aws_ec2.md)
+* [Flask Web Framework on AWS EC2(ubuntu)](https://github.com/namjunemy/TIL/blob/master/Python/python_flask_framework_on_aws_ec2.md)
 
 ### Tools
 
