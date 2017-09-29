@@ -9,6 +9,8 @@
 > [EC2 원격 접속](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
 >
 > [EC2에 Jupyter Notebook 개발환경 설치](https://github.com/namjunemy/TIL/blob/master/Python/python_jupyter_notebook_on_aws_ec2.md) 
+>
+> 학습 참조 링크 :  [https://code.tutsplus.com/ko/tutorials/an-introduction-to-pythons-flask-framework--net-28822](https://code.tutsplus.com/ko/tutorials/an-introduction-to-pythons-flask-framework--net-28822)
 
  
 
@@ -68,7 +70,7 @@ flask/ 내에 모든 파일을 포함하고 있는 testapp/ 디렉토리를 만�
 
 첫번쨰로 HTML 문서의 뼈대로 사용될 layout.html 파일을 만들어서 templates/ 디렉토리에 넣는다.
 
-#### app/templates/layout.html
+#### testapp/templates/layout.html
 
 ```html
 <!DOCTYPE html>
@@ -93,7 +95,7 @@ flask/ 내에 모든 파일을 포함하고 있는 testapp/ 디렉토리를 만�
 
 단순히 일반적인 HTML 파일처럼 보이지만 {% block content %}, {% endblock %}은 생소하다. **home.html**을 통해 이것들의 기능에 대해 알아본다.
 
-#### app/templates/home.html
+#### testapp/templates/home.html
 
 ```html
 {% extends "layout.html"%}
@@ -109,7 +111,7 @@ flask/ 내에 모든 파일을 포함하고 있는 testapp/ 디렉토리를 만�
 
 이제 브라우저에서 home.html을 볼 수 있도록 URL을 맵핑한다. routes.py를 생성하고 아래와 같이 입력한다.
 
-#### app/routes.py
+#### testapp/routes.py
 
 ```python
 from flask import Flask, render_template
@@ -138,7 +140,202 @@ if __name__ == '__main__':
 * ```$ python3 routes.py```
 * 웹 브라우저에서 http://{EC2 Public DNS}:5000으로 접속한다.
 
+### CSS 적용 
 
+#### testapp/static/css/main.css 생성
+
+```css
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #444;
+}
+ 
+/*
+ * Create dark grey header with a white logo
+ */
+  
+header {
+  background-color: #2B2B2B;
+  height: 35px;
+  width: 100%;
+  opacity: .9;
+  margin-bottom: 10px;
+}
+ 
+header h1.logo {
+  margin: 0;
+  font-size: 1.7em;
+  color: #fff;
+  text-transform: uppercase;
+  float: left;
+}
+ 
+header h1.logo:hover {
+  color: #fff;
+  text-decoration: none;
+}
+ 
+/*
+ * Center the body content
+ */
+  
+.container {
+  width: 940px;
+  margin: 0 auto;
+}
+ 
+div.jumbo {
+  padding: 10px 0 30px 0;
+  background-color: #eeeeee;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+ 
+h2 {
+  font-size: 3em;
+  margin-top: 40px;
+  text-align: center;
+  letter-spacing: -2px;
+}
+ 
+h3 {
+  font-size: 1.7em;
+  font-weight: 100;
+  margin-top: 30px;
+  text-align: center;
+  letter-spacing: -1px;
+  color: #999;
+}
+```
+
+이 스타일 시트를 **layout.html**에 추가해서 자식 템플릿에도 쓸 수 있도록 한다.
+
+```css
+<link rel="stylesheet" href"{{ url_for('static', filename='css/main.css') }}">
+```
+
+플라스크의 함수 **url_for()**를 사용해서 static디렉토리의 main.css파일의 URL주소를 생성한다. 이제 layout.html은 아래와 같이 변경된다.
+
+```css
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Flask App</title>
+    <strong><link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"></strong>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">Flask App</h1>
+      </div>
+    </header>
+    
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </body>
+</html>
+```
+
+다시 웹 사이트에 접근해 보면 CSS가 적용된 웹 페이지를 볼 수 있다. 새로운 페이지를 추가해보자.
+
+
+
+## About 페이지 만들기
+
+위에서 웹 템플릿 **home.html**을 만들 때, **layout.html**을 사용해서 만들었다. 그런 다음 URL ```/```가 **home.html**로 연결되도록 **routes.py**를 수정했다. 그리고 css파일을 추가해서 스타일을 입혔다. 다시 반복해서 새로운 about 페이지를 만들어 본다.
+
+#### testapp/templates/about.html
+
+```html
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>About</h2>
+  <p>This is an About page for the Intro to Flask article. Don't I look good? Oh stop, you're making me blush.</p>
+{% endblock %}
+```
+
+새로운 페이지에 접속하기 위해서 URL을 새롭게 매핑해야 한다. routes.py 파일을 열고 다음과 같이 매핑을 추가한다.
+
+#### testapp/routes.py
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+  return render_template('home.html')
+
+@app.route('/about')
+def about():
+  return render_template('about.html')
+
+if __name__ == '__main__':
+  app.run(host='0.0.0.0', port=5000, debug=True)
+```
+
+URL ```/about```을 함수 **about()**에 매핑한다. 이제 브라우저를 열고 /about으로 접속하면 새로 만든 페이지로 접근할 수 있다. 
+
+
+
+## 네비게이션
+
+대부분 웹사이트들은 헤더나 푸터에 메인페이지로 돌아가는 링크가 있다. 이런 링크는 모든 웹사이트의 모든 페이지에서 보여진다. **layout.html**을 열고, 아래의 코드를 추가해서 상속받는 템플릿에서 보여지게 해보자. 정확하게는 \<nav\> 엘리먼트를 \<header\> 코드 안에 넣는다.
+
+#### testapp/templates/layout.html
+
+플라스크 함수인 ```url_for```을 사용해서 URL을 만든다.
+
+```html
+...
+<header>
+  <div class="container">
+    <h1 class="logo">Flask App</h1>
+    <strong>
+      <nav>
+        <ul class="menu">
+          <li><a href="{{ url_for('home') }}"></a>Home</li>
+          <li><a href="{{ url_for('about') }}"></a>About</li>
+        </ul>
+      </nav>
+    </strong>
+  </div>
+</header>
+...
+```
+
+
+
+####testapp/static/css/main.css
+
+```html
+...
+.menu {
+  float: right;
+  margin-top: 8px;
+}
+
+.menu li {
+  display: inline;
+}
+
+.menu li {
+  margin-left: 35px;
+}
+
+.menu li a {
+  color: #999;
+  text-decoration: none;
+}
+
+```
 
 
 
