@@ -131,7 +131,7 @@ python 개발에 많이 사용되는 IDE로
 * Sublime Text, Atom
 * ...
 
-여러가지 개발 환경이 존재한다. 이 중 Jupyter를 설치하여 사용하려고 한다. Jupyter는 iPython이라는 이름으로 제공되었던 Python 개발 도구 중에 하나로 notebook 형태로 파일 공유가 가능하고, 코더가 짠 코드를 깔끔하게 정리해서 보여준다는 장점이 있다. 게다가 웹 브라우저를 사용하기 때문에 마크다운을 지원하기 때문에 굉장히 매력적면서, 다른 언어(Ruby, R, JavaScript 등)들도 지원한다.
+여러가지 개발 환경이 존재한다. 이 중 Jupyter를 설치하여 사용하려고 한다. Jupyter는 iPython이라는 이름으로 제공되었던 Python 개발 도구 중에 하나로 notebook 형태로 파일 공유가 가능하고, 코더가 짠 코드를 깔끔하게 정리해서 보여준다는 장점이 있다. 게다가 웹 브라우저를 사용하고 마크다운을 지원하기 때문에 굉장히 매력적면서, 다른 언어(Ruby, R, JavaScript 등)들도 지원한다.
 
 * 아래의 명령을 통해 jupyter를 설치한다.
   * ```$ pip3 install --upgrade jupyter```
@@ -160,7 +160,7 @@ python 개발에 많이 사용되는 IDE로
     ```
 
 
-    ```shell
+    ​```shell
     # Notebook config
     c.NotebookApp.certfile = u'/home/ubuntu/certs/mycert.pem' 
      
@@ -175,7 +175,7 @@ python 개발에 많이 사용되는 IDE로
      
     # This is the port we opened in Step 3.
     c.NotebookApp.port = 8888
-    ```
+    ​```
 
 ## Jupyter Notebook 접속
 
@@ -199,6 +199,7 @@ python 개발에 많이 사용되는 IDE로
 
 * 웹 브라우저를 열고 8888번 포트로 접속하면 경고 메세지가 뜨는데,  아래의 추가 정보에서 웹페이지로 이동 하면 된다.
 
+  * 필수적으로 AWS EC2 Security Group의 inbound 규칙 port 8888이 open되어 있어야 한다!
   * ```https://[자신의 EC2 Public DNS]:8888```
   * 위에서 ipython 콘솔을 통해 생성했던 패스워드를 입력하면 로그인에 성공할 수 있다.
 
