@@ -160,22 +160,27 @@ python 개발에 많이 사용되는 IDE로
     ```
 
 
-    ​```shell
-    # Notebook config
+    shell
+    # Notebook config  
+    
     c.NotebookApp.certfile = u'/home/ubuntu/certs/mycert.pem' 
      
-    #location of your certificate file
+    #location of your certificate file  
+    
     c.NotebookApp.ip = '*' 
      
-    #so that the ipython notebook does not opens up a browser by default
+    #so that the ipython notebook does not opens up a browser by default  
+    
     c.NotebookApp.open_browser = False 
      
-    #edit this with the SHA hash that you generated after typing in Step 9
+    #edit this with the SHA hash that you generated after typing in Step 9  
+    
     c.NotebookApp.password = 'sha1:262....your hash here.........65f' 
      
-    # This is the port we opened in Step 3.
+    # This is the port we opened in Step 3.  
+    
     c.NotebookApp.port = 8888
-    ​```
+    
 
 ## Jupyter Notebook 접속
 
