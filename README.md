@@ -26,6 +26,8 @@
 * [[Node API 서버] Hello Nodejs](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_hello_node.md)
 * [[Node API 서버] Express basic](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_express_basic.md)
 * [[Node API 서버] NPM](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_npm.md)
+* [[Node API 서버] REST API(첫번째 API 만들기)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_rest_api.md)
+* [[Node API 서버] 테스트 주도 개발(mocha, should, supertest)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_test_driven_development.md)
 
 ### Git
 
