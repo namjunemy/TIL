@@ -1042,7 +1042,6 @@ class Result {
     });
     ```
 
-  
 
 ### 콜백 방식의 작업 완료 통보
 
@@ -1060,7 +1059,7 @@ class Result {
     * Java.nio.channels.CompletionHandler 인터페이스를 활용해서 만들 수도 있다.
 
     ```java
-    CompletionHandler<V, A> callback = new CompletionHanbler<V, A> {
+    CompletionHandler<V, A> callback = new CompletionHandler<V, A> {
       @Override
       public void complited(V result, A attachment) {
           
