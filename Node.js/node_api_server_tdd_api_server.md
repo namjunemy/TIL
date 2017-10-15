@@ -274,7 +274,7 @@ GET /users 200 3.581 ms - 71
 
     
 
-## 2. 사용자 조회 API - GET /user/:id
+## 2. 사용자 조회 API - GET /users/:id
 
 유저 한명을 조회하는 API를 작성한다.
 
@@ -488,4 +488,142 @@ GET /users/999 404 0.062 ms - -
 
   
 
-## 3. 사용자 삭제 API - DELETE /user/:id
+## 3. 사용자 삭제 API - DELETE /users/:id
+
+id를 입력하면 해당 id의 유저를 삭제하는 API이다.
+
+* 성공시
+  * 204를 응답한다.
+* 실패시 
+  * id가 숫자가 아닐 경우 400(Bad Request)을 응답한다. 
+
+  
+
+### 성공시
+
+* 이번에는 삭제로직 이므로, supertest객체(변수 request)의 delete() 함수를 통해서 요청한다.
+* expect() 함수를 통해 204 코드를 검증하면 테스트 케이스는 통과된다.
+* app.spec.js 코드
+
+```javascript
+...(생략)
+
+describe('DELETE /users/1은', () => {
+  describe('성공시', () => {
+    it('204를 응답한다', (done) => {
+      request(app)
+          .delete('/users/1')
+          .expect(204)
+          .end(done);
+    });
+  });
+});
+```
+
+* app.js 코드
+  * app의 get() 함수가아닌 delete 함수로 삭제요청을 한다.
+  * 요청이 들어오면 마찬가지로 req.params.id에 접근하여 id를 가져오고
+  * users의 필터함수를 통해 기존에 배열에 있던 user의 id가, 요청한 id 가 아닌 유저들을 배열로 만들어서 users로 대체한다.
+  * 그다음 204를 리턴한다.
+
+```javascript
+...(생략)
+
+app.delete('/users/:id', function (req, res) {
+  const id = parseInt(req.params.id);
+  users = users.filter(user => user.id !== id);
+  res.status(204).end();
+});
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
+});
+
+module.exports = app;
+```
+
+* 테스트 케이스 성공 결과
+
+```javascript
+...(생략)
+
+
+DELETE /users/1은
+    성공시
+DELETE /users/1 204 0.159 ms - -
+      ✓ 204를 응답한다
+
+  7 passing (62ms)
+
+```
+
+  
+
+### 실패시 
+
+* id가 숫자가 아닐경우를 테스트 하기 위한 코드를 추가한다.
+* request의 delete 함수를 통해서 숫자가 아닌 문자 파라미터를 넘긴다.
+* app.spec.js 코드
+
+```javascript
+...
+
+describe('DELETE /users/1은', () => {
+  describe('성공시', () => {
+    it('204를 응답한다', (done) => {
+      request(app)
+          .delete('/users/1')
+          .expect(204)
+          .end(done);
+    });
+  });
+
+  describe('실패시', () => {
+    it('id가 숫자가 아닐경우 400을 응답한다', (done) => {
+      request(app)
+          .delete('/users/one')
+          .expect(400)
+          .end(done);
+    });
+  });
+});
+```
+
+* app.spec.js 코드
+  * 마찬가지로 id가 NaN이 들어오는 경우를 처리하는 로직을 만든다.
+  * 400을 리턴하도록 한다.
+
+```javascript
+...
+
+app.delete('/users/:id', function (req, res) {
+  const id = parseInt(req.params.id);
+  if(Number.isNaN(id))
+    return res.status(400).end();
+  users = users.filter(user => user.id !== id);
+  res.status(204).end();
+});
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
+});
+
+module.exports = app;
+```
+
+* 테스트 케이스 검증 결과
+
+```shell
+...
+
+  DELETE /users/1은
+    성공시
+DELETE /users/1 204 0.290 ms - -
+      ✓ 204를 응답한다
+    실패시
+DELETE /users/one 400 0.049 ms - -
+      ✓ id가 숫자가 아닐경우 400을 응답한다
+
+  8 passing (65ms)
+```
+
