@@ -29,6 +29,7 @@
 * [[Node API 서버] REST API(첫번째 API 만들기)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_rest_api.md)
 * [[Node API 서버] 테스트 주도 개발(mocha, should, supertest)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_test_driven_development.md)
 * [[Node API 서버] TDD로 하는 API 서버 개발](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_tdd_api_server.md)
+* [[Node API 서버] 코드 리팩토링(라우터, 컨트롤러, 테스트 코드, 테스트 환경 개선)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_code_refactoring.md)
 
 ### Git
 
