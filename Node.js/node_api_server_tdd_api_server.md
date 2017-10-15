@@ -806,7 +806,7 @@ app.post('/users', (req, res) => {
   if(isConflict)
     return res.status(409).end();
 
-  const id = users.length + 1;
+  const id = Date.now() + 1;
   const user = {id, name};
   users.push(user);
   res.status(201).json(user);
@@ -834,7 +834,159 @@ POST /users 409 0.393 ms - -
   12 passing (117ms)
 ```
 
+  
 
+## 5. 사용자 수정 API - PUT /users/:id
+
+* 요구사항
+  * 성공시
+    * 변경된 name을 응답한다.
+  * 실패시
+    * 정수가 아닌 id일 경우 400 응답
+    * name이 없을 경우 400 응답
+    * 없는 유저일 경우 404 응답
+    * 이름이 중복일 경우 409응답
+
+  
+
+### 성공시
+
+* 기존에 있던 4번 유저의 이름을 den으로 변경한다.
+* put메소드로 name 값을 설정하여 body에 실어 보낸다.
+* 그리고 res의 body값으로 name이 리턴되는지 확인한다.
+* app.spec.js 테스트 코드 수정
+
+```javascript
+...
+
+describe('PUT /users/:id', () => {
+  describe('성공시', () => {
+    it('변경된 name을 응답한다', (done) => {
+      const name = 'den';
+      request(app)
+          .put('/users/3')
+          .send({name})
+          .end((err, res) => {
+            res.body.should.have.property('name', name);
+            done();
+          });
+    });
+  });
+});
+```
+
+* app.js 코드 수정
+
+```javascript
+...
+
+app.put('/users/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const name = req.body.name;
+
+  const user = users.filter((user) => user.id === id)[0];
+  user.name = name;
+
+  res.json(user);
+});
+
+...
+```
+
+* 테스트 코드 실행 결과
+
+```javascript
+...
+
+app.put('/users/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const name = req.body.name;
+
+  const user = users.filter((user) => user.id === id)[0];
+  user.name = name;
+
+  res.json(user);
+});
+
+...
+```
+
+  
+
+### 실패시
+
+* 실패할 경우의 테스트 케이스 추가
+* 요구사항의 조건대로 각 케이스를 추가한다.
+* app.spec.js의 테스트 코드
+
+```javascript
+...
+
+describe('실패시', () => {
+    it('정수가 아닌 id일 경우 400을 응답한다', (done) => {
+      request(app)
+          .put('/users/one')
+          .expect(400)
+          .end(done);
+    });
+    it('name이 없을 경우 400을 응답한다', (done) => {
+      request(app)
+          .put('/users/1')
+          .expect(400)
+          .end(done);
+    });
+    it('없는 유저일 경우 404를 응답한다', (done) => {
+      request(app)
+          .put('/users/999')
+          .send({name: 'foo'})
+          .expect(404)
+          .end(done);
+    });
+    it('이름이 중복일 경우 409를 응답한다', (done) => {
+      request(app)
+          .put('/users/3')
+          .send({name: 'bek'})
+          .expect(409)
+          .end(done);
+    });
+  });
+
+..
+```
+
+* app.js의 어플리케이션 코드
+  * 아이디가 정수가 아닌 경우를 처리하기 위한 첫번째 if문
+  * 이름이 없는 경우를 처리하기 위한 두번째 if문
+  * users 배열의 필터를 활용하여 수정을 요청한 이름의 데이터가 중복될 경우를 처리하기 위한 세번째 if문
+  * 요청한 name에 해당하는 데이터가 없을 경우를 처리하기위한 네번째 if문
+
+```javascript
+...
+
+app.put('/users/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id))
+    return res.status(400).end();
+
+  const name = req.body.name;
+  if (!name)
+    return res.status(400).end();
+
+  const isConfilct = users.filter(user => user.name === name).length;
+  if (isConfilct)
+    return res.status(409).end();
+
+  const user = users.filter((user) => user.id === id)[0];
+  if (!user)
+    return res.status(404).end();
+
+  user.name = name;
+
+  res.json(user);
+});
+
+...
+```
 
 
 
