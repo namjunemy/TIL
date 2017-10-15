@@ -133,4 +133,197 @@
   module.exports = router;
   ```
 
-  ​
+* api/user/user.ctrl.js 분리하기
+
+  * index.js에서는 라우팅에 대한 컨트롤러 함수를 binding 역할을 하도록 하고, user.ctrl.js에서는 컨트롤러 로직에 대해서만 정의를 한다.
+  * 변경된 index.js
+
+  ```javascript
+  const express = require('express');
+  const router = express.Router();
+  const ctrl = require('./user.ctrl');
+
+  router.get('/', ctrl.index);
+  router.get('/:id', ctrl.show);
+  router.delete('/:id', ctrl.destroy);
+  router.post('/', ctrl.create);
+  router.put('/:id', ctrl.update);
+
+  module.exports = router;
+  ```
+
+  * 추가된 user.ctrl.js
+
+  ```javascript
+  let users = [
+    {id: 1, name: 'alice'},
+    {id: 2, name: 'bek'},
+    {id: 3, name: 'chris'}
+  ];
+
+  const index = function (req, res) {
+    req.query.limit = req.query.limit || 10;
+    const limit = parseInt(req.query.limit, 10);
+    if (Number.isNaN(limit)) {
+      return res.status(400).end();
+    }
+    res.json(users.slice(0, limit));
+  };
+
+  const show = function (req, res) {
+    const id = parseInt(req.params.id);
+    if (Number.isNaN(id))
+      return res.status(400).end();
+
+    const user = users.filter((user) => user.id === id)[0];
+    if (!user)
+      return res.status(404).end();
+
+    res.json(user);
+  };
+
+  const destroy = function (req, res) {
+    const id = parseInt(req.params.id);
+    if (Number.isNaN(id))
+      return res.status(400).end();
+    users = users.filter(user => user.id !== id);
+    res.status(204).end();
+  };
+
+  const create = function (req, res) {
+    const name = req.body.name;
+    if (!name)
+      return res.status(400).end();
+
+    const isConflict = users.filter(user => user.name === name).length;
+    if (isConflict)
+      return res.status(409).end();
+
+    const id = Date.now() + 1;
+    const user = {id, name};
+    users.push(user);
+    res.status(201).json(user);
+  };
+
+  const update = function (req, res) {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id))
+      return res.status(400).end();
+
+    const name = req.body.name;
+    if (!name)
+      return res.status(400).end();
+
+    const isConfilct = users.filter(user => user.name === name).length;
+    if (isConfilct)
+      return res.status(409).end();
+
+    const user = users.filter((user) => user.id === id)[0];
+    if (!user)
+      return res.status(404).end();
+
+    user.name = name;
+
+    res.json(user);
+  };
+
+  module.exports = {index, show, destroy, create, update};
+  ```
+
+* api/user/user.spec.js 파일 분리하기
+
+  * 이 파일은 app.spec.js 파일을 그대로 가져온다.
+  * 하나, app.js의 상대 경로가 바뀌었으므로 이 부분만 주의해서 변경한다.
+
+  ```javascript
+  const request = require('supertest');
+  const should = require('should');
+  const app = require('../../app');
+
+  describe('GET /users는', (done) => {
+    describe('성공시', () => {
+      it('유저 객체를 담은 배열로 응답한다.', () => {
+      ...
+      
+  ...(이하 생략)
+  ```
+
+* package.json의 테스트 스크립트의 경로도 수정을 해주고, 테스트를 해보면 정상적으로 수행된다.
+
+  
+
+## 테스트 환경 개선
+
+* 테스트 결과를 보는 로그 중간 중간, 어플리케이션에 관한 로그 등 불필요한 로그가 같이 찍힌다.
+
+* 테스트 결과는 테스트에 관한 내용만 보여주는 것이 좋다.
+
+* 따라서, 환경 변수를 사용해서 test의 결과를 깔끔하게 확인할 수 있도록 한다.
+
+  * 변경된 package.json의 test 스크립트
+    * NODE_ENV를 test로 할당해서 모카를 실행한다.
+
+  ```javascript
+  {
+    "name": "tdd_api_server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "NODE_ENV=test mocha api/user/user.spec.js",
+      "start": "node bin/www.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "body-parser": "^1.18.2",
+      "express": "^4.16.2",
+      "morgan": "^1.9.0"
+    },
+    "devDependencies": {
+      "mocha": "^4.0.1",
+      "should": "^13.1.2",
+      "supertest": "^3.0.0"
+    }
+  }
+  ```
+
+  * 변경된 app.js 파일
+    * process.env.NODE_ENV가 test일 경우에만 서버의 로그가 찍히도록 했다.
+    * 그리고 테스트 코드에서 supertest객체가 express 서버를 중복으로 구동하므로, app.js에서 app.listen() 메소드를 제거한다.
+    * 그리고 별도의 파일로 분리하여 npm start로 어플리케이션 코드를 실행 했을 때 문제가 없도록 한다.
+
+  ```javascript
+  const express = require('express');
+  const app = express();
+  const morgan = require('morgan');
+  const bodyParser = require('body-parser');
+  const user = require('./api/user/index');
+
+  if(process.env.NODE_ENV !== 'test') {
+    app.use(morgan('dev'));
+  }
+
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({extended: true}));
+
+  app.use('/users', user);
+
+  module.exports = app;
+  ```
+
+  * /bin/www.js 파일 추가
+
+    * 프로젝트 루트에 bin 폴더를 만들고 www.js에 아래의 내용을 추가한다.
+    * package.json의 npm start 경로를 bin/www.js로 변경한다.
+    * npm start로 서버를 구동해도 문제가 없어졌다.
+
+    ```javascript
+    const app = require('../app');
+
+    app.listen(3000, () => {
+      console.log('Server is running on 3000 port');
+    });
+    ```
+
+* 테스트 환경에서 로그를 깔끔하게 볼 수 있도록 코드를 수정함과 동시에 실제 어플리케이션 구동에도 문제가 없도록 코드를 변경했다.
