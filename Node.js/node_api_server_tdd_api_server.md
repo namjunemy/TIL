@@ -35,14 +35,15 @@
 
 ## 1. 사용자 목록 조회 API 테스트 만들기
 
-* 성공
-  * 유저 객체를 담은 배열로 응답한다.
-  * 최대 limit 갯수만큼 응답한다.
-* 실패
-  * limit이 숫자형이 아니면 400을 응답한다.
-    * limit은 응답받을 데이터의 총 길이
-  * offset이 숫자형이 아니면 400을 응답한다.
-    * offset은 넘어오는 데이터가 많을 경우에, 잘라서 데이터를 받게 되는데 앞에 몇개 데이터는 skip하고 데이터를 달라고 하는 경우가 있다. 이 때, skip하는 데이터가 offset에 들어간다.
+* 요구사항
+  * 성공
+    * 유저 객체를 담은 배열로 응답한다.
+    * 최대 limit 갯수만큼 응답한다.
+  * 실패
+    * limit이 숫자형이 아니면 400을 응답한다.
+      * limit은 응답받을 데이터의 총 길이
+    * offset이 숫자형이 아니면 400을 응답한다.
+      * offset은 넘어오는 데이터가 많을 경우에, 잘라서 데이터를 받게 되는데 앞에 몇개 데이터는 skip하고 데이터를 달라고 하는 경우가 있다. 이 때, skip하는 데이터가 offset에 들어간다.
 
   
 
@@ -278,15 +279,16 @@ GET /users 200 3.581 ms - 71
 
 유저 한명을 조회하는 API를 작성한다.
 
-* 성공시
-  * id가 1인 유저 객체를 반환한다.
-* 실패시
-  * id가 숫자가 아닐경우 400으로 응답한다.
-  * id로 유저를 찾을 수 없는 경우 404로 응답한다.
+* 요구사항
+  * 성공시
+    * id가 1인 유저 객체를 반환한다.
+  * 실패시
+    * id가 숫자가 아닐경우 400으로 응답한다.
+    * id로 유저를 찾을 수 없는 경우 404로 응답한다.
 
 
 
-  
+    
 
 ### 성공시
 
@@ -492,10 +494,11 @@ GET /users/999 404 0.062 ms - -
 
 id를 입력하면 해당 id의 유저를 삭제하는 API이다.
 
-* 성공시
-  * 204를 응답한다.
-* 실패시 
-  * id가 숫자가 아닐 경우 400(Bad Request)을 응답한다. 
+* 요구사항
+  * 성공시
+    * 204를 응답한다.
+  * 실패시 
+    * id가 숫자가 아닐 경우 400(Bad Request)을 응답한다. 
 
   
 
@@ -626,4 +629,214 @@ DELETE /users/one 400 0.049 ms - -
 
   8 passing (65ms)
 ```
+
+  
+
+## 4. 사용자 추가 API - POST /users
+
+* 요구사항
+  * 성공시
+    * 201 상태코드를 반환한다.
+    * 생성된 유저 객체를 반환한다
+    * 입력한 name을 반환한다
+  * 실패시
+    * name 파라미터 누락시 400을 반환한다.
+    * name이 중복일 경우 409를 반환한다.
+
+  
+
+### 성공시
+
+* mocha의 before라는 함수로 테스트 케이스가 실행되기 전에 진행되야 할 작업들을 정의한다.
+* 여기서는 post요청을 통해 daniel을 생성하고 상태코드로 201을 체크한다. 
+* 그리고 유저 객체 반환과 이름을 반환하는지 검증하기 위해 body를 저장하고, name을 미리 정의한다.
+* app.spec.js 테스트 코드 작성
+
+```javascript
+...
+
+describe('POST /users는', () => {
+  describe('성공시', () => {
+    let name = 'daniel', body;
+    before((done) => {
+      request(app)
+          .post('/users')
+          .send({name: daniel})
+          .expect(201)
+          .end((err, res) => {
+            body = res.body;
+            done();
+          });
+    });
+    it('생성된 유저 객체를 반환한다', () => {
+      body.should.have.property('id');
+    });
+    it('입력한 name을 반환한다', () => {
+      body.should.have.property('name', name);
+    })
+  });
+});
+```
+
+* app.js 코드 작성
+
+  * 새로운 유저를 만들기 위해서 사용자가 입력한 데이터에 접근해야 한다.
+  * post요청은 body를 통해서 그 데이터를 넘긴다.
+  * 그렇기 때문에 body값에 접근을 해야한다.
+  * 따라서 req.body.name과 같이 접근을 해야하는데,
+  * express에서는 body를 지원하지 않는다.
+  * 따라서, body를 사용하려면 추가적인 모듈을 사용해야한다.
+  * body-parser와 multer라는 모듈을 쓴다.
+    * `$ npm i body-parser --save`
+    * multer는 이미지와 같은 큰 데이터를 사용할때 쓴다.
+  * body-parser모듈을 추출해서, app.use() 를 통해 미들웨어 추가를 해준다.
+    * application/json과 application/x-www-form-urlencoded 를 파싱하기 위해 미들웨어를 추가한다.
+
+  ```
+  ...
+
+  const bodyParser = require('body-parser');
+
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({extended: true}));
+
+  ...
+  ```
+
+  * 그 후 다음과 같이 app.js의 코드를 변경할 수 있다.
+
+```javascript
+...
+
+app.post('/users', (req, res) => {
+  const name = req.body.name;
+  const id = users.length + 1;
+  const user = {id, name};
+  users.push(user);
+  res.status(201).json(user);
+});
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
+});
+
+module.exports = app;
+```
+
+* 테스트 코드 검증 결과
+
+```shell
+...
+
+  POST /users는
+    성공시
+POST /users 201 16.374 ms - 24
+      ✓ 생성된 유저 객체를 반환한다
+      ✓ 입력한 name을 반환한다
+
+  10 passing (103ms)
+```
+
+  
+
+### 실패시
+
+* name 파라미터 누락시 400 반환
+* name 중복일 경우 409 반환
+* 실패시의 app.spec.js 테스트 코드를 추가하면 다음과 같다.
+  * 아무것도 없는 빈 객체를 넘겨보고 400 상태코드를 반환하는 것을 검증하고
+  * 이미 존재하는 이름으로 생성요청을 하고 409를 반환하는지 검증한다.
+
+```javascript
+...
+
+describe('POST /users는', () => {
+  describe('성공시', () => {
+    let name = 'daniel', body;
+    before((done) => {
+      request(app)
+          .post('/users')
+          .send({name: 'daniel'})
+          .expect(201)
+          .end((err, res) => {
+            body = res.body;
+            done();
+          });
+    });
+    it('생성된 유저 객체를 반환한다', () => {
+      body.should.have.property('id');
+    });
+    it('입력한 name을 반환한다', () => {
+      body.should.have.property('name', name);
+    })
+  });
+  describe('실패시', () => {
+    it('name 파라미터 누락시 400을 반환한다', (done) => {
+      request(app)
+          .post('/users')
+          .send({})
+          .expect(400)
+          .end(done);
+    });
+    it('name이 중복일 경우 409를 반환한다', (done) => {
+      request(app)
+          .post('/users')
+          .send({name: 'daniel'})
+          .expect(409)
+          .end(done);
+    });
+  });
+});
+```
+
+* 다음은 테스트 코드 검증을 통과하기 위한 app.js 코드이다
+  * name 값을 가져와서 이 값이 없다면, 400 코드를 리턴한다. 간단하다.
+  * 다음으로 users.filter함수를 이용해서, 요청받은 이름이랑 같은 name인 객체들을 찾고, 그 배열의 length를 저장한다.
+  * 그 배열의 length가 0이 아니면 중복객체가 있다는 뜻이므로, 조건문으로 처리하여 409를 리턴한다.
+
+```javascript
+...
+
+app.post('/users', (req, res) => {
+  const name = req.body.name;
+  if (!name)
+    return res.status(400).end();
+
+  const isConflict = users.filter(user => user.name === name).length;
+  if(isConflict)
+    return res.status(409).end();
+
+  const id = users.length + 1;
+  const user = {id, name};
+  users.push(user);
+  res.status(201).json(user);
+});
+
+...
+```
+
+* 테스트 코드 검증 결과
+
+```shell
+...
+
+  POST /users는
+    성공시
+POST /users 201 15.745 ms - 24
+      ✓ 생성된 유저 객체를 반환한다
+      ✓ 입력한 name을 반환한다
+    실패시
+POST /users 400 0.589 ms - -
+      ✓ name 파라미터 누락시 400을 반환한다
+POST /users 409 0.393 ms - -
+      ✓ name이 중복일 경우 409를 반환한다
+
+  12 passing (117ms)
+```
+
+
+
+
+
+
 
