@@ -45,7 +45,6 @@
     * offset이 숫자형이 아니면 400을 응답한다.
       * offset은 넘어오는 데이터가 많을 경우에, 잘라서 데이터를 받게 되는데 앞에 몇개 데이터는 skip하고 데이터를 달라고 하는 경우가 있다. 이 때, skip하는 데이터가 offset에 들어간다.
 
-  
 
 ### 성공시
 
@@ -157,6 +156,7 @@ GET /users 200 3.581 ms - 71
   ```shell
   > tdd_api_server@1.0.0 test /Users/njkim/Workspace/intellij/nodejs_api_server_tdd/tdd_api_server
   > mocha app.spec.js
+  ```
 
 
 
@@ -273,7 +273,7 @@ GET /users 200 3.581 ms - 71
 
   ```
 
-    
+​    
 
 ## 2. 사용자 조회 API - GET /users/:id
 
@@ -288,7 +288,7 @@ GET /users 200 3.581 ms - 71
 
 
 
-    
+​    
 
 ### 성공시
 
@@ -310,7 +310,7 @@ describe('GET /users는', (done) => {
   });
 });
 
-describe('GET /user/1', () => {
+describe('GET /users/1', () => {
   describe('성공시', () => {
     it('id가 1인 유저 객체를 반환한다', (done) => {
       request(app)
@@ -351,7 +351,7 @@ app.get('/users', function (req, res) {
   res.json(users.slice(0, limit));
 });
 
-app.get('/user/:id', function (req, res) {
+app.get('/users/:id', function (req, res) {
   const id = parseInt(req.params.id);
   const user = users.filter((user) => user.id === id)[0];
   res.json(user);
@@ -500,7 +500,6 @@ id를 입력하면 해당 id의 유저를 삭제하는 API이다.
   * 실패시 
     * id가 숫자가 아닐 경우 400(Bad Request)을 응답한다. 
 
-  
 
 ### 성공시
 
@@ -643,7 +642,6 @@ DELETE /users/one 400 0.049 ms - -
     * name 파라미터 누락시 400을 반환한다.
     * name이 중복일 경우 409를 반환한다.
 
-  
 
 ### 성공시
 
@@ -847,7 +845,6 @@ POST /users 409 0.393 ms - -
     * 없는 유저일 경우 404 응답
     * 이름이 중복일 경우 409응답
 
-  
 
 ### 성공시
 
