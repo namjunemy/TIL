@@ -708,7 +708,7 @@ describe('POST /users는', () => {
 
 app.post('/users', (req, res) => {
   const name = req.body.name;
-  const id = users.length + 1;
+  const id = Date.now();
   const user = {id, name};
   users.push(user);
   res.status(201).json(user);
@@ -804,7 +804,7 @@ app.post('/users', (req, res) => {
   if(isConflict)
     return res.status(409).end();
 
-  const id = Date.now() + 1;
+  const id = Date.now();
   const user = {id, name};
   users.push(user);
   res.status(201).json(user);
