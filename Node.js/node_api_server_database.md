@@ -282,3 +282,154 @@ const show = function (req, res) {
 
   
 
+## destroy 컨트롤러 연동(delete)
+
+* 같은 방법으로 delete에 해당하는 destroy 컨트롤러와 연동한다.
+* user.ctrl.js 코드 수정
+  * destroy()함수의 where 인자로 id를 넣어주고, then을 통해 넘어오는 결과로 204를 리턴한다.
+
+```javascript
+...
+
+const destroy = function (req, res) {
+  const id = parseInt(req.params.id);
+  if (Number.isNaN(id))
+    return res.status(400).end();
+
+  models.User
+      .destroy({
+        where: {id}
+      })
+      .then(() => {
+        res.status(204).end();
+      });
+};
+
+...
+```
+
+* user.spec.js 코드
+
+```javascript
+describe.only('DELETE /users/1은', () => {
+  describe('성공시', () => {
+    it('204를 응답한다', (done) => {
+      request(app)
+          .delete('/users/1')
+          .expect(204)
+          .end(done);
+    });
+  });
+
+  describe('실패시', () => {
+    it('id가 숫자가 아닐경우 400을 응답한다', (done) => {
+      request(app)
+          .delete('/users/one')
+          .expect(400)
+          .end(done);
+    });
+  });
+});
+```
+
+  
+
+## create 컨트롤러 연동
+
+* 계속해서 only() 함수 위치를 옮겨가며 테스트를 진행한다.
+* user.ctrl.js 코드
+  * models의 User의 create함수를 이용하여 name을 넘겨준다.
+  * then을 통해 생성된 user를 리턴받으면 201을 리턴한다.
+  * 만약 err가 발생되고, 그것이 'SequelizeUniqueConstraintError'라는 unique하지 못함을 뜻하는 에러라면 409를 리턴하고, 그것이 아닐경우 500을 리턴하도록 코드를 변경한다.
+
+```javascript
+...
+const create = function (req, res) {
+  const name = req.body.name;
+  if (!name)
+    return res.status(400).end();
+  
+  models.User
+      .create({name})
+      .then(user => {
+        res.status(201).json(user);
+      })
+      .catch(err => {
+        if (err.name === 'SequelizeUniqueConstraintError') {
+          return res.status(409).end();
+        }
+        return res.status(500).end();
+      });
+};
+...
+```
+
+* 'SequelizeUniqueConstraintError' unique의 여부를 판단하기 위해서 sequelize의 설정을 다음과 같이 해준다.
+  * models.js코드
+    * ORM 모델을 정의할 때, name의 속성 값중 unique속성을 true로 준다.
+
+```javascript
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: './db.sqlite',
+  logging: false
+});
+
+const User = sequelize.define('User', {
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  }
+});
+
+module.exports = {Sequelize, sequelize, User};
+```
+
+* user.spec.js
+
+```javascript
+...
+describe.only('POST /users는', () => {
+  const users = [{name: 'alice'}, {name: 'bek'}, {name: 'chris'}];
+  before(() => models.sequelize.sync({force: true}));
+  before(() => models.User.bulkCreate(users));
+  describe('성공시', () => {
+    let name = 'daniel', body;
+    before((done) => {
+      request(app)
+          .post('/users')
+          .send({name: 'daniel'})
+          .expect(201)
+          .end((err, res) => {
+            body = res.body;
+            done();
+          });
+    });
+    it('생성된 유저 객체를 반환한다', () => {
+      body.should.have.property('id');
+    });
+    it('입력한 name을 반환한다', () => {
+      body.should.have.property('name', name);
+    })
+  });
+  describe('실패시', () => {
+    it('name 파라미터 누락시 400을 반환한다', (done) => {
+      request(app)
+          .post('/users')
+          .send({})
+          .expect(400)
+          .end(done);
+    });
+    it('name이 중복일 경우 409를 반환한다', (done) => {
+      request(app)
+          .post('/users')
+          .send({name: 'daniel'})
+          .expect(409)
+          .end(done);
+    });
+  });
+});
+...
+```
+
