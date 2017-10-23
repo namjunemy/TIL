@@ -433,3 +433,135 @@ describe.only('POST /users는', () => {
 ...
 ```
 
+  
+
+## update 컨트롤러 연동
+
+* user.ctrl.js 코드
+  * 요청에 대한 400 응답 처리 코드는 기존과 동일.
+  * User의 findOne 메소드를 통해서 해당 id를 가진 사용자가 존재하는지 먼저 확인한다.
+  * then으로 넘어오는 리턴값이 없다면 404를 리턴
+  * 그리고 user가 넘어 왔다면, user.name을 요청한 name으로 저장하고
+  * save 함수를 통해서 db에 저장한다. 성공시 넘어오는 값을 json으로 리턴하고,
+  * create와 마찬가지로 중복에러가 발생할경우 409를, 그외의 에러일 경우 500을 리턴한다. 
+
+```javascript
+...
+const update = function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id))
+    return res.status(400).end();
+
+  const name = req.body.name;
+  if (!name)
+    return res.status(400).end();
+
+  models.User
+      .findOne({where: {id}})
+      .then(user => {
+        if (!user) return res.status(404).end();
+
+        user.name = name;
+        user.save()
+            .then(() => {
+              res.json(user);
+            })
+            .catch(err => {
+              if (err.name === 'SequelizeUniqueConstraintError') {
+                return res.status(409).end();
+              }
+              return res.status(500).end();
+            })
+      });
+};
+...
+```
+
+* user.spec.js 코드
+
+```javascript
+...
+describe('PUT /users/:id', () => {
+  const users = [{name: 'alice'}, {name: 'bek'}, {name: 'chris'}];
+  before(() => models.sequelize.sync({force: true}));
+  before(() => models.User.bulkCreate(users));
+  describe('성공시', () => {
+    it('변경된 name을 응답한다', (done) => {
+      const name = 'chally';
+      request(app)
+          .put('/users/3')
+          .send({name})
+          .end((err, res) => {
+            res.body.should.have.property('name', name);
+            done();
+          });
+    });
+  });
+  describe('실패시', () => {
+    it('정수가 아닌 id일 경우 400을 응답한다', (done) => {
+      request(app)
+          .put('/users/one')
+          .expect(400)
+          .end(done);
+    });
+    it('name이 없을 경우 400을 응답한다', (done) => {
+      request(app)
+          .put('/users/1')
+          .expect(400)
+          .end(done);
+    });
+    it('없는 유저일 경우 404를 응답한다', (done) => {
+      request(app)
+          .put('/users/999')
+          .send({name: 'foo'})
+          .expect(404)
+          .end(done);
+    });
+    it('이름이 중복일 경우 409를 응답한다', (done) => {
+      request(app)
+          .put('/users/3')
+          .send({name: 'bek'})
+          .expect(409)
+          .end(done);
+    });
+  });
+});
+...
+```
+
+
+
+## 마무리
+
+* 데이터베이스와 컨트롤러 연동을 마쳤고, 데이터가 잘 유지되는지 보기 위한 확인을 진행한다.
+
+* 우선 db.sqlite파일을 지우고, curl 명령이 아닌 postman을 사용하여 확인을 진행한다.
+
+* 진행하기 전에, db-sync.js에서 db를 sync하는 부분의 force 옵션을 실제 구동 환경에서는 false로, 테스트 환경에서는 true로 하도록 코드를 수정한다.
+
+  * db-sync.js
+
+  ```javascript
+  const models = require('../models');
+
+  module.exports = () => {
+    const options = {
+      force: process.env.NODE_ENV === 'test' ? true : false
+    };
+    return models.sequelize.sync({options});
+  };
+  ```
+
+* 각 요청에 대한 응답코드와 결과가 잘 돌아오는지 확인한다.
+
+* 또한, 서버 쪽에서 찍히는 로그도 잘 찍히는지 확인한다.
+
+* 추가적인 api를 생성할 때는 api폴더의 하위 폴더를 생성하고, app.js에 라우팅 하는 부분에 추가만 해주면 된다.
+
+* 물론, 어떤 api를 추가하건 테스트 코드를 먼저 만들고, 실제 비즈니스 로직을 만들어야 함을 유념해야한다.
+
+* 끝으로 정말 유익하고 재미있는 강의를 해주신 우아한형제들의 김정환님께 감사하고, tdd에 입문하는 분들께 이 강의를 적극 추천한다.
+
+* 강의 링크
+
+  * [https://www.inflearn.com/course/%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%A3%BC%EB%8F%84%EA%B0%9C%EB%B0%9C-tdd-nodejs-api/](https://www.inflearn.com/course/%ED%85%8C%EC%8A%A4%ED%8A%B8%EC%A3%BC%EB%8F%84%EA%B0%9C%EB%B0%9C-tdd-nodejs-api/) 
