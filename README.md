@@ -20,6 +20,7 @@
 * [DI(Dependency Injection)를 이용한 빈 의존성 관리](https://github.com/namjunemy/TIL/blob/master/Java/dependency_injection_for_bean_management.md)
 * [12장. 멀티 스레드](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_12_multi_thread.md)
 * [13장. 제네릭](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_13_generic.md)
+* [14장. 람다식](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_14_lambda.md)
 
 ### Node.js
 
