@@ -192,4 +192,64 @@
     Myfunctionalnterface fi = (x, y) -> sum(x, y);
     ```
 
-    ​
+     
+
+  
+
+## 4절. 클래스 멤버와 로컬 변수 사용
+
+* 클래스의 멤버 사용
+
+  * 람다식 실행 블록에는 클래스의 멤버인 필드와 메소드를 제약 없이 사용할 수 있다.
+  * 람다식 실행 블록내에서 this는 람다식을 실행한 객체의 참조이다.
+
+  ```java
+  public class ThisExample {
+    public int outerField = 10;
+    
+    class Inner {
+      int innerField = 20;
+      
+      void method() {
+        MyfunctionalInterface fi = () -> {
+          System.out.println("outerField: " + outerField);
+          System.out.println("outerField: " + ThisExample.this.outerField);
+          
+          System.out.println("innerField: " + innerField);
+          System.out.println("innerField: " + this.innerField);
+        }
+        fi.method();
+      }
+    }
+  }
+  ```
+
+* 로컬 변수의 사용
+
+  * 람다식은 함수적 인터페이스의 익명 구현 객체를 생성한다.
+  * 람다식에서 사용하는 **외부 로컬 변수는 final 특성을 갖는다.**
+    * 원래 자바 익명 구현 객체에서 로컬 변수를 사용하게 되면, 그 로컬 변수는 final 특성을 가지게 된다. 람다도 마찬가지이다. 람다식이 익명 구현 객체를 생성하기 때문이다.
+    * 자바 8 이후부터는 로컬 변수에 final 키워드를 붙이지 않아도 자동으로 처리해준다.
+
+  ```java
+  public class UsingLocalVariable {
+    void method(int arg) {  //arg는 final 특성을 가짐
+      int localVar = 40     //localVar는 final 특성을 가짐
+        
+      ------------------
+        //arg = 31;      //final 특성 때문에 수정 불가
+        //localVar = 41; //final 특성 때문에 수정 불가
+   	------------------
+      
+      MyFunctionalInterface fi = () -> {
+        //로컬변수 사용
+        System.out.println("arg: " + arg);
+        System.out.println("localVar: " + localVar);
+      }
+      fi.method();
+    }
+  }
+  ```
+
+  ​
+
