@@ -84,3 +84,112 @@
     * ```(x,y) -> { return x + y; };```
   * 중괄호 {}에 return 문만 있을 경우, 중괄호를 생략 가능
     * ```(x,y) -> x + y```
+
+  
+
+## 3절. 타겟 타입과 함수적 인터페이스
+
+* 타겟 타입(target type)
+
+  * 람다식이 대입되는 인터페이스를 말한다.
+    * 인터페이스 변수 = 람다식;
+  * 익명 구현 객체를 만들 때 사용할 인터페이스이다.
+
+* 함수적 인터페이스(functional interface)
+
+  * 모든 인터페이스는 람다식의 타겟 타입이 될 수 없다.
+    * 람다식은 하나의 메소드를 정의하기 떄문에
+    * 하나의 추상 메소드만 선언된 인터페이스만 타겟 타입이 될 수 있다.
+  * 함수적 인터페이스
+    * 하나의 추상 메소드만 선언된 인터페이스를 말한다.
+  * @FunctionalInterface 어노테이션
+    * 하나의 추상 메소드만을 가지는지 컴파일러가 체크하도록 함
+    * 두 개 이상의 추상 메소드가 선언되어 있으면 컴파일 오류 발생
+
+* 매개변수와 리턴값이 없는 람다식
+
+  ```java
+  @FunctionalInterface
+  public interface MyFunctionalInterface {
+    public void method();
+  }
+  ```
+
+  ...
+
+  * 람다식을 인터페이스 변수에 대입하게 되면 익명 구현 객체가 만들어지게 되고,
+  * 실행은 인터페이스 변수를 통해 메소드를 호출해 주면 된다.
+
+  ```java
+  Myfunctionalnterface fi = () -> { ... }
+
+  fi.method();
+  ```
+
+* 매개변수가 있는 람다식
+
+  ```java
+  @FunctionalInterface
+  public interface MyFunctionalInterface {
+    public void method(int x);
+  }
+  ```
+
+  ...
+
+  ```java
+  Myfunctionalnterface fi = (x) -> { ... }
+  또는
+  Myfunctionalnterface fi = x -> { ... }
+
+  fi.method(5);
+  ```
+
+* 리턴값이 있는 람다식
+
+  ```java
+  @FunctionalInterface
+  public interface MyFunctionalInterface {
+    public int method(int x);
+  }
+  ```
+
+  ...
+
+  ```java
+  Myfunctionalnterface fi = (x, y) -> { ...; return 값; }
+
+  int result = fi.method(5, 2);
+  ```
+
+  * 약식 표현
+
+    * 1
+
+    ```java
+    Myfunctionalnterface fi = (x, y) -> { 
+      return x + y;
+    }
+    ```
+
+    =
+
+    ```java
+    Myfunctionalnterface fi = (x, y) -> x + y;
+    ```
+
+    * 2
+
+    ```java
+    Myfunctionalnterface fi = (x, y) -> { 
+      return sum(x, y);
+    }
+    ```
+
+    =
+
+    ```java
+    Myfunctionalnterface fi = (x, y) -> sum(x, y);
+    ```
+
+    ​
