@@ -558,4 +558,509 @@ public class SupplierEx {
   99.5
   ```
 
-  ​
+   
+
+#### Operator 함수적 인터페이스
+
+* Operator 함수적 인터페이스의 특징은 Function과 동일하게 매개변수와 리턴값이 있는 applyXXX() 메소드를 가지고 있다. 하지만 이들 메소드는 매개값을 리턴값으로 매핑(타입변환)하는 역할보다는 매개값을 이용해서 연산을 수행한 후 동일한 타입으로 리턴값을 제공하는 역할을 한다.
+* ex) 10+5 -> 15
+
+| 인터페이스명               | 추상메소드                                | 설명               |
+| -------------------- | ------------------------------------ | ---------------- |
+| BinaryOperator\<T\>  | BiFunction\<T,U,R\>의 하위 인터페이스        | T와 U를 연산한 후 R 리턴 |
+| UnaryOperator\<T\>   | Function\<T,R\>의 하위 인터페이스            | T를 연산한 후 R 리턴    |
+| DoubleBinaryOperator | double applyAsDouble(double, double) | 두 개의 double 연산   |
+| DoubleUnaryOperator  | double applyAsDouble(double)         | 한개의 double 연산    |
+| IntBinaryOperator    | int applyAsInt(int, int)             | 두 개의 int 연산      |
+| IntUnaryOperator     | int applyAsInt(int)                  | 한 개의 int 연산      |
+| LongBinaryOperator   | long applyAsLong(long, long)         | 두 개의 long 연산     |
+| LongUnaryOperator    | long applyAsLong(long)               | 한 개의 long 연산     |
+
+* IntBinaryOperator
+
+  ```IntBinaryOperator operator = (a,b) -> { ...; return int 값;}```
+
+  * 매개값 a, b는 모두 int 타입이고, 연산 후 리턴값도 int타입
+
+* IntUnaryOperator
+
+  `IntUnaryOperator operator = a -> { ...; return int값; }`
+
+  * 매개값 a는 int 타입이고, 연산 후 리턴값도 int 타입
+
+* Operator 함수적 인터페이스 예제 코드
+
+  ```java
+  import java.util.function.IntBinaryOperator;
+
+  public class OperatorEx {
+    private static int[] scores = {92, 34, 87};
+
+    private static int maxOrMin(IntBinaryOperator intBinaryOperator) {
+      int result = scores[0];
+      for (int score : scores) {
+        result = intBinaryOperator.applyAsInt(result, score);
+      }
+      return result;
+    }
+
+    public static void main(String[] args) {
+      int max = maxOrMin(
+          (result, score) -> {
+            if (result >= score) return result;
+            else return score;
+          }
+      );
+      System.out.println(max);
+
+      int min = maxOrMin(
+          (result, score) -> {
+            if (result <= score) return result;
+            else return score;
+          }
+      );
+      System.out.println(min);
+    }
+  }
+  ```
+
+  ```java
+  92
+  34
+  ```
+
+  
+
+#### Predicate 함수적 인터페이스
+
+* Predicate 함수적 인터페이스의 특징은 매개변수와 boolean 리턴값이 있는 testXXX() 메소드를 가지고 있다. 이들 메소드는 매개값을 조사해서 true 또는 false를 리턴하는 역할을 한다.
+
+| 인터페이스명              | 추상 메소드                     | 설명             |
+| ------------------- | -------------------------- | -------------- |
+| Predicate\<T\>      | boolean test(T t)          | 객체 T를 조사       |
+| BiPredicate\<T, U\> | boolean test(T t, U u)     | 객체 T와 U를 비교 조사 |
+| DoublePredicate     | boolean test(double value) | double 값을 조사   |
+| IntPredicate        | boolean test(int value)    | int 값을 조사      |
+| LongPredicate       | boolean test(long value)   | long 값을 조사     |
+
+* Predicate\<T\>
+
+  ```java
+  Predicate<Student> predicate = t -> { return t.getSex().equals("남자")};
+  또는
+  Preducate<Sturent> predicate = t -> { t.getSex().equals("남자")};
+  ```
+
+  * \<Student\> 이므로 매개값 t는 Student 타입이고, 리턴값은 boolean 타입(고정)
+
+* Predicate 함수적 인터페이스 예제 코드
+
+```java
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class PredicateEx {
+  private static List<Student> list = Arrays.asList(
+      new Student("김남준", "남", 100),
+      new Student("김남순", "여", 100),
+      new Student("김남준1", "남", 90),
+      new Student("김남순2", "여", 80)
+  );
+
+  public static double avg(Predicate<Student> predicate) {
+    int count = 0;
+    int sum = 0;
+    for (Student student : list) {
+      if (predicate.test(student)) {
+        sum += student.getScore();
+        count++;
+      }
+    }
+    return sum / count;
+  }
+
+  public static void main(String[] args) {
+    double maleAvg = avg(student -> student.getSex().equals("남"));
+    System.out.println("남자 점수 평균: " + maleAvg);
+
+    double femaleAvg = avg(student -> student.getSex().equals("여"));
+    System.out.println("여자 점수 평균: " + femaleAvg);
+  }
+}
+```
+
+```java
+남자 점수 평균: 95.0
+여자 점수 평균: 90.0
+```
+
+  
+
+#### andThen()과 conpose() 디폴트 메소드
+
+* 함수적 인터페이스가 가지고 있는 디폴트 메소드이다.
+* 두 개의 함수적 인터페이스를 순차적으로 연결해서 실행한다.
+* 첫번째 리턴값을 두번째 매개값으로 제공해서 최종 결과값을 리턴한다.
+* andThen()과 compose()의 차이점은 어떤 함수적 인터페이스부터 처리하느냐이다.
+
+  
+
+* andThen() 디폴트 메소드
+  * 인터페이스 AB의 method를 실행하면
+  * 인터페이스 A의 람다식의 결과값을 받아서
+  * 인터페이스 B의 매개값으로 전달하고
+  * 최종결과를 리턴을 한다.
+
+```java
+인터페이스 AB = 인터페이스 A.andThen(인터페이스 B);
+최종결과 = 인터페이스 AB.method();
+```
+
+* compose() 디폴트 메소드
+  * 인터페이스 AB의 method를 실행하면
+  * 인터페이스 B의 람다식의 결과값을 받아서
+  * 인터페이스 A의 매개값으로 전달하고
+  * 최종결과를 리턴한다.
+
+```java
+인터페이스 AB = 인터페이스 A.compose(인터페이스 B);
+최종결과 = 인터페이스 AB.method();
+```
+
+* 함수적 인터페이스가 andThen()과 compose()를 제공하는지를 알아보고 사용하는 것이 좋다.
+* andThen()메소드는 거의 제공을하지만 compose()의 경우 아래의 메소드들만 제공한다.
+  * compose() 디폴트 메소드를 제공하는 함수적 인터페이스
+    * Function\<T, R\>
+    * DoubleUnaryOperator
+    * IntUnaryOperator
+    * LongUnaryOperator
+
+**Consumer의 순차적 연결**
+
+* Consumer 종류의 함수적 인터페이스는 처리 결과를 리턴하지 않기 떄문에 andThen()과 compose() 디폴트 메소드는 함수적 인터페이스의 호출순서만 정한다.
+* 사용 예시
+
+```java
+Consumer<Member> consumerA = (m) -> {
+  System.out.println("consumerA: " + m.getName());
+};
+```
+
+```java
+Consumer<Member> consumerB = (m) -> {
+  System.out.println("consumerB: " + m.getId());
+};
+```
+
+```java
+Consumer<Member> consumerAB = consumerA.andThen(consumerB);
+consumerAB.accept(new Member("홍길동", "hong", null));
+```
+
+```java
+실행 결과:
+consumerA: 홍길동
+consumerB: hong
+```
+
+* 예제코드
+
+  * Member.java
+
+  ```java
+  public class Member {
+    private String name;
+    private String id;
+    private Address address;
+
+    public Member(String name, String id, Address address) {
+      this.name = name;
+      this.id = id;
+      this.address = address;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public Address getAddress() {
+      return address;
+    }
+  }
+  ```
+
+  * Address.java
+
+  ```java
+  public class Address {
+    private String country;
+    private String city;
+
+    public Address(String country, String city) {
+      this.country = country;
+      this.city = city;
+    }
+
+    public String getCountry() {
+      return country;
+    }
+
+    public String getCity() {
+      return city;
+    }
+  }
+  ```
+
+  * ConsumerAndThenEx.java
+
+  ```java
+  public class ConsumerAndThenEx {
+    public static void main(String[] args) {
+      Consumer<Member> consumerA = (member) -> {
+        System.out.println(member.getName());
+      };
+      Consumer<Member> consumerB = (member) -> {
+        System.out.println(member.getId());
+      };
+
+      Consumer<Member> consumerAB = consumerA.andThen(consumerB);
+      consumerAB.accept(
+          new Member("김남준", "njkim", new Address("korea", "seoul"))
+      );
+    }
+  }
+  ```
+
+  ```java
+  김남준
+  njkim
+  ```
+
+  
+
+**Function의 순차적 연결**
+
+* Function과 Operator 종류의 함수적 인터페이스는 먼저 실행한 함수적 인터페이스의 결과를 다음 함수적 인터페이스의 매개값으로 넘겨주고, 최종 처리결과를 리턴한다.
+* functionA의 두번째 매개변수 A는 functionB로 전달되는 매개값의 타입이고, functionB의 첫번째 매개변수로 정의되어 있다.
+* Address는 functionA에서 functionB로 전달되는 타입이고, 최종적으로 functionAB에서는 Member객체를 이용하여 String 타입의 결과값을 얻는다.
+* 사용 예시
+
+```java
+Function<Member, Address> functionA;
+Function<Address, String> functionB;
+Function<Member, String> functionAB;
+String city;
+
+functionA = m -> m.getAddress();
+functionB = a -> a.getCity;
+```
+
+```java
+functionAB = functionA.andThen(functionB);
+city = functionAB.apply(
+  new Member("홍길동","hong",new Address("한국", "서울"))
+);
+
+functionAB = functionB.compose(functionA);
+city = functionAB.apply(
+  new Member("홍길동","hong",new Address("한국", "서울"))
+);
+```
+
+* 예제 코드
+
+  * FunctionAndThenComposeEx
+
+  ```java
+  public class FunctionAndThenComposeEx {
+    public static void main(String[] args) {
+      Function<Member, Address> functionA;
+      Function<Address, String> functionB;
+      Function<Member, String> functionAB;
+
+      functionA = member -> member.getAddress();
+      functionB = address -> address.getCity();
+
+      functionAB = functionA.andThen(functionB);
+      String city = functionAB.apply(
+          new Member("김남준", "njkim", new Address("한국", "서울"))
+      );
+      System.out.println("andThen 거주도시: " + city);
+
+      functionAB = functionB.compose(functionA);
+      city = functionAB.apply(
+          new Member("김남준", "njkim", new Address("한국", "서울"))
+      );
+      System.out.println("compose 거주도시: " + city);
+    }
+  }
+  ```
+
+  ```java
+  andThen 거주도시: 서울
+  compose 거주도시: 서울
+  ```
+
+  
+
+#### Predicate 함수적 인터페이스의 and(), or(), negate() 디폴트 메소드와 isEqual() 정적 메소드
+
+* and(), or(), negate() 디폴트 메소드
+  * Predicate 함수적 인터페이스의 디폴트 메소드
+* and() : &&과 대응 - 두 Predicate가 모두 true를 리턴하면 최종적으로 true를 리턴
+  * `predicateAB = predicateA.and(predicateB);`
+* or() : ||과 대응 - 두 Predicate중 하나만 true를 리턴하면 최종적으로 true를 리턴
+  * `predicateAB = predicate.or(predicateB);`
+* negate() : !과 대응 - Predicate의 결과가 true리면 false, false이면 true를 리턴
+  * `predicateAB = predicateA.negate();`
+* and(), or(), negate() 예제 코드
+
+```java
+import java.util.function.IntPredicate;
+
+public class PredicateAndOrNegateEx {
+  public static void main(String[] args) {
+    IntPredicate predicateA = a -> a % 2 == 0;
+    IntPredicate predicateB = b -> b % 3 == 0;
+    IntPredicate predicateAB = predicateA.and(predicateB);
+
+    int input = 6;
+    boolean result = predicateAB.test(input);
+    System.out.println(input + "은/는 2의 배수이면서 3의 배수인가? " + result);
+
+    input = 4;
+    predicateAB = predicateA.or(predicateB);
+    result = predicateAB.test(input);
+    System.out.println(input + "은/는 2의 배수 또는 3의 배수 인가? " + result);
+
+    input = 4;
+    predicateAB = predicateA.negate();
+    result = predicateAB.test(input);
+    System.out.println(input + "은/는 2의 배수가 아닌가? " + result);
+  }
+}
+```
+
+```java
+6은/는 2의 배수이면서 3의 배수인가? true
+4은/는 2의 배수 또는 3의 배수 인가? true
+4은/는 2의 배수가 아닌가? false
+```
+
+* isEqual() 정적 메소드
+
+  * Predicate\<T\>의 정적 메소드
+
+  ```java
+  Predicate<Object> predicate = Predicate.isEqual(targetObject);
+  boolean result = predicate.test(sourceObject);
+  ```
+
+  * Objects.equals(sourceObject, targetObject)는 다음과 같은 리턴값을 제공한다.
+
+  | sourceObject | targetObject | 리턴값                                    |
+  | ------------ | ------------ | -------------------------------------- |
+  | null         | null         | true(주의 해야 한다.)                        |
+  | not null     | null         | false                                  |
+  | null         | not null     | false                                  |
+  | not null     | not null     | sourceObject.equals(targetObject)의 리턴값 |
+
+* isEqual() 예제 코드
+
+```java
+import java.util.function.Predicate;
+
+public class PredicateIsEqualEx {
+  public static void main(String[] args) {
+    Predicate<String> predicate;
+
+    predicate = Predicate.isEqual(null);
+    System.out.println("null, null: " + predicate.test(null));
+
+    predicate = Predicate.isEqual("java8");
+    System.out.println("null, java8: " + predicate.test(null));
+
+    predicate = Predicate.isEqual(null);
+    System.out.println("java8, null: " + predicate.test("java8"));
+
+    predicate = Predicate.isEqual("java8");
+    System.out.println("java8, java8: " + predicate.test("java8"));
+  }
+}
+```
+
+```java
+null, null: true
+null, java8: false
+java8, null: false
+java8, java8: true
+```
+
+  
+
+#### minBy(), maxBy() 정적 메소드
+
+* BinaryOperator\<T\> 함수적 인터페이스의 정적 메소드
+* Comparator를 이용해서 최대 T와 최소 T를 얻는 BinaryOperator\<T\>를 리턴한다.
+
+| 리턴타입                | 정적 메소드                                  |
+| ------------------- | --------------------------------------- |
+| BinaryOperator\<T\> | minBy(Comparator<? super T> comperator) |
+| BinaryOperator\<T\> | maxBy(Comparator<? super T> comparator) |
+
+* Comparator\<T\>는 다음과 같이 선언된 함수적 인터페이스이다. o1과 o2를 비교해서 o1이 작으면 음수를, 동일하면 0, o1이 크면 양수를 리턴해야하는 compare() 메소드가 선언되어 있다.
+
+```java
+@FunctionalInterface
+public interface Comparator<T> {
+  public int compare(T o1, T o2);
+}
+```
+
+* Comparator\<T\>를 타겟 타입으로하는 람다식은 다음과 같이 작성할 수 있다.
+
+```java
+(o1, o2) -> { ...; return int 값; }
+```
+
+* 만약 o1과 o2가 int 타입이라면 다음과 같이 Integer.compare(int, int) 메소드를 이용할 수 있다.
+  * 만약 int 타입이 아니라면 직접 비교해서 return 하도록 작성을 해야한다.
+
+```java
+(o1. o2) -> Integer.compare(o1, o2);
+```
+
+* 예제 코드
+
+```java
+import java.util.function.BinaryOperator;
+
+public class OperatorMinByMaxByEx {
+  public static void main(String[] args) {
+    BinaryOperator<Fruit> binaryOperator;
+    Fruit fruit;
+
+    binaryOperator = BinaryOperator.minBy(
+        (f1, f2) -> Integer.compare(f1.getPrice(), f2.getPrice()));
+    fruit = binaryOperator.apply(
+        new Fruit("수박", 20000), new Fruit("오렌지", 10000));
+    System.out.println("minBy: " + fruit.getName());
+
+    binaryOperator = BinaryOperator.maxBy(
+        (f1, f2) -> Integer.compare(f1.getPrice(), f2.getPrice()));
+    fruit = binaryOperator.apply(
+        new Fruit("수박", 20000), new Fruit("오렌지", 10000));
+    System.out.println("maxBy: " + fruit.getName());
+  }
+```
+
+```java
+minBy: 오렌지
+maxBy: 수박
+```
+
