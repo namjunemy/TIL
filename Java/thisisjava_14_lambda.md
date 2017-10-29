@@ -1064,3 +1064,234 @@ minBy: 오렌지
 maxBy: 수박
 ```
 
+  
+
+## 5절. 메소드 참조(Method references)
+
+* 메소드를 참조해서 매개변수의 정보 및 리턴타입을 알아내어 람다식에서 불필요한 매개변수를 제거하는 것이 목적이다.
+* 종종 람다식은 기존 메소드를 단순하게 호출만 하는 경우가 있다.
+  * `(left, right) -> Math.max(left, right);`
+  * 위의 형태에서 left와 right의 중복 사용을 줄여서 아래와 같이 메소드 참조의 형태로 사용할 수 있다.
+  * `Math::max;`
+* 메소드 참조도 람다식과 마찬가지로 인터페이스의 익명 구현 객체로 생성됨
+  * 타겟 타입에서 추상 메소드의 매개변수 및 리턴 타입에 따라 메소드 참조도 달라진다.
+  * ex) IntBinaryOperator 인터페이스는 두개의 int 매개값을 받아 int 값을 리턴하므로 동일한 매개값과 리턴타입을 갖는 Math 클래스의 max() 메소드를 참조할 수 있다.
+  * `IntBinaryOperator operator = Math::max;`
+
+#### 정적 메소드와 인스턴스 메소드 참조
+
+* 정적메소드 참조
+  * `클래스::메소드`
+* 인스턴스 메소드 참조
+  * `참조변수::메소드`
+* 사용 예시
+
+```java
+public class Calculator {
+  public static int staticMethod(int x, int y) {
+    return x + y;
+  }
+  
+  public int instanceMethod(int x, int y) {
+    return x + y;
+  }
+}
+```
+
+```java
+IntBinaryOperator operator;
+
+//정적 메소드 참조
+operator = (x, y) -> Calculator.staticMethod(x, y);
+operator = Calculator::staticMethod;
+
+//인스턴스 메소드 참조
+Calculator obj = new Calculator();
+
+operator = (x, y) -> obj.instanceMethod(x, y);
+operator = obj::instanceMethod;
+```
+
+* 예제 코드
+
+```java
+import java.util.function.IntBinaryOperator;
+
+public class MethodReferencesEx {
+  public static void main(String[] args) {
+    IntBinaryOperator operator;
+    operator = (x, y) -> Calculator.staticMethod(x, y);
+    System.out.println("결과1: " + operator.applyAsInt(1, 2));
+
+    operator = Calculator::staticMethod;
+    System.out.println("결과2: " + operator.applyAsInt(3, 4));
+
+    Calculator obj = new Calculator();
+    operator = (x, y) -> obj.instanceMethod(x, y);
+    System.out.println("결과3: " + operator.applyAsInt(5, 6));
+
+    operator = obj::instanceMethod;
+    System.out.println("결과4: " + operator.applyAsInt(7, 8));
+  }
+}
+```
+
+```java
+결과1: 3
+결과2: 7
+결과3: 11
+결과4: 15
+```
+
+#### 매개변수의 메소드 참조
+
+* `(a, b) -> { a.instanceMethod(b); }` -> `클래스::instanceMethod`
+
+  * 왼쪽의 람다식을 메소드 참조로 구현하면 오른쪽과 같다.
+
+  * 위에서 클래스는 a의 타입이다. a의 타입이 String 이면 클래스는 String이다.
+
+  * 메소드 참조로 구현한 것을 보면, 클래스가 가지고 있는 static 메소드를 참조한 것 처럼 보이지만
+
+  * 사실은 클래스의 인스턴스 메소드를 호출한 것이다. 
+
+  * 그렇다면, 어떻게 static메소드를 참조한 것인지, 인스턴스 메소드를 참조한 것인지 알 수 있는가?
+
+    * 함수적 인터페이스의 추상메소드의 매개변수와 리턴타입을 보고 결정을 한다.
+
+    ```java
+    ToIntBiFunction<String, String> function;
+
+    //String이 가지고 있는 인스턴스 메소드 호출
+    //compareToIgnoreCase()는 a가 b보다 사전순으로 먼저이면 음수를, 같다면 0을, b가 먼저라면 양수를 리턴한다.
+    function = (a, b) -> a.compareToIgnoreCase(b);
+    print(function.applyAsInt("Java8", "JAVA8"));
+
+    function = String::compareToIgnoreCase;
+    print(function.applyAsInt("Java8", "JAVA8"));
+    ```
+
+* 예제 코드
+
+  * 아래의 `String::compareToIgnoreCase;`을 보면 String 클래스의 정적 메소드를 참조하는 것 처럼 보이지만,
+  * 문맥상으로 볼때 a변수의 인스턴스 메소드를 참조되는 상황이기 때문에, 정적 메소드가 아니라 인스턴스 메소드가 된다.
+
+```java
+import java.util.function.ToIntBiFunction;
+
+public class ArgumentMethodReferencesEx {
+  public static void main(String[] args) {
+    ToIntBiFunction<String, String> function;
+
+    function = (a, b) -> a.compareToIgnoreCase(b);
+    print(function.applyAsInt("java8", "JAVA8"));
+
+    function = String::compareToIgnoreCase;
+    print(function.applyAsInt("java8", "JAVA8"));
+  }
+
+  public static void print(int order) {
+    if (order < 0) {
+      System.out.println("사전순으로 먼저 옵니다.");
+    } else if (order == 0) {
+      System.out.println("동일한 문자열 입니다.");
+    } else {
+      System.out.println("사전순으로 나중에 옵니다.");
+    }
+  }
+}
+```
+
+```java
+동일한 문자열 입니다.
+동일한 문자열 입니다.
+```
+
+#### 생성자 참조
+
+* `(a, b) -> { return new 클래스(a, b);}` -> `클래스::new`
+
+  * 람다식의 실행부에 객체를 생성하고 리턴하는 코드만 있다면 오른쪽과 같이 생성자 참조를 사용할 수 있다.
+  * 생성자의 매개값의 타입과 수는 생성자 참조가 대입되는 함수적 인터페이스의 추상 메소드가 어떻게 선언되어 있느냐에 따라서 결정 된다.
+  * 예시 1
+
+  ```java
+  Function<String, Member> function1 = Member::new;
+  Member member1 = function1.apply("angel");
+  ```
+
+  ```java
+  //아래의 생성자 사용
+  public Member(String id) {
+    System.out.println("Member(String id) 실행");
+    this.id = id;
+  }
+  ```
+
+  * 예시 2
+
+  ```java
+  BiFunction<String, String, Member> function2 = Member::new;
+  Member member2 = function2.apply("김남준", "njkim");
+  ```
+
+  ```java
+  //아래의 생성자 사용
+  public Member(String name, String id) {
+    System.out.println("Member(String name, String id) 실행");
+    this.name = name;
+    this.id = id;
+  }
+  ```
+
+* 예제 코드
+
+  * Member.java
+
+  ```java
+  public class Member {
+    private String name;
+    private String id;
+
+    public Member() {
+      System.out.println("Member() 실행");
+    }
+
+    public Member(String id) {
+      System.out.println("Member(String id) 실행");
+      this.id = id;
+    }
+
+    public Member(String name, String id) {
+      System.out.println("Member(String name, String id) 실행");
+      this.name = name;
+      this.id = id;
+    }
+  }
+  ```
+
+  * ConstructorReferencesEx.java
+
+  ```java
+  import java.util.function.BiFunction;
+  import java.util.function.Function;
+
+  public class ConstructorReferencesEx {
+    public static void main(String[] args) {
+      Function<String, Member> function1 = Member::new;
+      Member member1 = function1.apply("angel");
+
+      BiFunction<String, String, Member> function2 = Member::new;
+      Member member2 = function2.apply("namjun", "njkim");
+    }
+  }
+  ```
+
+  ```java
+  Member(String id) 실행
+  Member(String name, String id) 실행
+  ```
+
+  ​
+
+  ​
