@@ -1,4 +1,4 @@
-## 14장. 람다식
+# 14장. 람다식
 
 > [소스코드 repo](https://github.com/namjunemy/this_is_java)
 >
@@ -31,7 +31,6 @@
 * 현대적 프로그래밍 기법
   * 객체 지향 프로그래밍 + 함수적 프로그래밍
 
-  
 
 #### 자바는 8부터 함수적 프로그래밍 지원
 
@@ -63,7 +62,6 @@
   };
   ```
 
-  
 
 ## 2절. 람다식 기본 문법
 
@@ -85,7 +83,6 @@
   * 중괄호 {}에 return 문만 있을 경우, 중괄호를 생략 가능
     * ```(x,y) -> x + y```
 
-  
 
 ## 3절. 타겟 타입과 함수적 인터페이스
 
@@ -192,7 +189,6 @@
     Myfunctionalnterface fi = (x, y) -> sum(x, y);
     ```
 
-     
 
   
 
@@ -251,7 +247,6 @@
   }
   ```
 
-  
 
 ## 5절. 표준 API의 함수적 인터페이스
 
@@ -558,7 +553,6 @@ public class SupplierEx {
   99.5
   ```
 
-   
 
 #### Operator 함수적 인터페이스
 
@@ -629,7 +623,6 @@ public class SupplierEx {
   34
   ```
 
-  
 
 #### Predicate 함수적 인터페이스
 
@@ -704,7 +697,6 @@ public class PredicateEx {
 * 첫번째 리턴값을 두번째 매개값으로 제공해서 최종 결과값을 리턴한다.
 * andThen()과 compose()의 차이점은 어떤 함수적 인터페이스부터 처리하느냐이다.
 
-  
 
 * andThen() 디폴트 메소드
   * 인터페이스 AB의 method를 실행하면
@@ -841,7 +833,6 @@ consumerB: hong
   njkim
   ```
 
-  
 
 **Function의 순차적 연결**
 
@@ -906,7 +897,6 @@ city = functionAB.apply(
   compose 거주도시: 서울
   ```
 
-  
 
 #### Predicate 함수적 인터페이스의 and(), or(), negate() 디폴트 메소드와 isEqual() 정적 메소드
 
@@ -1291,7 +1281,3 @@ public class ArgumentMethodReferencesEx {
   Member(String id) 실행
   Member(String name, String id) 실행
   ```
-
-  ​
-
-  ​
