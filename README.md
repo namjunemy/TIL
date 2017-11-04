@@ -28,6 +28,8 @@
 * [13장. 제네릭](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_13_generic.md)
 * [14장. 람다식](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_14_lambda.md)
 * [[Spring]스프링이란?](https://github.com/namjunemy/TIL/blob/master/Spring/what_is_spring.md)
+* [[Spring]프로젝트 만들기](https://github.com/namjunemy/TIL/blob/master/Spring/create_spring_project.md)
+* [[Spring]Dependency Injection](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection.md)
 
 ### Node.js
 
