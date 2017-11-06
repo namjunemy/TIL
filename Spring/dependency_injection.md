@@ -75,5 +75,115 @@
 
 ### 3-3. 스프링 프로퍼티 설정
 
+* 스프링 프로퍼티 설정에 대한 기본적인 사항들을 학습한다. 기본적이라고 하지만, 가장 많이 쓰이고 꼭 알고 있어야 한다.
+
+* MyInfo.java
+
+  ```java
+  public class MyInfo {
+    private String name;
+    private double height;
+    private double weight;
+    private ArrayList<String> hobbys;
+    private BMICalculator bmiCalculator;
+    
+    public void setBmiCalculator(BMICalculator bmiCalculator) {
+      this.bmiCalculator = bmiCalculator;
+    }
+    
+    public void setName(String name) {
+      this.name = name;
+    }
+    
+    public void setHeight(double height) {
+      this.height = height;
+    }
+    
+    public void setWeight(double weight) {
+      this.weight = weight;
+    }
+    
+    public void setHobbys(ArrayList<String> hobbys) {
+      this.hobbys = hobbys;
+    }
+  }
+  ```
+
+* 스프링 프로퍼티 파일
+
+  * MyInfo의 setter가 존재하기 때문에 아래의 설정을 사용할 수 있다.
+  * 각 property의 value에 기초 데이터를 설정할 수 있다.
+
+  ```xml
+  ...
+  <bean id="myInfo" class="com.java.ex.MyInfo">
+    <property name="name">
+      <value>홍길동</value>  //기초데이터
+    </property>
+    <property name="height">
+      <value>187</value>
+    </property>
+    <property name="weight">
+      <value>85</value>
+    </property>
+    <property name="hobbys">	//List타입
+      <list>
+        <value>수영</value>
+        <value>요리</value>
+        <value>독서</value>
+      </list>
+    </property>
+    <property name="bmiCalculator">
+      <ref bean="bmiCalculator"/>  //다른 빈객체 참조
+    </property>
+  </bean>
+  ...
+  ```
+
+* MainClass.java
+
+  ```java
+  import org.springframework.context.support.AbstractApplicationContext;
+  import org.springframework.context.support.GenericXmlApplicationContext;
+
+  public class MainClass {
+    public static void main(String[] args) {
+      String configLocation = "classpath:applicationCTX.xml";
+      //스프링 컨테이너 생성
+      AbstractApplicationContext ctx = new GenericXmlApplicationContext(configLocation);
+      
+      //스프링 컨테이너에서 컴포넌트를 가져옴
+      MyInfo myInfo = ctx.getBean("myInfo", MyInfo.class);
+      myInfo.getInfo();
+      ctx.close();
+    }
+  }
+  ```
+
+  
+
 ### 3-4. 스프링 컨테이너의 이해
+
+* GenericXmlApplicationContext를 이용하여 스프링 컨테이너를 생성하고 아래와 같이 컴포넌트를 사용한다.
+
+
+* MainClass.java
+
+```java
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+
+public class MainClass {
+  public static void main(String[] args) {
+    String configLocation = "classpath:applicationCTX.xml";
+    //스프링 컨테이너 생성
+    AbstractApplicationContext ctx = new GenericXmlApplicationContext(configLocation);
+    
+    //스프링 컨테이너에서 컴포넌트를 가져옴
+    MyInfo myInfo = ctx.getBean("myInfo", MyInfo.class);
+    myInfo.getInfo();
+    ctx.close();
+  }
+}
+```
 
