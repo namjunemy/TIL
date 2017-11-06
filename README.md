@@ -30,6 +30,7 @@
 * [[Spring]스프링이란?](https://github.com/namjunemy/TIL/blob/master/Spring/what_is_spring.md)
 * [[Spring]프로젝트 만들기](https://github.com/namjunemy/TIL/blob/master/Spring/create_spring_project.md)
 * [[Spring]Dependency Injection](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection.md)
+* [[String]DI 활용](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection_uses.md)
 
 ### Node.js
 
