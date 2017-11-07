@@ -1,4 +1,5 @@
-# 13장. 제네릭
+13장. 제네릭
+
 >[소스코드 repo](https://github.com/namjunemy/this_is_java)
 >
 >1절. 왜 제네릭을 사용해야 하는가?
@@ -45,25 +46,25 @@ default BiConsumer<T,U> andThen(BiConsumer<? super T,? super I> after)
 
      - 타입 변환이 많이 생길수록 전체 애플리케이션 성능이 떨어지게 된다.
 
-    ```java	
-    List list = new ArrayList();
-    list.add("hello");
-    String str = (String) list.get(0);
-    ```
-    	위의 코드에서는 강제타입 변환이 두번 일어난다.	
-    	"hello"라는 String 객체를 Object 타입으로 저장할 때 한번, list.get(0)의 반환값인 Object 타입의 객체를 String 타입으로 저장할 때 한번.	
-    		
-    	제네릭을 적용하면 다음과 같이 코드가 변화한다.	
+     ```java
+     List list = new ArrayList();
+     list.add("hello");
+     String str = (String) list.get(0);
+     ```
 
+     * 위의 코드에서는 강제타입 변환이 두번 일어난다.	
+     * "hello"라는 String 객체를 Object 타입으로 저장할 때 한번, list.get(0)의 반환값인 Object 타입의 객체를 String 타입으로 저장할 때 한번. 제네릭을 적용하면 다음과 같이 코드가 변화한다.	
 
-    	List<String> list = new ArrayList<String>();
-    	list.add("hello");
-    	String str = list.get(0);
-    	
-    	List 객체를 생성할 때, String 객체를 저장하겠다고 선언하면 불필요한 타입변환이 사라지게 된다.	
-      
+     ```java
+     List<String> list = new ArrayList<String>();
+     list.add("hello");
+     String str = list.get(0);
+     ```
 
-  
+     * List 객체를 생성할 때, String 객체를 저장하겠다고 선언하면 불필요한 타입변환이 사라지게 된다.	
+
+       
+
 
 ## 2절. 제네릭 타입
 #### 제네릭 타입이란
@@ -88,7 +89,7 @@ default BiConsumer<T,U> andThen(BiConsumer<? super T,? super I> after)
     * 제네릭
        * 클래스를 선언할 때 타입 파라미터를 기술해 준다.
        * 따라서, 컴파일시 타입 파라미터가 구체적인 클래스로 변경된다. 불필요한 타입변환이 이루어지지 않는다.
-       * 아래와 같이 코드가 변경되면,	
+         * 아래와 같이 코드가 변경되면,
     ```java
    public class Box<T> {
      private T t;
@@ -128,11 +129,11 @@ default BiConsumer<T,U> andThen(BiConsumer<? super T,? super I> after)
     ```
    * 위와 같이, 클래스를 설계할 때 타입파라미터로 설계를 해 두고, 실제로 사용할 때 구체적인 클래스를 지정해 줌으로써 컴파일러가 클래스를 재구성해준다.
    * 따라서, 전혀 타입변환이 생기지 않는다.
-   * 한가지 더 중요한 사실은 실제 사용시 구체적인 클래스를 지정해 줌으로써 컴파일러가 클래스를 재구성 했을 때, 강한타입 체크를 하게 되므로 사전에 컴파일 에러를 방지한다.		
+     * 한가지 더 중요한 사실은 실제 사용시 구체적인 클래스를 지정해 줌으로써 컴파일러가 클래스를 재구성 했을 때, 강한타입 체크를 하게 되므로 사전에 컴파일 에러를 방지한다.	
    * 예를 들어, 클래스 사용시 제네릭타입에 String 타입을 설정 했다면 Integer 타입이 들어올 경우 에러가 컴파일 에러가 발생한다. 이처럼 사전에 에러를 방지 할 수 있다.
-   * 결과적으로 제네릭을 사용하는것이 애플리케이션 성능을 좋게 만들 수 있다.	
+     * 결과적으로 제네릭을 사용하는것이 애플리케이션 성능을 좋게 만들 수 있다.
 
-  
+
 
 ## 3절. 멀티타입 파라미터
 - 두 개 이상의 타입 파라미터를 사용해서 선언할 수 있다.	
@@ -151,7 +152,7 @@ default BiConsumer<T,U> andThen(BiConsumer<? super T,? super I> after)
  ```java
 Product<Tv,String> product = new Product<>();
  ```
-  
+
 
 ## 4절. 제네릭 메소드
 - 매개변수 타입과 리턴 타입으로 타입 파라미터를 갖는 메소드를 말한다.
@@ -177,7 +178,7 @@ Product<Tv,String> product = new Product<>();
   2. Box<Integer> box = boxing(100); 	//타입 파라미터를 Integer로 추정
   ```
   * 일반적으로 매개값을 넣어줌으로 컴파일러가 유추하게 만들어주는 두번째 방법을 사용한다.	
-  
+
 
 #### 실습예제
 
@@ -242,7 +243,7 @@ public class CompareMethodEx {
 true
 false
 ```
-  
+
 ## 5. 제한된 타입 파라미터
 #### 타입 파라미터에 지정되는 구체적인 타입을 제한할 필요가 있을 경우
 
@@ -270,7 +271,7 @@ false
        return Double.compare(v1, v2);
    }
    ```
-  
+
 #### 실습예제
 
 ```java
@@ -295,7 +296,7 @@ public class BoundedTypeParameterEx {
   }
 }
 ```
-  
+
 ## 6. 와일드카드 타입
 **제네릭 타입을 매개변수나 리턴타입으로 사용할 때 타입 파라미터를 제한할 목적**
 
@@ -319,7 +320,7 @@ public class BoundedTypeParameterEx {
  * `제네릭타입<? super 하위타입>` : Lower Bounded Wildcards (하위 클래스 제한)
   * 타입 파라미터를 대치하는 구체적인 타입으로 하위 타입이나, 그 하위 타입의 상위 타입이 올 수 있다. 따라서, **하위 클래스 제한** 이라고 한다.	
   * 즉, 하위 타입이 해당 자리에 들어갈 수 있는 가장 하위 타입이다.
-  
+
 
 #### 실습예제
 
@@ -445,7 +446,7 @@ public class WildCardEx {
   }
 }
 ```
-  
+
 ## 7절. 제네릭 타입의 상속과 구현
 #### 제네릭 타입을 부모 클래스로 사용할 경우
 
