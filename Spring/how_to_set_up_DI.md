@@ -8,7 +8,7 @@
 * XML 파일을 이용한 DI설정 방법은 그 동안 살펴본 방식이다.
 * 아래와 같이 생성자를 통해서 필드값을 주입하는 방법이 있고, 클래스의 setter를 이용해서 property값을 할당하는 방법도 있었다.
 
-```java
+```xml
 <bean id="student1" class="com.javalec.ex.Student">
   <constructor-arg value="홍길동" />
   <constructor-arg value="10" />
