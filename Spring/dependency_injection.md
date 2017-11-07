@@ -75,6 +75,8 @@
 
 # 4. DI(Dependency Injection) 2
 
+* 실습 코드 repo : [저장소](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_4_1_ex1_springex)
+
 ### 4-1. 스프링 프로퍼티 설정
 
 * 스프링 프로퍼티 설정에 대한 기본적인 사항들을 학습한다. 기본적이라고 하지만, 가장 많이 쓰이고 꼭 알고 있어야 한다.

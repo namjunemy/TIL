@@ -2,6 +2,9 @@
 
 ### 5-1. 의존 관계
 
+* 실습 코드 repo : [저장소](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_5_1_ex1_springex)
+
+
 * DI는 Dependency Injection의 약자로 우리말로 '의존 주입'이다.
 
   * 의존성을 주입하는 방법은 
@@ -175,6 +178,8 @@
   
 
 ### 5-2. DI 사용에 따른 장점
+
+* 실습 코드 repo : [저장소](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_5_2_ex1_springex)
 
 사실 작은 규모의 프로젝트에서는 스프링의 DI를 사용하는 것 보다 일반적인 방법을 사용하여 개발하는 것이 더욱 빠르고, 개발에 따른 스트레스를 줄일 수 있다. 하지만 규모가 어느 정도 커지고, 추후 유지보수 업무가 발생할 때 DI를 이용한 개발의 장점을 느낄 수 있다. 예제를 통해 살펴보자.
 
