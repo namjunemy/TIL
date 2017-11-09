@@ -1,4 +1,4 @@
-# 5.DI(Dependency Injection)활용
+# 5. DI(Dependency Injection)활용
 
 ### 5-1. 의존 관계
 
