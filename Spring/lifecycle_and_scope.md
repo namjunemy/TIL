@@ -40,7 +40,6 @@
   ctx.close();
   ```
 
-  
 
 ### 7-2. 스프링 빈 생명 주기
 
@@ -141,7 +140,7 @@ public class Student implements InitializingBean, DisposableBean {
 * 위의 메인 클래스에서 `ctx.close()` 메소드가 호출되면서 빈이 소멸 될 때, 아래의 `@preDestroy` 어노테이션이 선언된 메소드가 호출 된다. 마찬가지로 메소드 명은 자유롭게 정의할 수 있다.
 
   ```java
-  @PostConstruct
+  @preDestroy
   public void destroyMethod() {
     System.out.println("destroyMethod()");
   }
