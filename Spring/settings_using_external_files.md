@@ -678,6 +678,3 @@ public class MainClass {
 }
 ```
 
-
-
-## 파일(Profile) 속성을 이용한 설
