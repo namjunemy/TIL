@@ -86,9 +86,9 @@ public class LogAop {
 ```
 
 * XML파일 설정
-  * `<bean id="logApp" class="com.javalec.ex.LogApp" />` - 빈을 생성한다.
+  * `<bean id="logAop" class="com.javalec.ex.LogAop" />` - 빈을 생성한다.
   * `<aop:config>` - 태그를 이용하여 app설정 정보를 입력한다.
-  * `<aop:aspect id="logger" ref="logApp">` - id는 logger이며 참조는 위에 선언된 Bean인 logApp을 참조한다.
+  * `<aop:aspect id="logger" ref="logAop">` - id는 logger이며 참조는 위에 선언된 Bean인 logApp을 참조한다.
   * `<aop:pointcut id="publicM" expression="within(com.javalec.ex.*)" />` - aop의 pointcut 즉, 공통기능을 적용할 핵심기능의 id는 publicM이며 범위(expression)는 com.javalec.ex의 모든 메소드(*)이다.
   * `<aop:aroud pointcut-ref="publicM" method="loggerAop" />` - advice 즉, 공통 기능 타입중 aroud라는 타입을 사용하며 아이디가 publicM인 pointcut을 참조하며, loggerAop메소드에 적용한다.
 
