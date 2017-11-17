@@ -25,8 +25,8 @@ AOP 기법이 바로 이런 것이다. 공통 기능을 핵심 기능과 분리�
       * `<aop:after-throwing>` : 메소드 실행중 exception 발생시 advice 실행
       * `<aop:after>` : 메소드 실행중 exception이 발생하여도 advice 실행
       * `<aop:around>` : 메소드 실행 전/후 및 exception 발생시 advice 실행
-  * JointPoint : Advice를 적용해야 되는 부분. 즉, 핵심기능들 하나 하나를 jointpoint라고 한다,(ex. 필드, 메소드)(스프링에서는 메소드만 해당)
-  * Pointcut : Jointpoint의 부분으로 실제로 Advice가 적용된 부분
+  * JoinPoint : Advice를 적용해야 되는 부분. 즉, 핵심기능들 하나 하나를 joinpoint라고 한다,(ex. 필드, 메소드)(스프링에서는 메소드만 해당)
+  * Pointcut : Joinpoint의 부분으로 실제로 Advice가 적용된 부분
   * Weaving : Advice를 핵심 기능(Pointcut)에 적용하는 행위 자체
 * 스프링에서 AOP 구현 방법 : Proxy를 이용 한다.
   * 공통 기능(Advice)을 핵심 기능(Pointcut)인 메소드에 삽입을 할 때(Weaving할 때), AOP는 공통기능(Advice)를 직접 삽입하지 않고, Proxy를 이용하여 삽입하고 메소드를 실행한다.
