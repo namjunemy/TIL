@@ -21,6 +21,10 @@
 
 
 ## 분류
+### Seminar & Conference
+
+* [2017.11.16 okky 미니 세미나 - 비전공 학원출신 SI 개발자, 유명 스타트업 들어간 ssul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20171116_okky_mini_seminar_woowahan_bros_lee.md)
+
 ### Java
 
 * [DI(Dependency Injection)를 이용한 빈 의존성 관리](https://github.com/namjunemy/TIL/blob/master/Java/dependency_injection_for_bean_management.md)
