@@ -43,6 +43,7 @@
 * [[Spring] 12.MVC Controller](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_controller.md)
 * [[Spring] 13.MVC Form Data](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_form_data.md)
 * [[Spring] 14.@RequestMapping Parameter](https://github.com/namjunemy/TIL/blob/master/Spring/request_mapping_parameter.md)
+* [[Spring] 15.Form 데이터 값 검증](https://github.com/namjunemy/TIL/blob/master/Spring/form_data_validation.md)
 
 ### Node.js
 
