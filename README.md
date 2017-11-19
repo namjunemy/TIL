@@ -41,6 +41,8 @@
 * [[Spring] 9,10.Spring AOP(Aspect Oriented Programming)](https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md)
 * [[Spring] 11.Spring MVC basic](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_basic.md)
 * [[Spring] 12.MVC Controller](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_controller.md)
+* [[Spring] 13.MVC Form Data](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_form_data.md)
+* [[Spring] 14.@RequestMapping Parameter](https://github.com/namjunemy/TIL/blob/master/Spring/request_mapping_parameter.md)
 
 ### Node.js
 
