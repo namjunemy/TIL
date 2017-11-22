@@ -17,7 +17,7 @@
 
 * Controller에서는 @RequestMapping을 통해 method를 정의하고, path(value)를 설정한다. 
 
-  * 그리고 해당 path와 get Method로 들어온 데이터를 HttpServletRequest 객체를 통해
+  * 그리고 해당 path와 get Method로 들어온 데이터를 HttpServletRequest 객체를 통해 처리한다.
 
   ```java
   @RequestMapping(method = RequestMethod.GET, value = "/student")
@@ -49,7 +49,6 @@
 
 * 실습 코드 repo : [저장소](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_14_1_ex1_springex)
 
-  
 
 ## 14-2. @ModelAttribute
 
@@ -99,7 +98,6 @@
 
 * 실습 코드 repo : [저장소](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_14_2_ex1_springex)
 
-  
 
 ## 14-3. 리다이렉트(redirect) 키워드
 
