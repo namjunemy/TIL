@@ -67,10 +67,12 @@
 * [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
 
 
-### AWS
+### Cloud
 
-* [EC2 인스턴스 생성하기](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_create_instance.md)
-* [EC2 ssh 원격 접속과 scp를 통한 파일 업로드](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
+* [AWS EC2 인스턴스 생성하기](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_create_instance.md)
+* [AWS EC2 ssh 원격 접속과 scp를 통한 파일 업로드](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
+* [NVIDIA GPU CLOUD 플랫폼](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_cloud.md)
+* [NVIDIA GPU CLOUD on AWS(TensorFlow Example)](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_cloud_on_aws.md)
 
 ### Python
 
