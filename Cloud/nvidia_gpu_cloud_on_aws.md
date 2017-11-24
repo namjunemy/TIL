@@ -8,7 +8,6 @@
     * 계정 생성
     * NGC 웹 사이트 로그인 후 NGC API 키 생성(생성 후 보관)
 
-  
 
 ### AWS 예비 설정
 
@@ -36,7 +35,7 @@
 
 
 
-  
+
 
 ### AWS Console에서 VM 인스턴스 시작
 
@@ -51,7 +50,6 @@
 * 보안 그룹 구성 단계(6단계)에서 위의 AWS 예비 설정에서 만들어 놓은 Security Group을 선택한다.
 * 마지막으로 키 페어를 선택하는 창이 뜨면, 기존에 위에서 생성했던 키페어를 선택하고 인스턴스를 시작한다.
 
-  
 
 ### VM 인스턴스에 연결
 
@@ -148,7 +146,7 @@
   * 예제 실행
 
   ```shell
-  root@fa49e8f3c798:/workspace# python /opt/tensorflow/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py
+   root@fa49e8f3c798:/workspace# python /opt/tensorflow/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py
 
 
   Extracting /tmp/tensorflow/mnist/input_data/train-images-idx3-ubyte.gz
