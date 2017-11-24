@@ -146,7 +146,7 @@
   * 예제 실행
 
   ```shell
-   root@fa49e8f3c798:/workspace# python /opt/tensorflow/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py
+  $ root@fa49e8f3c798:/workspace# python /opt/tensorflow/tensorflow/examples/tutorials/mnist/mnist_with_summaries.py
 
 
   Extracting /tmp/tensorflow/mnist/input_data/train-images-idx3-ubyte.gz
