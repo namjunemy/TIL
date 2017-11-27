@@ -301,3 +301,214 @@ public class BWriteCommand implements BCommand {
 
 ## 18-3. 글 내용 페이지 만들기
 
+* list 페이지에서 각 컨텐츠의 타이틀을 누르면 게시물의 id를 전달하여 해당 게시물을 보는 페이지를 요청한다.
+
+  * list.jsp 코드의 일부분
+    * \<a href="contenView?bId=${dto.bId}"\>${dto.bTitle}
+
+  ```jsp
+  <table width="500" cellpadding="0" cellspacing="0" border="1">
+    <tr>
+      <td>번호</td>
+      <td>이름</td>
+      <td>제목</td>
+      <td>날짜</td>
+      <td>히트</td>
+    </tr>
+    <c:forEach items="${list}" var="dto">
+      <tr>
+        <td>${dto.bId}</td>
+        <td>${dto.bName}</td>
+        <td>
+          <c:forEach begin="1" end="${dto.bIndent}">-</c:forEach>
+          <a href="contenView?bId=${dto.bId}">${dto.bTitle}</a></td>
+        <td>${dto.bDate}</td>
+        <td>${dto.bHit}</td>
+      </tr>
+    </c:forEach>
+    <tr>
+      <td colspan="5"><a href="writeView">글작성</a></td>
+    </tr>
+  </table>
+  ```
+
+
+
+![](https://github.com/namjunemy/TIL/blob/master/Spring/img/spring_mvc_5.png?raw=true)
+
+
+
+### contentView 서비스 객체
+
+* BContentView.java
+  * 요청받은 ID를 DAO객체의 메소드로 넘기는 역할을 한다.
+  * 작업이 끝나면 DTO객체를 model객체에 추가한다.
+
+```java
+package com.javalec.spring_project_board_command;
+
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.ui.Model;
+
+import com.javalec.spring_project_board_dao.BDao;
+import com.javalec.spring_project_board_dto.BDto;
+
+public class BContentCommand implements BCommand {
+
+  @Override
+  public void execute(Model model) {
+    Map<String, Object> map = model.asMap();
+    HttpServletRequest request = (HttpServletRequest) map.get("request");
+    String bId = request.getParameter("bId");
+
+    BDao dao = new BDao();
+    BDto dto = dao.contentView(bId);
+
+    model.addAttribute("contentView", dto);
+  }
+}
+```
+
+  
+
+### DAO contentView() 메소드
+
+* BDao.java의 일부
+  * DB에 게시물 ID를 바탕으로 데이터를 가져오기 위한 작업을 수행하고,
+  * upHit() 메소드를 통해서 게시물 조회수를 올린다.
+
+```java
+...
+  
+public BDto contentView(String strId) {
+    upHit(strId);
+
+    BDto dto = null;
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+    ResultSet resultSet = null;
+
+    try {
+      connection = dataSource.getConnection();
+
+      String query = "select * from mvc_board where bId = ?";
+      preparedStatement = connection.prepareStatement(query);
+      preparedStatement.setInt(1, Integer.parseInt(strId));
+      resultSet = preparedStatement.executeQuery();
+
+      if (resultSet.next()) {
+        int bId = resultSet.getInt("bId");
+        String bName = resultSet.getString("bName");
+        String bTitle = resultSet.getString("bTitle");
+        String bContent = resultSet.getString("bContent");
+        Timestamp bDate = resultSet.getTimestamp("bDate");
+        int bHit = resultSet.getInt("bHit");
+        int bGroup = resultSet.getInt("bGroup");
+        int bStep = resultSet.getInt("bStep");
+        int bIndent = resultSet.getInt("bIndent");
+
+        dto = new BDto(bId, bName, bTitle, bContent, bDate, bHit, bGroup, bStep, bIndent);
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (resultSet != null)
+          resultSet.close();
+        if (preparedStatement != null)
+          preparedStatement.close();
+        if (connection != null)
+          connection.close();
+      } catch (Exception e2) {
+        e2.printStackTrace();
+      }
+    }
+    return dto;
+  }
+
+  private void upHit(String bId) {
+    Connection connection = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+      connection = dataSource.getConnection();
+      String query = "update mvc_board set bHit = bHit + 1 where bId = ?";
+      preparedStatement = connection.prepareStatement(query);
+      preparedStatement.setString(1, bId);
+
+      int rn = preparedStatement.executeUpdate();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        if (preparedStatement != null)
+          preparedStatement.close();
+        if (connection != null)
+          connection.close();
+      } catch (Exception e2) {
+        e2.printStackTrace();
+      }
+    }
+  }
+
+...
+```
+
+  
+
+### contentView JSP페이지
+
+* contentView.jsp
+  * 데이터를 바탕으로  jsp페이지를 구성한다.
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Insert title here</title>
+</head>
+<body>
+
+<table width="500" cellpadding="0" cellspacing="0" border="1">
+  <form action="modify" method="post">
+    <input type="hidden" name="bId" value="${contentView.bId}">
+    <tr>
+      <td> 번호</td>
+      <td> ${contentView.bId} </td>
+    </tr>
+    <tr>
+      <td> 히트</td>
+      <td> ${contentView.bHit} </td>
+    </tr>
+    <tr>
+      <td> 이름</td>
+      <td><input type="text" name="bName" value="${contentView.bName}"></td>
+    </tr>
+    <tr>
+      <td> 제목</td>
+      <td><input type="text" name="bTitle" value="${contentView.bTitle}"></td>
+    </tr>
+    <tr>
+      <td> 내용</td>
+      <td><textarea rows="10" name="bContent">${contentView.bContent}</textarea></td>
+    </tr>
+    <tr>
+      <td colspan="2"><input type="submit" value="수정"> &nbsp;&nbsp; <a href="list">목록보기</a> &nbsp;&nbsp;
+        <a href="delete?bId=${contentView.bId}">삭제</a> &nbsp;&nbsp; <a
+            href="replyView?bId=${contentView.bId}">답변</a></td>
+    </tr>
+  </form>
+</table>
+
+</body>
+</html>
+```
+
