@@ -25,6 +25,23 @@ DB에 접근하여 데이터를 가져올 때, DBCP를 사용한다. JDBC는 뒤
   url="jdbc:mysql://localhost:3306/javatest" />
 ```
 
+
+
+### pom.xml Dependency 추가
+
+* mysql-connector-java 라이브러리를 이용하기 위해서 maven dependency를 추가한다.
+
+```xml
+...
+	<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+    </dependency>
+...
+```
+
 ### 서비스 클래스 작성(커맨드 클래스)
 
 * BListCommand.java
