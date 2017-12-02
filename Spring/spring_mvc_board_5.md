@@ -4,7 +4,7 @@
 
 ## 20-1. 글 답변 페이지 만들기
 
-해당 게시글에 답변을 다는 기능을 추가 한다.
+해당 게시글에 답변하고, 댓글을 표시하기 위해 Indent, Step을 컨트롤하는 기능을 추가 한다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/Spring/img/spring_mvc_8.png?raw=true)
 
