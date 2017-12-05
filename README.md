@@ -49,7 +49,7 @@
 * [[Spring] 18.스프링 MVC 게시판3(리스트 조회, 게시물 등록, 상세조회)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_3.md)
 * [[Spring] 19.스프링 MVC 게시판(게시물 수정, 게시물 삭제)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_4.md)
 * [[Spring] 20.스프링 MVC 게시판(댓글 등록)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_5.md)
-* [[Spring] 21.스프링 JDBC](https://github.com/namjunemy/TIL/blob/master/Spring/[spring_jdbc.md](https://github.com/namjunemy/TIL/blob/master/Spring/spring_jdbc.md))
+* [[Spring] 21.스프링 JDBC](https://github.com/namjunemy/TIL/blob/master/Spring/spring_jdbc.md)
 * [[Spring] 22.트랜잭션1](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_1.md)
 
 ### Node.js
