@@ -39,12 +39,78 @@
   * security-context.xml안에 있는 설정 정보를 사용할 수 있다.
 
   ```xml
+  ...
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/spring/root-context.xml</param-value>
     <param-value>/WEB-INF/spring/security-context.xml</param-value>
   </context-param>
+  ...
   ```
 
 ## 25-4 In-Memory 인증
+
+[소스코드 repo](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_25_1_ex1_springex)
+
+* Spring security를 인증 테스트 하기 위한 실습이다.
+* 프로젝트 구성에는 보이지 않지만, 스프링 프레임워크에서 제공하는 login.html을 이용해서 인증테스트를 할 수 있다.
+* security-context.xml 파일 작성
+  *  name이 user이고 패스워드가 123인 유저는 ROLE_USER 권한을 갖고 login.html 페이지에 접근 할 수 있다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+
+
+  <security:http auto-config="true">
+    <security:intercept-url pattern="/login.html" access="ROLE_USER" />
+    <security:intercept-url pattern="/welcome.html" access="ROLE_ADMIN" />
+  </security:http>
+
+  <security:authentication-manager>
+    <security:authentication-provider>
+      <security:user-service>
+        <security:user name="user" password="123" authorities="ROLE_USER" />
+        <security:user name="admin" password="123" authorities="ROLE_ADMIN, ROLE_USER" />
+      </security:user-service>
+    </security:authentication-provider>
+  </security:authentication-manager>
+</beans>
+```
+
+* 보안 관련 설정인 security-context.xml에 있는 설정이 프로젝트에 적용되게 하기 위하여 web.xml파일에 Security필터 설정을 한다.
+* web.xml
+  * DelegatingFilterProxy를 이용하여 접근하는 모든 요청에 대해 필터를 거치게 한다.
+  * 이 과정에서 spring-context.xml을 참조하여 권한이 있는 사용자가 페이지에 접근할 수 있도록 한다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+    /WEB-INF/spring/root-context.xml
+    /WEB-INF/spring/security-context.xml
+    </param-value> 
+  </context-param>
+
+  <filter>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  ...
+```
+
+
 
