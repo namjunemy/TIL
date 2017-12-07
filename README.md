@@ -53,6 +53,9 @@
 * [[Spring] 22.트랜잭션1(개념 및 사용 방법)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_1.md)
 * [[Spring] 23.트랜잭션2(TransactionTemplate, 복수 트랜잭션 처리)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_2.md)
 * [[Spring] 24.트랜잭션3(트랜잭션 전파 속성)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_3.md)
+* [[Spring] 25.Security1(보안 관련 설정, 라이브러리 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_1.md)
+* [[Spring] 26.Security2(로그인 페이지 생성 및 연동, 기능 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_2.md)
+* [[Spring] 27.Security3(보안 관련 taglibs 사용법)](https://github.com/namjunemy/TIL/blob/master/Spring/security_3.md)
 
 ### Node.js
 
