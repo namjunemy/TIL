@@ -1,4 +1,4 @@
-# 26강. Security-2
+# 26. Security-2
 
 ## 26-1 로그인 페이지 만들기
 
@@ -31,6 +31,7 @@
     </security:authentication-provider>
   </security:authentication-manager>
 </beans>
+
 ```
 
 * 다음으로 로그인 페이지의 코드이다.
@@ -68,7 +69,7 @@
 [소스코드 repo](https://github.com/namjunemy/spring_for_junior_developer/tree/master/spring_26_1_ex1_springex)
 
 * 로그인에 실패 했을 경우 실패 메시지를 출력한다.
-  * loginForm.html
+  * loginForm.jsp
     * jstl core 라이브러리를 사용하여 param의 ng값이 null이 아니면 Login NG와 메세지를 출력한다.
 
 ```jsp
@@ -103,7 +104,7 @@
 ```
 
 * 로그아웃 기능과 로그인 상태를 출력한다.
-  * login.html
+  * login.jsp
     * 마찬가지로 jstl core 라이브러리를 사용하여 pageContext의 request.userPrincipal이 비어있을 경우와 존재할 경우를 판단하여 로그인 상태를 출력한다.
     * 추가적으로 pageContext의 request.userPrincipal.name을 뽑아내서 로그인 아이디를 출력한다.
     * 로그아웃 기능을 추가하기 위해 ${pageContext.request.contextPath}/j_spring_security_logout로 이동시킨다.
