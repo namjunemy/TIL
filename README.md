@@ -56,6 +56,9 @@
 * [[Spring] 25.Security1(보안 관련 설정, 라이브러리 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_1.md)
 * [[Spring] 26.Security2(로그인 페이지 생성 및 연동, 기능 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_2.md)
 * [[Spring] 27.Security3(보안 관련 taglibs 사용법)](https://github.com/namjunemy/TIL/blob/master/Spring/security_3.md)
+* [[Spring] 28.Mybatis1(기본 설정)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_1.md)
+* [[Spring] 29.Mybatis2(리스트 출력)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_2.md)
+* [[Spring] 30.Mybatis1(글 작성 및 삭제, 마무리)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_3.md)
 
 ### Node.js
 
