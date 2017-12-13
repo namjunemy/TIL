@@ -486,3 +486,336 @@ Set<E> set = new HashSet<E>();
 
   
 
+## 4. Map 컬렉션
+
+### Map 컬렉션의 특징 및 주요 메소드
+
+- 특징
+  - 키(Key)와 값(value)으로 구성된 Map.Entry 객체를 저장하는 구조
+  - 키와 값은 모두 객체
+  - 키는 중복될 수 없지만 값은 중복 저장 가능
+- 구현 클래스
+  - HashMap, Hashtable, LinkedHashMap, Properties, TreeMap
+- 주요 메소드
+
+| 기능    | 메소드                                 | 설명                                       |
+| ----- | ----------------------------------- | ---------------------------------------- |
+| 객체 추가 | V put(K key, V value)               | 주어진 키와 값을 추가, 저장이 되면 값을 리턴               |
+| 객체 검색 | boolean containsKey(Object key)     | 주어진 키가 있는지 여부                            |
+|       | boolean containsValue(Object value) | 주어진 값이 있는지 여부                            |
+|       | Set\<Map.Entry\<K,V\>\> entrySet()  | 키와 값의 쌍으로 구성된 모든 Map.Entry 객체를 Set에 담아서 리턴 |
+|       | V get(Object key)                   | 주어진 키의 값을 리턴                             |
+|       | boolean isEmpty()                   | 컬렉션이 비어있는지 여부                            |
+|       | Set\<K\> keySet()                   | 모든 키를 Set 객체에 담아서 리턴                     |
+|       | int size()                          | 저장된 키의 총 수를 리턴                           |
+|       | Collection \<V\> values()           | 저장된 모든 값 Collection에 담아서 리턴              |
+| 객체 삭제 | void clear()                        | 모든 Map.Entry(키와 값)를 삭제                   |
+|       | V remove(Object key)                | 주어진 키와 일치하는 Map.Entry 삭제, 삭제가 되면 값을 리턴   |
+
+* 객체 추가, 찾기, 삭제
+
+```java
+Map<String, Integer> map = ...;
+map.put("홍길동", 30);
+int score = map.get("홍길동");
+map.remove("홍길동")
+```
+
+* 전체 객체를 대상으로 반복해서 얻기
+  * Key-Value 쌍을 반복적으로 다루기 위해서 Set인터페이스 형태로 keySet과 entrySet을 저장하고 iterator를 이용해 반복 접근한다.
+
+```java
+Map<K,V> map = ...;
+Set<K> keySet = map.keySet();
+Iterator<K> keyIterator = keySet.iterator();
+while(keyIterator.hasNext()) {
+  K key = keyIterator.next();
+  V value = map.get(key);
+}
+```
+
+```java
+Set<Map.Entry<K,V>> entrySet = map.entrySet();
+Iterator<Map.Entry<K,V>> entryIterator = entrySet.iterator();
+while(entryIterator.hasNext()) {
+  Map.Entry<K,V> entry = entryIterator.next();
+  K key = entry.getKey();
+  V value = entry.getValue();
+}
+```
+
+  
+
+### HashMap
+
+```java
+Map<K, V> map = new HashMap<K, V>();
+```
+
+* 특징
+
+  * 키 객체는 hashCode()와 equals()를 재정의해서 동등객체가 될 조건을 정해야 한다.
+    * 동등객체가 되려면?
+      - 두 객체의 hashCode()의 리턴값이 같을 경우, 다시 두 객체의 equals()의 리턴값을 비교하여 같을 경우 동등 객체로 판단한다.
+      - hashCode() 리턴값이 다르거나, hashCode() 리턴값은 같지만 equals()의 리턴값이 다른 경우 다른 객체로 판단한다.
+  * 키 타입은 String을 많이 사용
+    * String은 문자열이 같을 경우 동등 객체가 될 수 있도록 hashCode()와 equals()메소드가 재정의되어 있기 때문
+
+* 예제
+
+  * HaspMap Iterator 사용
+
+  ```java
+  package map.hashmap;
+
+  import java.util.HashMap;
+  import java.util.Iterator;
+  import java.util.Map;
+  import java.util.Set;
+
+  public class HaspMapEx1 {
+    public static void main(String[] args) {
+      Map<String, Integer> map = new HashMap<>();
+
+      map.put("신용권", 40);
+      map.put("홍길동", 30);
+      map.put("김남준", 32);
+      map.put("홍길동", 32);
+      System.out.println(map.size());
+      System.out.println(map);
+
+      Set<Map.Entry<String, Integer>> entrySet = map.entrySet();
+      Iterator<Map.Entry<String, Integer>> entryIterator = entrySet.iterator();
+
+      System.out.println("##entrySet()");
+      while(entryIterator.hasNext()) {
+        Map.Entry<String, Integer> entry = entryIterator.next();
+        System.out.print(entry.getKey() + " ");
+        System.out.println(entry.getValue());
+      }
+
+      Set<String> keySet = map.keySet();
+      Iterator<String> keyIterator = keySet.iterator();
+
+      System.out.println("##keySet()");
+      while(keyIterator.hasNext()) {
+        String key = keyIterator.next();
+        int value = map.get(key);
+        System.out.println(key + " " + value);
+      }
+
+      map.clear();
+      System.out.println(map.size());
+    }
+  }
+  ```
+
+  ```java
+  3
+  {홍길동=32, 신용권=40, 김남준=32}
+  ##entrySet()
+  홍길동 32
+  신용권 40
+  김남준 32
+  ##keySet()
+  홍길동 32
+  신용권 40
+  김남준 32
+  0
+
+  Process finished with exit code 0
+  ```
+
+  * 중복 키값 저장 안함, 가장 최근 추가된 value로 대체
+
+  ```java
+  package map.hashcode_equals;
+
+  import java.util.HashMap;
+  import java.util.Map;
+
+  public class HashMapEx2 {
+    public static void main(String[] args) {
+      Map<Student, Integer> map = new HashMap<>();
+
+      map.put(new Student(1, "홍길동"), 95);
+      map.put(new Student(1, "홍길동"), 97);
+
+      System.out.println("총 Entry 수 : " + map.size());
+      System.out.println(map.get(new Student(1, "홍길동")));
+    }
+  }
+  ```
+
+  ```java
+  총 Entry 수 : 1
+  97
+
+  Process finished with exit code 0
+  ```
+
+  
+
+### Hashtable
+
+```java
+Map<K, V> map = new Hashtable<>();
+```
+
+* 특징
+
+  * 키 객체는 hashCode()와 equals()를 재정의해서 동등객체가 될 조건을 정해야 한다.
+    - 동등객체가 되려면?
+      - 두 객체의 hashCode()의 리턴값이 같을 경우, 다시 두 객체의 equals()의 리턴값을 비교하여 같을 경우 동등 객체로 판단한다.
+      - hashCode() 리턴값이 다르거나, hashCode() 리턴값은 같지만 equals()의 리턴값이 다른 경우 다른 객체로 판단한다.
+  * Hashtable은 스레드 동기화(synchronization)가 되어 있기 때문에 복소의 스레드가 동시에 Hashtable에 접근해서 객체를 추가, 삭제하더라고 스레드레 안전(thread safe)하다.
+    * ArrayList와 Vector의 관계와 같다.
+    * 멀티스레드 환경에서는 Hashtable을 사용하는 것이 안전하며, 싱글스레드 환경에서는 동기화처리가 되지 않은 HashMap을 사용하는 것이 성능에 더 좋다.
+
+* 예제
+
+  * 기본 사용법은 HashMap이랑 같다. Thread Safe여부만 다르다.
+
+  ```Java
+  package map.hashtable;
+
+  import java.util.Hashtable;
+  import java.util.Map;
+  import java.util.Scanner;
+
+  public class HashtableEx {
+    public static void main(String[] args) {
+      Map<String, String> map = new Hashtable<>();
+
+      map.put("spring", "12");
+      map.put("summer", "123");
+      map.put("fall", "1234");
+      map.put("winter","12345");
+
+      Scanner scanner = new Scanner(System.in);
+      while(true) {
+        System.out.println("아이디와 비밀번호를 입력해주세요.");
+        System.out.print("아이디 :");
+        String id = scanner.nextLine();
+        System.out.print("비밀번호 :");
+        String pw = scanner.nextLine();
+        System.out.println();
+        if(map.containsKey(id)) {
+          if(map.get(id).equals(pw)) {
+            System.out.println("로그인 되었습니다.");
+          } else {
+            System.out.println("비밀번호가 맞지 않습니다.");
+          }
+        } else {
+          System.out.println("아이디가 존재하지 않습니다.");
+        }
+      }
+    }
+  }
+  ```
+
+  ```java
+  아이디와 비밀번호를 입력해주세요.
+  아이디 :spring
+  비밀번호 :12
+
+  로그인 되었습니다.
+  아이디와 비밀번호를 입력해주세요.
+  아이디 :spring
+  비밀번호 :123
+
+  비밀번호가 맞지 않습니다.
+  ```
+
+  
+
+### Properties
+
+* 특징
+
+  * 키와 값을 String 타입으로 제한한 Map 컬렉션이다
+  * Properties는 프로퍼티(~.properties) 파일을 읽어 들일 때 주로 사용한다.
+
+* 프로퍼티 파일
+
+  * 옵션 정보, 데이터베이스 연결정보, 국제화(다국어) 정보를 기록한 텍스트 파일로 활용
+  * 애플리케이션에서 주로 변경이 잦은 문자열을 저장해서 유지 보수를 편리하게 만들어줌
+
+  ```properties
+  driver=oracle.jdbc.OracleDriver
+  url=jdbc:oravle:thin@localhost:1521:orcl
+  username=scott
+  password=tiger
+  ```
+
+  * 키와 값이 =기호로 연결되어 있는 텍스트파일로 ISO 8859-1 문자셋으로 저장
+  * 한글은 유니코드로 변환되어 저장
+
+* Properties 객체 생성
+
+  * 파일 시스템 경로 이용
+
+  ```java
+  Properties properties = new Properties();
+  properties.load(new FileReader("C:/~/database.properties"));
+  ```
+
+  * ClassPath를 이용
+
+  ```java
+  String path = 클래스.class.getResource("database.properties").getPath();
+  path = URLDecoder.decode(path, "utf-8");	//경로에 한글이 있을 경우 한글 복원
+  Properties properties = new Properties();
+  properties.load(new FileReader(path));
+  ```
+
+  ```java
+  //패키지가 다를경우
+  String path = A.class.getResource("config/database.properties").getPath();
+  ```
+
+* 값 읽기
+
+```java
+String value = properties.getProperty("key");
+```
+
+* 예제
+
+```java
+package map.properties;
+
+import java.io.FileReader;
+import java.net.URLDecoder;
+import java.util.Properties;
+
+public class PropertiesEx {
+  public static void main(String[] args) throws Exception {
+    Properties properties = new Properties();
+    String path = PropertiesEx.class.getResource("database.properties").getPath();
+    path = URLDecoder.decode(path, "utf-8");
+    properties.load(new FileReader(path));
+
+    String driver = properties.getProperty("driver");
+    String url = properties.getProperty("url");
+
+    System.out.println(driver);
+    System.out.println(url);
+  }
+}
+```
+
+```properties
+driver=oracle.jdbc.OracleDriver
+url=jdbc:oravle:thin@localhost:1521:orcl
+username=scott
+password=tiger
+```
+
+```java
+oracle.jdbc.OracleDriver
+jdbc:oravle:thin@localhost:1521:orcl
+
+Process finished with exit code 0
+```
+
