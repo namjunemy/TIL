@@ -287,3 +287,202 @@ linkedList 걸린 시간 : 4967602ns
 Process finished with exit code 0
 ```
 
+  
+
+## 3. Set 컬렉션
+
+### Set 컬렉션의 특징 및 주요 메소드
+
+* 특징
+  * 수학의 집합에 비유될 수 있다.
+  * 저장 순서가 유지되지 않는다.
+  * 객체를 중복해서 저장할 수 없고,
+  * 하나의 null만 저장할 수 있다.
+* 구현 클래스
+  * HashSet, LinkedHashSet, TreeSet
+* 주요 메소드
+
+| 기능    | 메소드                        | 설명                                       |
+| ----- | -------------------------- | ---------------------------------------- |
+| 객체 추가 | boolean add(E e)           | 주어진 객체를 저장, 객체가 성공적으로 저장되면 true를 리턴하고 중복 객체면 false를 리턴 |
+| 객체 검색 | boolean contains(Object o) | 주어진 객체가 저장되어 있는지 여부                      |
+|       | isEmpty()                  | 컬렉션이 비어 있는지 조사                           |
+|       | Iterator\<E\> iterator()   | 저장된 객체를 한번씩 가져오는 반복자 리턴                  |
+|       | int size()                 | 저장되어있는 전체 객체 수 리턴                        |
+| 객체 삭제 | void clear()               | 저장된 모든 객체를 삭제                            |
+|       | boolean remove(Object o)   | 주어진 객체를 삭제                               |
+
+* 객체 추가 및 삭제
+
+```java
+Set<String> set = ...;
+set.add("홍길동");
+set.remove("홍길동");
+```
+
+* Set 컬렉션은 인덱스로 객체를 검색해서 가져오는 메소드가 없다.
+* 대신, 전체 객체를 대상으로 한번씩 반복해서 가져오는 **반복자(Iterator)**를 제공한다.
+
+```java
+Set<String> set = ...;
+Iterator<String> iterator = set.iterator();
+```
+
+| 리턴타입    | 메소드명      | 설명                                      |
+| ------- | --------- | --------------------------------------- |
+| boolean | hasNext() | 가져올 객체가 있으면 true를 반환하고 없으면 false를 반환한다. |
+| E       | next()    | 컬렉션에서 하나의 객체를 가져온다.                     |
+| void    | remove()  | Set 컬렉션에서 객체를 제거한다.                     |
+
+```java
+Set<String> set = ...;
+Iterator<String> iterator = set.iterator();
+while(iterator.hasNext()) {
+  String str = iterator.next();
+}
+
+or
+
+for(String str : set) {
+  ...
+}
+```
+
+* 반복자를 통한 객체 제거
+  * iterator의 메소드이지만 set컬렉션의 객체가 제거된다.
+
+```java
+while(iterator.hasNext()) {
+  String str = iterator.next();
+  if(str.equals("홍길동")) {
+    iterator.remove();
+  }
+}
+```
+
+  
+
+### HashSet
+
+```java
+Set<E> set = new HashSet<E>();
+```
+
+* 특징
+
+  * 동일 객체 및 동등 객체는 중복 저장하지 않는다.
+  * 동등 객체 판단 방법
+    * 동등객체가 되려면?
+      * 두 객체의 hashCode()의 리턴값이 같을 경우, 다시 두 객체의 equals()의 리턴값을 비교하여 같을 경우 동등 객체로 판단한다.
+      * hashCode() 리턴값이 다르거나, hashCode() 리턴값은 같지만 equals()의 리턴값이 다른 경우 다른 객체로 판단한다.
+
+* 예제
+
+  * HashSet
+
+  ```java
+  package set;
+
+  import java.util.HashSet;
+  import java.util.Iterator;
+  import java.util.Set;
+
+  public class HashSetEx {
+    public static void main(String[] args) {
+      Set<String> set = new HashSet<>();
+
+      set.add("java");
+      set.add("JDBC");
+      set.add("java");
+      set.add("Servlet/JSP");
+      set.add("mybatis");
+
+      System.out.println(set.size());
+
+      Iterator<String> iterator = set.iterator();
+      while (iterator.hasNext()) {
+        System.out.print(iterator.next() + " ");
+      }
+
+      System.out.println();
+      for (String str : set) {
+        System.out.print(str + " ");
+      }
+
+      System.out.println();
+      set.clear();
+      System.out.println(set);
+    }
+  }
+  ```
+
+  ```java
+  4
+  java mybatis JDBC Servlet/JSP 
+  java mybatis JDBC Servlet/JSP 
+  []
+
+  Process finished with exit code 0
+  ```
+
+  * hashCode(), equals() Override
+
+  ```java
+  package set.hashcode_equals;
+
+  import java.util.Objects;
+
+  public class Member {
+    public String name;
+    public int age;
+
+    public Member(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+      if(object instanceof Member) {
+        Member member = (Member) object;
+        return member.name.equals(name) && member.age == age;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name, age);
+    }
+  }
+  ```
+
+  ```java
+  package set.hashcode_equals;
+
+  import java.util.HashSet;
+  import java.util.Set;
+
+  public class HashSetEx2 {
+    public static void main(String[] args) {
+      Set<Member> set = new HashSet<>();
+
+      set.add(new Member("홍길동", 30));
+      set.add(new Member("홍길동", 30));
+
+      System.out.println(set.size());
+    }
+  }
+  ```
+
+  ```java
+  1
+
+  Process finished with exit code 0
+  ```
+
+
+
+  
+
