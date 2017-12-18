@@ -37,7 +37,7 @@
   * java.util 패키지에 포함
   * 인터페이스를 통해서 정형화된 방법으로 다양한 컬렉션 클래스를 이용
 
-### 컬렉션 프렘워크의 주요 인터페이스
+### 컬렉션 프레임워크의 주요 인터페이스
 
 * List
   * 배열과 유사하게 인덱스로 관리
@@ -484,7 +484,7 @@ Set<E> set = new HashSet<E>();
 
 
 
-  
+
 
 ## 4. Map 컬렉션
 
@@ -654,7 +654,6 @@ Map<K, V> map = new HashMap<K, V>();
   Process finished with exit code 0
   ```
 
-  
 
 ### Hashtable
 
@@ -727,7 +726,6 @@ Map<K, V> map = new Hashtable<>();
   비밀번호가 맞지 않습니다.
   ```
 
-  
 
 ### Properties
 
@@ -819,3 +817,198 @@ jdbc:oravle:thin@localhost:1521:orcl
 Process finished with exit code 0
 ```
 
+  
+
+## 5. 검색 기능을 강화시킨 컬렉션
+
+### 검색기능을 강화시킨 컬렉션
+
+* TreeSet, TreeMap
+  * 이진트리(binary tree)를 사용하기 때문에 검색 속도 향상
+
+### 이진 트리 구조
+
+* 부모 노드와 자식 노드로 구성
+  * 왼쪽 자식 노드 : 부모 보다 작은 값
+  * 오른쪽 자식 노드 : 부모 보다 큰 값
+* 정렬이 쉬움
+  * 오름 차순 : 왼쪽노드 -> 부모노드 -> 오른쪽노드
+  * 내림 차순 : 오른쪽노드 -> 부모노드 -> 왼쪽노드
+* 범위 검색이 쉽다
+  * 노드를 기준으로 왼쪽 자식트리(작은 값들)와 오른쪽 자식트리(큰 값들)의 속성이 결정되어있음
+
+### TreeSet
+
+```java
+TreeSet<E> treeSet = new TreeSet<>();
+```
+
+TreeSet은 Set 인터페이스의 구현 클래스이므로 Set인터페이스의 타입의 변수에 대입해도 되지만, TreeSet 타입의 변수에 대입한 이유는 TreeSet이 가지고 있는 검색 기능 메소드를 사용하기 위함이다.
+
+* 특징
+
+  * 이진 트리(Binary Tree)를 기반으로 한 Set 컬렉션
+  * 왼쪽과 오른쪽 자식노드를 참조하기 위한 두개의 변수로 구성
+
+* 주요 메소드
+
+  * 특정 객체를 찾는 메소드
+
+    * first(), last(), lower(), higher(), ...
+
+    ```java
+    package advanced_search_collection.treeset;
+
+    import java.util.Iterator;
+    import java.util.TreeSet;
+
+    public class TreeSetEx01 {
+      public static void main(String[] args) {
+        TreeSet<Integer> scores = new TreeSet<>();
+
+        scores.add(87);
+        scores.add(98);
+        scores.add(75);
+        scores.add(95);
+        scores.add(80);
+
+        System.out.println("최소값(first): " + scores.first());
+        System.out.println("최대값(last): " + scores.last());
+        System.out.println("95 아래에 있는 값(미만, lower): " + scores.lower(95));
+        System.out.println("95 위에 있는 값(초과, higher): " + scores.higher(95));
+        System.out.println("95이거나 바로 아래 있는 값(이하, floor): " + scores.floor(95));
+        System.out.println("95이거나 바로 위에 있는 값(이상, ceiling): " + scores.ceiling(95));
+        System.out.println();
+
+        System.out.println("Iterator");
+        Iterator<Integer> iterator = scores.iterator();
+        while(iterator.hasNext()) {
+          System.out.println(iterator.next());
+        }
+        System.out.println();
+
+        System.out.println("최소값(pollFirst)/최대값(pollLast) 추출 후 set에서 제거");
+        while (!scores.isEmpty()) {
+          int score = scores.pollFirst();
+    //      int score = scores.pollLast();
+          System.out.print("빼낸 값: " + score);
+          System.out.println(" / 남은 객체 수: " + scores.size());
+        }
+        System.out.println();
+      }
+    }
+    ```
+
+    ```java
+    최소값(first): 75
+    최대값(last): 98
+    95 아래에 있는 값(미만, lower): 87
+    95 위에 있는 값(초과, higher): 98
+    95이거나 바로 아래 있는 값(이하, floor): 95
+    95이거나 바로 위에 있는 값(이상, ceiling): 95
+
+    Iterator
+    75
+    80
+    87
+    95
+    98
+
+    최소값(pollFirst)/최대값(pollLast) 추출 후 set에서 제거
+    빼낸 값: 75 / 남은 객체 수: 4
+    빼낸 값: 80 / 남은 객체 수: 3
+    빼낸 값: 87 / 남은 객체 수: 2
+    빼낸 값: 95 / 남은 객체 수: 1
+    빼낸 값: 98 / 남은 객체 수: 0
+
+
+    Process finished with exit code 0
+    ```
+
+
+  * 정렬 메소드
+
+    * descendingIterator(), descendingSet()
+
+    ```java
+    package advanced_search_collection.treeset;
+
+    import java.util.NavigableSet;
+    import java.util.TreeSet;
+
+    public class TreeSetEx02 {
+      public static void main(String[] args) {
+        TreeSet<Integer> scores = new TreeSet<>();
+
+        scores.add(87);
+        scores.add(98);
+        scores.add(75);
+        scores.add(95);
+        scores.add(80);
+        System.out.println(scores);
+
+        NavigableSet<Integer> descendingSet = scores.descendingSet();
+        System.out.println("descendingSet");
+        for(int score : descendingSet) {
+          System.out.print(score + " ");
+        }
+
+        System.out.println();
+        System.out.println("ascendingSet");
+        NavigableSet<Integer> ascendSet = descendingSet.descendingSet();
+        for(int score : ascendSet) {
+          System.out.print(score + " ");
+        }
+      }
+    }
+    ```
+
+    ```java
+    [75, 80, 87, 95, 98]
+    descendingSet
+    98 95 87 80 75 
+    ascendingSet
+    75 80 87 95 98 
+    Process finished with exit code 0
+    ```
+
+  * 범위 검색 메소드
+
+    * headSet(), tailSet, subSet()
+
+    ```java
+    package advanced_search_collection.treeset;
+
+    import java.util.NavigableSet;
+    import java.util.TreeSet;
+
+    public class TreeSetEx03 {
+      public static void main(String[] args) {
+        TreeSet<String> treeSet = new TreeSet<>();
+
+        treeSet.add("apple");
+        treeSet.add("forever");
+        treeSet.add("description");
+        treeSet.add("ever");
+        treeSet.add("zoo");
+        treeSet.add("base");
+        treeSet.add("guess");
+        treeSet.add("cherry");
+        treeSet.add("f");
+        treeSet.add("c");
+
+        System.out.println("[c~f사이의 단어 검색]");
+        NavigableSet<String> rangeSet = treeSet.subSet("c", true, "f", true);
+        System.out.println(rangeSet);
+      }
+    }
+    ```
+
+    ```java
+    [c~f사이의 단어 검색]
+    [c, cherry, description, ever, f]
+
+    Process finished with exit code 0
+    ```
+
+  
