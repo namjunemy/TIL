@@ -1351,3 +1351,157 @@ TreeMap<K, V> treeMap = new TreeMap<K, V>();
   Process finished with exit code 0
   ```
 
+  
+
+## 6. LIFO와 FIFO 컬렉션
+
+Last In First Out, First In First Out
+
+### Stack 클래스
+
+```Java
+Stack<E> stack = new Stack<>();
+```
+
+* 특징
+  * 후입선출(Last In First Out) 구조
+  * 응용 예: JVM 스택 메모리
+
+* 주요 메소드
+
+  | 리턴타입 | 메소드          | 설명                                  |
+  | ---- | ------------ | ----------------------------------- |
+  | E    | push(E item) | 주어진 객체를 스택에 넣는다                     |
+  | E    | peek()       | 스택의 맨위 객체를 가져온다. 객체를 스택에서 제거하지 않는다. |
+  | E    | pop()        | 스택의 맨위 객체를 가져온다. 객체를 스택에서 제거한다.     |
+
+* 예제 코드
+
+```java
+package stack;
+
+public class Coin {
+  private int value;
+
+  public Coin(int value) {
+    this.value = value;
+  }
+
+  public int getValue(){
+    return value;
+  }
+}
+```
+
+```java
+package stack;
+
+import java.util.Stack;
+
+public class StackEx {
+  public static void main(String[] args) {
+    Stack<Coin> coinBox = new Stack<>();
+
+    coinBox.push(new Coin(100));
+    coinBox.push(new Coin(500));
+    coinBox.push(new Coin(50));
+
+    while(!coinBox.isEmpty()) {
+      System.out.println("꺼낸 동전 : " + coinBox.pop().getValue() + "원");
+    }
+  }
+}
+```
+
+```java
+꺼낸 동전 : 50원
+꺼낸 동전 : 500원
+꺼낸 동전 : 100원
+
+Process finished with exit code 0
+```
+
+### Queue 클래스
+
+```java
+Queue queue = new LinkedList();
+```
+
+* 특징
+
+  * 선입선출(First In First Out) tnwh
+  * 응용 예: 작업큐, 메세지큐, ...
+  * 구현 클래스 : LinkedList
+
+* 주요 메소드
+
+  | 리턴타입    | 메소드        | 설명                             |
+  | ------- | ---------- | ------------------------------ |
+  | boolean | offer(E e) | 주어진 객체를 넣는다.                   |
+  | E       | peek()     | 객체 하나를 가져온다. 객체를 큐에서 제거하지 않는다. |
+  | E       | poll()     | 객체 하나를 가져온다. 객체를 큐에서 제거한다.     |
+
+* 예제 코드
+
+```java
+package queue;
+
+public class Message {
+  private String command;
+  private String to;
+
+  public Message(String command, String to) {
+    this.command = command;
+    this.to = to;
+  }
+
+  public String getCommand() {
+    return command;
+  }
+
+  public String getTo() {
+    return to;
+  }
+}
+```
+
+```java
+package queue;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class QueueEx {
+  public static void main(String[] args) {
+    Queue<Message> messageQueue = new LinkedList<>();
+
+    messageQueue.offer(new Message("send Email", "홍길동"));
+    messageQueue.offer(new Message("send SMS", "신용권"));
+    messageQueue.offer(new Message("send Kakaotalk", "김남준"));
+
+    while(!messageQueue.isEmpty()) {
+      Message message = messageQueue.poll();
+      switch(message.getCommand()) {
+        case "send Email":
+          System.out.println(message.getTo() + "님에게 메일을 보냅니다.");
+          break;
+        case "send SMS":
+          System.out.println(message.getTo() + "님에게 SMS를 보냅니다.");
+          break;
+        case "send Kakaotalk":
+          System.out.println(message.getTo() + "님에게 KakaoTalk 보냅니다.");
+          break;
+      }
+    }
+  }
+}
+```
+
+```java
+홍길동님에게 메일을 보냅니다.
+신용권님에게 SMS를 보냅니다.
+김남준님에게 KakaoTalk 보냅니다.
+
+Process finished with exit code 0
+```
+
