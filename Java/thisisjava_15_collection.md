@@ -1197,10 +1197,158 @@ TreeMap<K, V> treeMap = new TreeMap<K, V>();
 
 * 사용자 정의 객체를 정렬하고 싶을 경우
 
-  * 방법1 : 사용자 정의 클래스가 Comparable을 구현
+  * **방법1 : 사용자 정의 클래스가 Comparable을 구현**
 
   | 리턴타입 | 메소드            | 설명                                       |
   | ---- | -------------- | ---------------------------------------- |
   | int  | compareTo(T o) | 주어진 객체과 같으면 0을 리턴, 주어진 객체보자 적으면 음수를 리턴, 주어진 객체보다 크면 양수를 리턴 |
 
-  * 방법2 : TreeSet, TreeMap 생성시 Comparator 구현 객체 제공 
+  ```java
+  package comparable;
+
+  public class Person implements Comparable<Person> {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
+
+    @Override
+    public int compareTo(Person o) {
+      if (age < o.getAge()) return -1;
+      else if (age == o.age) return 0;
+      else return 1;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public int getAge() {
+      return age;
+    }
+
+    @Override
+    public String toString() {
+      return age + "-" + name;
+    }
+  }
+  ```
+
+  ```java
+  package comparable;
+
+  import java.util.Iterator;
+  import java.util.TreeSet;
+
+  public class ComparableEx {
+    public static void main(String[] args) {
+      TreeSet<Person> treeSet = new TreeSet<>();
+      treeSet.add(new Person("김남준", 25));
+      treeSet.add(new Person("신용권", 40));
+      treeSet.add(new Person("김자바", 30));
+      System.out.println(treeSet);
+
+      Iterator<Person> iterator = treeSet.iterator();
+      while(iterator.hasNext()) {
+        Person person = iterator.next();
+        System.out.println(person);
+      }
+    }
+  }
+  ```
+
+  ```java
+  [25-김남준, 30-김자바, 40-신용권]
+  25-김남준
+  30-김자바
+  40-신용권
+
+  Process finished with exit code 0
+  ```
+
+  * **방법2 : TreeSet, TreeMap 생성시 Comparator 구현 객체 제공**
+
+  | 리턴타입 | 메소드                 | 설명                                       |
+  | ---- | ------------------- | ---------------------------------------- |
+  | int  | compare(T o1, T o2) | o1과 o2가 동등하다면 0을 리턴, o1이 o2보다 앞에 오게 하려면 음수를 리턴, o1과 o2보다 뒤에 오게 하려면 양수를 리턴 |
+
+  ```java
+  package comparator;
+
+  public class Fruit {
+    private String name;
+    private int price;
+
+    public Fruit(String name, int price) {
+      this.name = name;
+      this.price = price;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public int getPrice() {
+      return price;
+    }
+
+    @Override
+    public String toString() {
+      return price + "-" + name;
+    }
+  }
+  ```
+
+  ```java
+  package comparator;
+
+  import java.util.Comparator;
+
+  public class DescendingComparator implements Comparator<Fruit> {
+
+    @Override
+    public int compare(Fruit o1, Fruit o2) {
+      if (o1.getPrice() < o2.getPrice()) return -1;
+      else if (o1.getPrice() == o2.getPrice()) return 0;
+      else return 1;
+    }
+  }
+  ```
+
+  ```java
+  package comparator;
+
+  import java.util.Iterator;
+  import java.util.TreeSet;
+
+  public class ComparatorEx {
+    public static void main(String[] args) {
+      TreeSet<Fruit> treeSet = new TreeSet<>(new DescendingComparator());
+
+      treeSet.add(new Fruit("포도", 3000));
+      treeSet.add(new Fruit("수박", 10000));
+      treeSet.add(new Fruit("딸기", 6000));
+      System.out.println(treeSet);
+
+      Iterator<Fruit> iterator = treeSet.iterator();
+      while(iterator.hasNext()) {
+        Fruit fruit = iterator.next();
+        System.out.println(fruit);
+      }
+    }
+  }
+  ```
+
+  ```java
+  [3000-포도, 6000-딸기, 10000-수박]
+  3000-포도
+  6000-딸기
+  10000-수박
+
+  Process finished with exit code 0
+  ```
+
+  ​
