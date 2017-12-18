@@ -1011,4 +1011,196 @@ TreeSet은 Set 인터페이스의 구현 클래스이므로 Set인터페이스�
     Process finished with exit code 0
     ```
 
+   
+
+### TreeMap
+
+```java
+TreeMap<K, V> treeMap = new TreeMap<K, V>();
+```
+
+검색속도를 향상 시키기 위해서 제공되는 컬렉션, 제공되는 객체를 MapEntry형태로 제공하는 컬렉션
+
+- 특징
+
+  - 이진 트리(Binary Tree)를 기반으로한 Map 컬렉션
+  - 키와 값이 저장된 Map.Entry를 저장
+  - 왼쪽과 오른쪽 자식노드를 참조하기 위한 두개의 변수로 구성
+
+- 주요 메소드
+
+  - 단일 노드 객체를 찾는 메소드
+
+    - firstEntry(), lastEntry(), lowerEntry(), lowerEntry(), higherEntry(), ...
+
+    ```java
+    package advanced_search_collection.treemap;
+
+    import java.util.Map;
+    import java.util.TreeMap;
+
+    public class TreeMapEx01 {
+      public static void main(String[] args) {
+        TreeMap<Integer, String> scores = new TreeMap<>();
+        scores.put(87, "홍길동");
+        scores.put(98, "이동수");
+        scores.put(75, "박길순");
+        scores.put(95, "신용권");
+        scores.put(80, "김자바");
+
+        Map.Entry<Integer, String> entry = scores.firstEntry();
+        System.out.println("가장 작은 키값을 가진 객체: " + entry.getKey() + ", " + entry.getValue());
+
+        entry = scores.lastEntry();
+        System.out.println("가장 큰 키값을 가진 객체: " + entry.getKey() + ", " + entry.getValue());
+
+        entry = scores.lowerEntry(95);
+        System.out.println("95점 미만의 키값을 가진 객체: " + entry.getKey() + ", " + entry.getValue());
+
+        entry = scores.higherEntry(95);
+        System.out.println("95점 초과의 키값을 가진 객체: " + entry.getKey() + ", " + entry.getValue());
+
+        entry = scores.floorEntry(95);
+        System.out.println("95점 이상의 키값을 가진 객체: " + entry.getKey() + ", " + entry.getValue());
+
+        entry = scores.ceilingEntry(95);
+        System.out.println("95점 이하의 키값을 가진 객체: " + entry.getKey() + ", " + entry.getValue());
+
+        System.out.println("키의 값이 최소값(pollFirst)/최대값(pollLast)인 객체 추출 후 Map에서 제거");
+        while (!scores.isEmpty()) {
+          //entry = scores.pollFirstEntry();
+          entry = scores.pollLastEntry();
+          System.out.println(entry.getKey() + ", " + entry.getValue() + "(남은 객체 수: " + scores.size() + ")");
+        }
+      }
+    }
+    ```
+
+    ```java
+    가장 작은 키값을 가진 객체: 75, 박길순
+    가장 큰 키값을 가진 객체: 98, 이동수
+    95점 미만의 키값을 가진 객체: 87, 홍길동
+    95점 초과의 키값을 가진 객체: 98, 이동수
+    95점 이상의 키값을 가진 객체: 95, 신용권
+    95점 이하의 키값을 가진 객체: 95, 신용권
+
+    키의 값이 최소값(pollFirst)/최대값(pollLast)인 객체 추출 후 Map에서 제거
+    98, 이동수(남은 객체 수: 4)
+    95, 신용권(남은 객체 수: 3)
+    87, 홍길동(남은 객체 수: 2)
+    80, 김자바(남은 객체 수: 1)
+    75, 박길순(남은 객체 수: 0)
+
+    Process finished with exit code 0
+    ```
+
+
+  - 정렬 메소드
+
+    - descendingKetSet(), descendingMap()
+
+    ```java
+    package advanced_search_collection.treemap;
+
+    import java.util.Map;
+    import java.util.NavigableMap;
+    import java.util.Set;
+    import java.util.TreeMap;
+
+    public class TreeMapEx02 {
+      public static void main(String[] args) {
+        TreeMap<Integer, String> scores = new TreeMap<>();
+        scores.put(87, "홍길동");
+        scores.put(98, "이동수");
+        scores.put(75, "박길순");
+        scores.put(95, "신용권");
+        scores.put(80, "김자바");
+        System.out.println(scores);
+
+        NavigableMap<Integer, String> descendingMap = scores.descendingMap();
+        Set<Map.Entry<Integer, String>> descendingEntrySet = descendingMap.entrySet();
+        for(Map.Entry<Integer, String> entry : descendingEntrySet) {
+          System.out.print(entry.getKey() + "-" + entry.getValue() + " ");
+        }
+        System.out.println();
+
+        NavigableMap<Integer, String> ascendingMap = descendingMap.descendingMap();
+        Set<Map.Entry<Integer, String>> ascendingEntrySet = ascendingMap.entrySet();
+        for(Map.Entry<Integer, String> entry : ascendingEntrySet) {
+          System.out.print(entry.getKey() + "-" + entry.getValue() + " ");
+        }
+        System.out.println();
+      }
+    }
+    ```
+
+    ```java
+    {75=박길순, 80=김자바, 87=홍길동, 95=신용권, 98=이동수}
+    98-이동수 95-신용권 87-홍길동 80-김자바 75-박길순 
+    75-박길순 80-김자바 87-홍길동 95-신용권 98-이동수 
+
+    Process finished with exit code 0
+    ```
+
+  - 범위 검색 메소드
+
+    - headMap(), tailMap(), subMap()
+
+    ```java
+    package advanced_search_collection.treemap;
+
+    import java.util.Map;
+    import java.util.NavigableMap;
+    import java.util.TreeMap;
+
+    public class TreeMapEx03 {
+      public static void main(String[] args) {
+        TreeMap<String, Integer> treeMap = new TreeMap<>();
+        treeMap.put("apple", 10);
+        treeMap.put("forever", 60);
+        treeMap.put("description", 40);
+        treeMap.put("ever", 50);
+        treeMap.put("zoo", 10);
+        treeMap.put("base", 20);
+        treeMap.put("guess", 70);
+        treeMap.put("cherry", 30);
+        treeMap.put("f", 5);
+        treeMap.put("c", 80);
+
+        System.out.println("[c~f 사이의 단어 검색]");
+        NavigableMap<String, Integer> rangeMap = treeMap.subMap("c", true, "f", true);
+        for (Map.Entry<String, Integer> entry : rangeMap.entrySet()) {
+          System.out.print(entry.getKey() + "-" + entry.getValue() + " ");
+        }
+      }
+    }
+    ```
+
+    ```java
+    [c~f 사이의 단어 검색]
+    c-80 cherry-30 description-40 ever-50 f-5 
+    Process finished with exit code 0
+    ```
+
   
+
+### Comparable과 Comparator
+
+* TreeSet과 TreeMap의 자동 정렬
+
+  * TreeSet의 객체와 TreeMap의 키는 저장과 동시에 자동 오름차순으로 정렬
+  * 숫자(Integer, Double)타입일 경우에는 값으로 정렬
+  * 문자열(String)타입일 경우에는 값으로 정렬
+  * TreeSet과 TreeMap은 정렬을 위해 java.lang.Comparable을 구현한 객체를 요구
+    * Integer, Double, String은 모두 Comparable 인터페이스를 구현한 클래스이기 때문에 TreeSet과 TreeMap에 저장할 때, 자동으로 오름차순으로 정렬될 수 있다.
+    * 사용자가 정의하는 객체를 TreeSet, TreeMap에 저장하려고 할 때, Comparable을 구현하고 있지 않을 경우에는 저장하는 순간 ClassCastException이 발생
+
+* 사용자 정의 객체를 정렬하고 싶을 경우
+
+  * 방법1 : 사용자 정의 클래스가 Comparable을 구현
+
+  | 리턴타입 | 메소드            | 설명                                       |
+  | ---- | -------------- | ---------------------------------------- |
+  | int  | compareTo(T o) | 주어진 객체과 같으면 0을 리턴, 주어진 객체보자 적으면 음수를 리턴, 주어진 객체보다 크면 양수를 리턴 |
+
+  * 방법2 : TreeSet, TreeMap 생성시 Comparator 구현 객체 제공 
