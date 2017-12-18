@@ -1505,3 +1505,34 @@ public class QueueEx {
 Process finished with exit code 0
 ```
 
+  
+
+## 7. 동기화된(synchronized) 컬렉션
+
+### 비동기화된 컬렉션을 동기화된 컬렉션으로 래핑
+
+비동기화된 컬렉션을 멀티스레드 환경에서 사용해야 할 경우 동기화된 컬렉션으로 래핑하여 사용하는 것이 안전하다.
+
+#### List 컬렉션
+
+```java
+List<T> list = Collections.synchronizedList(new ArrayList<T>());
+```
+
+* 위와 같이 비동기화된 컬렉션인 ArrayList를 Collections클래스의 정적메소드를 통해서 래핑시켜주면 Thread Safe한 컬렉션을 만들 수 있다.
+
+#### Set 컬렉션
+
+```java
+Set<E> set = Collections.synchronizedSet(new HashSet<E>);
+```
+
+* 마찬가지로 비동기화된 컬렉션인 HashSet를 Collections클래스의 정적메소드를 통해서 래핑시켜주면 Thread Safe하게 만들 수 있다.
+
+#### Map 컬렉션
+
+```java
+Map<K, V> map = Collections.synchronizedMap(new HashMap<K, V>));
+```
+
+* 마찬가지로 비동기화된 컬렉션인 HashMap를 Collections클래스의 정적메소드를 통해서 래핑시켜주면 Thread Safe하게 만들 수 있다.
