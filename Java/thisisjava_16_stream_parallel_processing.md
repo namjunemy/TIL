@@ -172,4 +172,162 @@ stream.forEach(name -> System.out.println(name));
   Process finished with exit code 0
   ```
 
-  ​
+    
+
+## 2. 스트림의 종류
+
+### 스트림이 포함된 패키지
+
+* 자바 8 부터 java.util.stream 패키지에서 인터페이스 타입으로 제공
+  * 모든 스트림에서 사용할 수 있는 공통 메소드들이 정의 되어있는 BaseStream아래에 객체와 타입 요소를 처리하는 스트림이 있다. BaseStream은 공통 메소드들이 정의되어 있고, 코드에서 직접적으로 사용하지는 않는다.
+  * BaseStream
+    * Stream
+    * IntStream
+    * LongStream
+    * DoubleStream
+* 스트림 구현 객체를 얻는 방법
+
+| 리턴타입                                     | 메소드(매개변수)                                | 소스                                       |
+| ---------------------------------------- | ---------------------------------------- | ---------------------------------------- |
+| Stream\<T\>                              | java.util.Collection.stream(), java.util.Collection.parallelStream() | 컬렉션                                      |
+| Stream\<T\>, IntStream, LongStream, DoubleStream | Arrays.stream(T[]), Arrays.stream(int[]), Arrays.stream(long[]), Arrays.stream(double[]), Stream.of(T[]), IntStream.of(int[]), LongStream.of(long[]), DoubleStream.of(double[]) | 배열                                       |
+| IntStream                                | IntStream.range(int, int), IntStream.rangeClosed(int, int) | Int 범위. rangeClosed() 메소드는 두번째 파라미터인 끝값을 포함한다. range()는 포함하지 않는다. |
+| LongStream                               | LongStream.range(long, long), LongStream.rangeClosed(long, long) | long 범위. rangeClosed() 메소드는 두번째 파라미터인 끝값을 포함한다. range()는 포함하지 않는다. |
+| Stream\<Path\>                           | Files.find(Path, int, BiPredicate, FileVisitOption), Files.list(Path) | 디렉토리 - Path 경로에서 BiPredicate가 true인 Path Stream을 얻을 수 있다. |
+| Stream\<String\>                         | Files.lines(Path, Charset), BufferedReader.lines() | 파일 - 한 라인에 대한 텍스트 정보를 요소가지는 Stream을 얻을 수 있다. |
+| DoubleStream, IntStream, LongStream      | Random.doubles(…), Random.ints(), Random.longs() | 랜덤수                                      |
+
+  
+
+### 컬렉션으로부터 스트림 얻기
+
+```java
+List<Student> studentList = Arrays.asList(
+  new Student("홍길동", 10),
+  new Student("김길동", 20),
+  new Student("남길동", 30)
+);
+
+Stream<Student> stream = studentList.stream();
+stream.forEach(s -> System.out.println(s.getName()));
+```
+
+```java
+홍길동
+김길동
+남길동
+```
+
+  
+
+### 배열로부터 스트림 얻기
+
+```java
+String[] stringArray = {"홍길동", "신용권", "김미나"};
+Stream<String> stringStream = Arrays.stream(stringArray);
+stringStream.forEach(a -> System.out.print(a + ","));
+System.out.println();
+
+int[] intArray = {1, 2, 3, 4, 5};
+IntStream intStream = Arrays.stream(intArray);
+intStream.forEach(a -> System.out.print(a + ","));
+```
+
+```java
+홍길동,신용권,김미나,
+1,2,3,4,5,
+```
+
+  
+
+### 숫자 범위로부터 스트림 얻기
+
+```java
+public class FromIntRangeEx {
+  public static int sum;
+
+  public static void main(String[] args) {
+    IntStream stream = IntStream.rangeClosed(1, 100);
+    //IntStream stream = IntStream.range(1, 100);	//범위에 100이 포함되지 않음
+    stream.forEach(a -> sum += a);
+    System.out.println("총합: " + sum);
+  }
+}
+```
+
+```java
+총합: 5050
+또는
+총합: 4950
+```
+
+  
+
+### 파일로부터 스트림 얻기
+
+```java
+Path path = Paths.get("/Users/njkim/Workspace/intellij/this_is_java/ch16_스트림과병렬처리/src/sec02/kind_of_stream/linedata.txt");
+Stream<String> stream;
+
+
+stream = Files.lines(path, Charset.defaultCharset());
+stream.forEach(System.out::println);
+stream.close();
+System.out.println();
+
+File file = path.toFile();
+FileReader fileReader = new FileReader(file);
+BufferedReader bufferedReader = new BufferedReader(fileReader);
+stream = bufferedReader.lines();
+stream.forEach(System.out::println);
+stream.close();
+```
+
+```java
+Java8에서 추가된 새로운 기능
+1. 람다식
+2. 메소드 참조
+3. 디폴트 메소드와 정적 메소드
+4. 새로운 API 패키지
+
+Java8에서 추가된 새로운 기능
+1. 람다식
+2. 메소드 참조
+3. 디폴트 메소드와 정적 메소드
+4. 새로운 API 패키지
+```
+
+  
+
+### 디렉토리로부터 스트림 얻기
+
+```java
+Path path = Paths.get("/Users/njkim/Workspace/intellij/this_is_java");
+Stream<Path> stream = Files.list(path);
+stream.forEach(p -> System.out.println(p.getFileName()));
+```
+
+```java
+ch14_람다식
+ch08_인터페이스
+ch15_컬렉션프레임워크
+.DS_Store
+out
+ch07_상속
+ch02_변수와타입
+ch04_조건문과반복문
+ch06_클래스
+ch12_멀티스레드
+ch03_연산자
+README.md
+ch05_참조타입
+.gitignore
+ch10_예외처리
+ch16_스트림과병렬처리
+ch09_중첩클래스와_중첩인터페이스
+ch13_제네릭
+ch11_기본_API_클래스
+.git
+.idea
+```
+
