@@ -485,5 +485,176 @@ Process finished with exit code 0
 
   
 
+## 5. 매핑 중간 처리 - flatMapXXX(), mapXXX(), asXXXStream(), box
 
+* 매핑(mapping)은 중간 처리 기능으로 스트림의 요소를 다른 요소로 대체 한다.
+
+  * 예를 들면, 객체를 정수로, 객체를 double로, 객체를 boolean값으로 대체하는 것을 말한다. 반드시 하나의 요소가 하나의 요소로 대체 되는것은 아니다. 하나의 요소가 여러개의 요소로 대체될 수도 있다. 
+
+* 매핑 메소드 종류
+
+  * flatMapXXX(), mapXXX(), asDoubleStream(), asLongStream(), boxed()
+
+  ​
+
+### flatMapXXX()메소드
+
+* 한 개의 요소를 대체하는 복수개의 요소들로 구성된 새로운 스트림을 리턴한다.
+
+| 리턴타입         | 메소드(매개변수)                                | 요소 -> 대체 요소            |
+| ------------ | ---------------------------------------- | ---------------------- |
+| Stream\<R\>  | flatMap(Function\<T, Stream\<R\>\>)      | T -> Stream\<R\>       |
+| DoubleStream | flatMap(DoubleFunction\<DoubleStream\>)  | double -> DoubleStream |
+| IntStream    | flatMap(IntFunction\<IntStream\>)        | int -> IntStream       |
+| LongStream   | flatMap(LongFunction\<LongStream\>)      | long -> longStream     |
+| DoubleStream | flatMapToDouble(Function\<T, DoubleStream\>) | T -> DoubleStream      |
+| IntStream    | flatMapToInt(Function\<T, IntStream\>)   | T -> IntStream         |
+| LongStream   | flatMapToLong(Function\<T, LongStream\>) | T -> LingStream        |
+
+* **flatMapXXX() 실습 예제**
+  * 다음 예제는 입력된 데이터(요소)들이 List\<String\>에 저장되어 있다고 가정하고, 요소별로 단어를 뽑아 단어 스트림으로 재생성한다. 만약 입력된 데이터들이 숫자라면 숫자를 뽑아 숫자 스트림으로 재생성한다.
+
+```java
+package sec05.stream_mapping;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class FlatMapEx {
+  public static void main(String[] args) {
+    List<String> inputList1 = Arrays.asList("java8 lambda", "stream mapping");
+
+    inputList1.stream()
+        .flatMap(data -> Arrays.stream(data.split(" ")))
+        .forEach(System.out::println);
+
+    System.out.println();
+
+    List<String> inputList2 = Arrays.asList("10, 20, 30", "40, 50, 60");
+    inputList2.stream()
+        .flatMapToInt(data -> {
+          String[] strArray = data.split(",");
+          int[] intArray = new int[strArray.length];
+          for (int i = 0; i < strArray.length; i++) {
+            intArray[i] = Integer.parseInt(strArray[i].trim());
+          }
+          return Arrays.stream(intArray);
+        })
+        .forEach(System.out::println);
+  }
+}
+```
+
+```java
+java8
+lambda
+stream
+mapping
+
+10
+20
+30
+40
+50
+60
+
+Process finished with exit code 0
+```
+
+  
+
+### mapXXX() 메소드
+
+* 요소를 대체하는 요소로 구성된 새로운 스트림을 리턴한다.
+
+  * flatMapXXX() 메소드는 하나의 요소를 여러개의 요소로 대체 하고, mapXXX() 메소드는 하나의 요소로 대체 한다.
+
+  ![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_4.png?raw=true)
+
+* **mapXXX() 실습 예제**
+
+```java
+package sec05.stream_mapping;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class MapEx {
+  public static void main(String[] args) {
+    List<Student> studentList = Arrays.asList(
+        new Student("홍길동", 10),
+        new Student("신용권", 20),
+        new Student("김남준", 30)
+    );
+
+    studentList.stream()
+        .mapToInt(Student::getScore)
+        .forEach(System.out::println);
+
+  }
+}
+```
+
+```java
+10
+20
+30
+
+Process finished with exit code 0
+```
+
+  
+
+### asDoubleStream(), asLongStream(), boxed() 메소드
+
+| 리턴타입                                     | 메소드(매개변수)        | 설명                                       |
+| ---------------------------------------- | ---------------- | ---------------------------------------- |
+| DoubleStream                             | asDoubleStream() | int -> double, long -> double            |
+| LongStream                               | asLongStream()   | int -> long                              |
+| Stream\<Integer\>, Stream\<Long\>, Stream\<Double\> | boxed()          | int -> Integer, long -> Long, double -> Double |
+
+* asDoubleStream()
+  * IntStream()의 int요소 또는 LongStream의 long요소를 double요소로 타입 변환해서 DoubleStream을 생서
+* asLongStream()
+  * IntStream()의 int요소를 long요소로 타입 변환해서 LongStream을 생성
+* boxed()
+  * int요소, long요소, double요소를 Integer, Long, Double요소로 박싱해서 Stream을 생성
+* **asDoubleStream, boxed() 실습 예제**
+
+```java
+package sec05.stream_mapping;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
+public class AsDoubleStreamAndBoxedEx {
+  public static void main(String[] args) {
+    int[] intArray = {1, 2, 3, 4, 5};
+
+    IntStream intStream = Arrays.stream(intArray);
+    intStream.asDoubleStream().forEach(System.out::println);
+
+    System.out.println();
+
+    intStream = Arrays.stream(intArray);
+    intStream.boxed().forEach(System.out::println);
+  }
+}
+```
+
+```java
+1.0
+2.0
+3.0
+4.0
+5.0
+
+1
+2
+3
+4
+5
+
+Process finished with exit code 0
+```
 
