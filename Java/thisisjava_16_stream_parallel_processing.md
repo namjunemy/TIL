@@ -419,3 +419,71 @@ Process finished with exit code 0
 * 최종 처리 메소드
 
 ![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_2.png?raw=true)
+
+  
+
+## 4. 필터링 중간 처리 - distinct(), filter()
+
+* 중간 처리 기능으로 요소를 걸러내는 역할을 한다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_3.png?raw=true)
+
+* distinct()
+  * 중복을 제거하는 스트림 필터링 메소드
+  * **Stream:** equals() 메소드가 true가 나오면 동일한 객체로 판단하고 중복을 제거
+  * **IntStream, LongStream, DoubleStream:** 동일값일 경우 중복을 제거
+* filter()
+  * 매개값으로 **주어진 Predicate가 true를 리턴하는 요소만 필터링**한다.
+
+### distinct(), filter() 실습 예제
+
+* distinct()로 List에 저장된 중복 객체를 제거하고,
+* filter()를 통해서 조건에 맞는 객체만을 찾아서
+* forEach()를 통해 하나씩 출력한다.
+
+```java
+package sec04.stream_filtering;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class FilteringEx {
+  public static void main(String[] args) {
+    List<String> names = Arrays.asList("홍길동", "신용권", "김자바", "신용권", "김남준", "김남준");
+
+    names.stream()
+        .distinct()
+        .forEach(System.out::println);
+    System.out.println();
+
+    names.stream()
+        .filter(str -> str.startsWith("신"))
+        .forEach(System.out::println);
+    System.out.println();
+
+    names.stream()
+        .distinct()
+        .filter(str -> str.endsWith("준"))
+        .forEach(System.out::println);
+  }
+}
+```
+
+```java
+홍길동
+신용권
+김자바
+김남준
+
+신용권
+신용권
+
+김남준
+
+Process finished with exit code 0
+```
+
+  
+
+
+
