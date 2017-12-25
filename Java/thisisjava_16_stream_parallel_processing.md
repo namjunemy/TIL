@@ -331,3 +331,39 @@ ch11_기본_API_클래스
 .idea
 ```
 
+  
+
+## 3. 스트림 파이프라인
+
+### 중간 처리와 최종 처리
+
+* 리덕션(Reduction)
+  * 대량의 데이터를 가공해서 축소하는 것을 말한다.
+    * 합계, 평균값, 카운팅, 최대값, 최소값등을 집계하는 것
+  * 요소가 리덕션의 결과물로 바로 집계할 수 없을 경우 중간 처리가 필요하다.
+    * 중간 처리 : 필터링, 매핑, 정렬, 그룹핑
+  * 중간 처리한 요소를 최종 처리해서 리덕션 결과물을 산출한다.
+* 스트림은 중간 처리와 최종 처리를 파이프라인으로 해결한다.
+  * 파이프라인(pipelines): 스트림을 파이프처럼 이어 놓은 것을 말한다.
+    * 중산처리 메소드(필터링, 매핑, 정렬)는 중간 처리된 스트림을 리턴하고,
+    * 이 스트림에서 다시 중간 처리 메소드를 호출해서 파이프라인을 형성하게 된다.
+  * **최종 스트림의 집계 기능이 시작되기 전까지 중간 처리는 지연(lazy)된다.**
+    * 최종 스트림이 시작하면 비로소 컬렉션에서 요소가 하나씩 중간 스트림에서 처리되고 최종 스트림까지 오게된다.   
+* 예) 회원 컬렉션에서 남자 회원의 평균 나이
+
+```java
+Stream<Member> maleFemaleStream = list.stream();
+Stream<Member> maleStream = maleFemaleStream.filter(m -> m.getSex() == Member.MALE);
+IntStream ageStream = maleStream.mapToInt(Member::getAge);
+OptionalDouble optionalDouble = ageStream.average();
+double ageAvg = optionalDouble.getAsDouble();
+```
+
+```java
+double ageAvg = list.stream()				//오리지날 스트림
+  .filter(m -> m.getSex() == Member.MALE)	//중간 처리 스트림
+  .mapToInt(Member::getAge)					//중간 처리 스트림
+  .average()								//최종 처리
+  .getAsDouble();
+```
+
