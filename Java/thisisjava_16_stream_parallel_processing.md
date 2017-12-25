@@ -367,3 +367,55 @@ double ageAvg = list.stream()				//오리지날 스트림
   .getAsDouble();
 ```
 
+* 예제 코드
+
+```java
+package sec03.stream_pipelines;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class StreamPipelinesEx {
+  public static void main(String[] args) {
+    List<Member> list = Arrays.asList(
+        new Member("홍길동", Member.MALE, 30),
+        new Member("김나리", Member.FEMALE, 20),
+        new Member("김남준", Member.MALE, 25),
+        new Member("박수미", Member.FEMALE, 28)
+    );
+
+    double avg = list.stream()
+        .filter(m -> m.getSex() == Member.MALE)
+        .mapToInt(Member::getAge)
+        .average()
+        .getAsDouble();
+    System.out.println(avg);
+  }
+}
+```
+
+```java
+남자 평균 나이: 27.5
+
+Process finished with exit code 0
+```
+
+  
+
+### 중간 처리 메소드롸 최종 처리 메소드
+
+* 리턴 타입을 보면 중간 처리 메소드인지 최종 처리 메소드인지 구분할 수 있다.
+  * 중간 처리 메소드 : 리턴 타입이 스트림
+  * 최종 처리 메소드 : 리턴 타입이 기본 타입이거나 OptionalXXX
+* 중간 처리 메소드
+  * 중간 처리 메소드는 최종 처리 메소드가 실행되기 전까지 지연한다.
+  * 최종 처리 메소드가 실행이 되어야만 동작을 한다.
+
+
+* ​
+
+![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_1.png?raw=true)
+
+* 최종 처리 메소드
+
+![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_2.png?raw=true)
