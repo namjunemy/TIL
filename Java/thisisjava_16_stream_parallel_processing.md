@@ -905,3 +905,149 @@ public class MatchEx {
 Process finished with exit code 0
 ```
 
+  
+
+## 9. 기본 집계 최종 처리
+
+### 집계(Aggregate)
+
+* 최종 처리 기능
+  * 카운팅, 합계, 평균값, 최대값, 최소값등과 같이 하나의 값으로 산출한다.
+  * 대량의 데이터를 가공해서 축소하는 리덕션(Reduction)이라고 볼 수 있다.
+* 스트림이 제공하는 기본 집계 함수
+
+| 리턴타입              | 메소드(매개변수)            | 설명     |
+| ----------------- | -------------------- | ------ |
+| long              | count()              | 요소 개수  |
+| OptionalXXX       | findFirst()          | 첫번째 요소 |
+| Optional\<T\>     | max(Compatator\<T\>) | 최대 요소  |
+| OptionalXXX       | max()                | 최대 요소  |
+| Optional\<T\>     | min(Comparator\<T\>) | 최소 요소  |
+| OptionalXXX       | min()                | 최소 요소  |
+| OptionalDouble    | average()            | 요소 평균  |
+| int, long, double | sum()                | 요소 총합  |
+
+* OptionalXXX 클래스
+  * 자바8부터 추가된 값을 저장하는 값 기반 클래스
+  * java.util 패키지의 Optional, OptionalDouble, OptionalInt, OptionalLong 클래스를 말한다.
+    * 저장괸 값을 얻으려면 get(), getAsDouble(), getAsInt(), getAsLong() 메소드를 호출한다.
+
+### Aggregate 실습 예제
+
+```java
+package sec09.stream_aggregate;
+
+import java.util.Arrays;
+
+public class AggregateEx {
+  public static void main(String[] args) {
+    long count = Arrays.stream(new int[]{1, 2, 3, 4, 5})
+        .filter(n -> n % 2 == 0)
+        .count();
+    System.out.println("2의 배수의 수: " + count);
+
+    long sum = Arrays.stream(new int[]{1, 2, 3, 4, 5})
+        .filter(n -> n % 2 == 0)
+        .sum();
+    System.out.println("2의 배수의 합: " + sum);
+
+    int max = Arrays.stream(new int[]{1, 2, 3, 4, 5})
+        .filter(n -> n % 2 == 0)
+        .max()
+        .getAsInt();
+    System.out.println("2의 배수 중 최대값: " + max);
+
+    int min = Arrays.stream(new int[]{1, 2, 3, 4, 5})
+        .filter(n -> n % 2 == 0)
+        .min()
+        .getAsInt();
+    System.out.println("2의 배수 중 최소값: " + min);
+
+    int first = Arrays.stream(new int[]{1, 2, 3, 4, 5})
+        .filter(n -> n % 3 == 0)
+        .findFirst()
+        .getAsInt();
+    System.out.println("첫번째 3의 배수: " + first);
+  }
+}
+```
+
+```java
+2의 배수의 수: 2
+2의 배수의 합: 6
+2의 배수 중 최대값: 4
+2의 배수 중 최소값: 2
+첫번째 3의 배수: 3
+
+Process finished with exit code 0
+```
+
+  
+
+### Optional 클래스
+
+* 값을 저장하는 값 기반 클래스
+  * Optional, OptionalDouble, OptionalInt, OptionalLong
+  * 집계 메소드의 리턴 타입으로 사용되어 집계 값을 가지고 있늠
+* 특징
+  * 집계 값이 존재하지 않을 경우 디폴트 값을 설정할 수도 있다.
+  * 집계 값을 처리하는 Consumer를  등록할 수 있다.
+
+| 리턴타입    | 메소드(매개변수)                 | 설명                          |
+| ------- | ------------------------- | --------------------------- |
+| boolesn | isPresent()               | 값이 저장되어 있는지 여부              |
+| T       | orElse(T)                 | 값이 저장되어 있지 않을 경우 디폴트 값      |
+| double  | orElse(double)            | 값이 저장되어 있지 않을 경우 디폴트 값      |
+| int     | orElse(int)               | 값이 저장되어 있지 않을 경우 디폴트 값      |
+| long    | orElse(long)              | 값이 저장되어 있지 않을 경우 디폴트 값      |
+| void    | ifPresent(Consumer)       | 값이 저장되어 있을 경우 Consumer에서 처리 |
+| void    | ifPresent(DoubleConsumer) | 값이 저장되어 있을 경우 Consumer에서 처리 |
+| void    | ifPresent(IntConsumer)    | 값이 저장되어 있을 경우 Consumer에서 처리 |
+| void    | ifPresent(LongConsumer)   | 값이 저장되어 있을 경우 Consumer에서 처리 |
+
+### Optional 실습 예제
+
+```java
+package sec09.stream_aggregate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalDouble;
+
+public class OptionalEx {
+  public static void main(String[] args) {
+    List<Integer> list = new ArrayList<>();
+
+    OptionalDouble optional = list.stream()
+        .mapToInt(Integer::intValue)
+        .average();
+    if(optional.isPresent()) {
+      System.out.println("방법1 평균: " + optional.getAsDouble());
+    } else {
+      System.out.println("방법1 평균: 0.0");
+    }
+
+    double avg = list.stream()
+        .mapToInt(Integer::intValue)
+        .average()
+        .orElse(0.0);
+    System.out.println("orElse를 이용한 평균: " + avg);
+
+    list.add(2);
+    list.add(4);
+    list.stream()
+        .mapToInt(Integer::intValue)
+        .average()
+        .ifPresent(a -> System.out.println("isPresent를 이용한 평균: " + a));
+  }
+}
+```
+
+```java
+방법1 평균: 0.0
+orElse를 이용한 평균: 0.0
+isPresent를 이용한 평균: 3.0
+
+Process finished with exit code 0
+```
+
