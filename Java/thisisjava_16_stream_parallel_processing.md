@@ -775,3 +775,85 @@ public class SortingEx {
 Process finished with exit code 0
 ```
 
+  
+
+## 7. 루핑(looping)
+
+* 중간 또는 최종 처리 기능으로 요소 전체를 반복하는 것을 말한다.
+
+* 루핑 메소드
+
+  * peek() : 중간 처리 메소드
+
+    * 최종 처리 메소드가 실행되지 않으면 지연되기 때문에 최종 처리 메소드가 호출되어야만 동작한다.
+
+    * 루핑 미동작
+
+      ```java
+      intStream
+        .filter(a -> a % 2 == 0)
+        .peek(System.out::println);
+      ```
+
+    * 루핑 동작
+
+      ```java
+      intStream
+        .filter(a -> a % 2 == 0)
+        .peek(System.out::println)
+        .sum()
+      ```
+
+  * forEach() : 최종 처리 메소드
+
+    ```java
+    intStream
+      .filter(a -> a % 2 == 0)
+      .forEach(System.out::println);
+    ```
+
+### 루핑 실습 예제
+
+```java
+package sec07.stream_looping;
+
+import java.util.Arrays;
+
+public class LoopingEx {
+  public static void main(String[] args) {
+    int[] intArr = {1, 2, 3, 4, 5};
+    System.out.println("[peek()를 마지막에 호출한 경우]");
+    Arrays.stream(intArr)
+        .filter(a -> a % 2 == 0)
+        .peek(System.out::println); //동작하지 않는다.
+    System.out.println();
+
+    System.out.println("[최종 처리 메소드를 마지막에 호출한 경우]");
+    int sum = Arrays.stream(intArr)
+        .filter(a -> a % 2 == 0)
+        .peek(System.out::println)
+        .sum();
+    System.out.println("총합: " + sum);
+    
+    System.out.println("[forEach()를 마지막에 호출한 경우]");
+    Arrays.stream(intArr)
+        .filter(a -> a % 2 == 0)
+        .forEach(System.out::println);
+  }
+}
+```
+
+```java
+[peek()를 마지막에 호출한 경우]
+
+[최종 처리 메소드를 마지막에 호출한 경우]
+2
+4
+총합: 6
+[forEach()를 마지막에 호출한 경우]
+2
+4
+
+Process finished with exit code 0
+```
+
