@@ -411,9 +411,6 @@ Process finished with exit code 0
   * 중간 처리 메소드는 최종 처리 메소드가 실행되기 전까지 지연한다.
   * 최종 처리 메소드가 실행이 되어야만 동작을 한다.
 
-
-* ​
-
 ![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_1.png?raw=true)
 
 * 최종 처리 메소드
@@ -655,6 +652,126 @@ public class AsDoubleStreamAndBoxedEx {
 4
 5
 
+Process finished with exit code 0
+```
+
+  
+
+## 6. 정렬 중간 처리 - sorted()
+
+* 중간 처리 기능으로 최종 처리되기 전에 요소를 정렬한다.
+
+| 리턴타입         | 메소드(매개변수)               | 설명                         |
+| ------------ | ----------------------- | -------------------------- |
+| Stream\<T\>  | sorted()                | 객체를 Comarable 구현 방법에 따라 정렬 |
+| Stream\<T\>  | sorted(Comparator\<T\>) | 객체를 주어진 Comparator에 따라 정렬  |
+| DoubleStream | sorted()                | double 요소를 올림 차순으로 정렬      |
+| IntStream    | sorted()                | int 요소를 올림 차순으로 정렬         |
+| LongStream   | sorted()                | long 요소를 올림 차순으로 정렬        |
+
+* 객체 요소일 경우에는 Comparable을 구현하지 않으면 첫번째 sorted() 메소드를 호출하면 ClassCastException이 발생
+
+* 객체 요소가 Compatable을 구현하지 않았거나, 구현 했다하더라도 다른 비교 방법으로 정렬하려면 Comparator를 매개값으로 갖는 두번째 sorted() 메소드를 사용해야 한다.
+
+  * Comparator는 함수적 인터페이스이므로 다음과 같이 람다식으로 매개값을 작성할 수 있다.
+
+    ```java
+    sorted((a, b) -? { ... })
+    ```
+
+  * 중괄호 {} 안에는 a와 b를 비교해서 a가 작으면 음수, 같으면 0, a가 크면 양수를 리턴하는 코드를 작성
+
+* 정렬 코드 예
+
+  * 객체 요소가 Comparable을 구현하고 있고, 기본 비교(Comparable) 방법으로 정렬
+
+  * 다음 세가지 방법 중 하나를 선택
+
+    ```java
+    sorted();
+    sorted((a, b) -> a.compareTo(b));
+    sorted(Comparator.naturalOrder());
+    ```
+
+  * 요소가 Comparable을 구현하고 있지만, 기본 비교 방법과 정반대 방법으로 정렬
+
+    * 위에서의 정렬 방법과 정반대의 결과가 나온다.
+
+    ```java
+    sorted((a, b) -> b.compareTo(a));
+    sorted(Comparator.reverseOrder());
+    ```
+
+### 정렬 실습 예제
+
+* sorted() 메소드를 이용하여 스트림 중간 처리를 한다. Comparator.reverseOrder()를 통해 정반대의 정렬을 할 수 있다.
+
+```java
+package sec06.stream_sorting;
+
+public class Student implements Comparable<Student> {
+  private String name;
+  private int score;
+
+  public Student(String name, int score) {
+    this.name = name;
+    this.score = score;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public int getScore() {
+    return score;
+  }
+
+  @Override
+  public int compareTo(Student o) {
+    return Integer.compare(score, o.score);
+  }
+}
+```
+
+```java
+package sec06.stream_sorting;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.IntStream;
+
+public class SortingEx {
+  public static void main(String[] args) {
+    IntStream intStream = Arrays.stream(new int[]{5, 3, 2, 1, 4,});
+
+    intStream.sorted().forEach(n -> System.out.print(n + ","));
+    System.out.println();
+
+    List<Student> studentList = Arrays.asList(
+        new Student("홍길동", 30),
+        new Student("신용권", 33),
+        new Student("김남준", 25)
+    );
+
+    studentList.stream()
+        .sorted()
+        .forEach(student -> System.out.print(student.getScore() + ","));
+
+    System.out.println();
+
+    studentList.stream()
+        .sorted(Comparator.reverseOrder())
+        .forEach(student -> System.out.print(student.getScore() + ","));
+
+  }
+}
+```
+
+```java
+1,2,3,4,5,
+25,30,33,
+33,30,25,
 Process finished with exit code 0
 ```
 
