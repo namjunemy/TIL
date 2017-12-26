@@ -1051,3 +1051,87 @@ isPresent를 이용한 평균: 3.0
 Process finished with exit code 0
 ```
 
+  
+
+## 커스텀 집계 - reduce()
+
+### reduce() 메소드
+
+* 프로그램화해서 다양한 집계(리덕션) 결과물을 만들수 있다.
+  * Stream 인터페이스 타입의 두 메소드를 보면
+  * 첫번째 메소드는 BinaryOperator를 매개 변수로 받으므로 두 값의 연산 결과를 Optional하게 리턴한다는 의미이고
+  * 두번째 메소드는 두 값의 연산결과를 리턴하되, 결과가 없다면(연산이 안되는 경우 즉, 두개의 요소가 없는 예외 발생 경우 NoSuchElementException) default로 identity값을 리턴한다는 의미이다.
+
+| 인터페이스        | 리턴타입           | 메소드(매개변수)                                |
+| ------------ | -------------- | ---------------------------------------- |
+| Stream       | Optional\<T\>  | reduce(BinaryOperator\<T\> accumulator)  |
+| Stream       | T              | reduce(T identity, BinaryOperator\<T\> accumulator) |
+| IntStream    | OptionalInt    | reduce(IntBinaryOperator op)             |
+| IntStream    | int            | reduce(int identity, IntBinaryOperator op) |
+| LongStream   | OptionalLong   | reduce(LongBinaryOperator op)            |
+| LongStream   | long           | reduce(long identity, LongBinaryOperator op) |
+| DoubleStream | OptionalDouble | reduce(DoubleBinaryOperator op)          |
+| DoubleStream | double         | reduce(double identity, DoubleBinaryOperator op) |
+
+* 매개변수
+  * XXXBinaryOperator : 두 개의 매개값을 받아 연산 후 리턴하는 함수적 인터페이스
+  * identity : 스트림에 요소가 전혀 없을 경우 리턴될 디폴트 값
+* 예: 학생들의 성적 총점
+
+```java
+int sum = studentList.stream()
+  .map(Student::getScore)
+  .reduce((a, b) -> a + b)
+  .get();
+```
+
+```java
+int sum = studentList.stream()
+  .map(Student::getScore)
+  .reduce(0, (a, b) -> a + b)
+```
+
+### reduce() 실습 예제
+
+```java
+package sec10.stream_reduce;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class ReductionEx {
+  public static void main(String[] args) {
+    List<Student> studentList = Arrays.asList(
+        new Student("홍길동", 90),
+        new Student("신용권", 70),
+        new Student("김남준", 98)
+    );
+
+    int sum1 = studentList.stream()
+        .mapToInt(Student::getScore)
+        .sum();
+
+    int sum2 = studentList.stream()
+        .mapToInt(Student::getScore)
+        .reduce((a, b) -> a + b)
+        .getAsInt();
+
+    int sum3 = studentList.stream()
+        .mapToInt(Student::getScore)
+        .reduce(0, (a, b) -> a + b);
+
+    System.out.println("sum1: " + sum1);
+    System.out.println("sum2: " + sum2);
+    System.out.println("sum3: " + sum3);
+  }
+}
+```
+
+```java
+sum1: 258
+sum2: 258
+sum3: 258
+
+Process finished with exit code 0
+```
+
