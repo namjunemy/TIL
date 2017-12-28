@@ -1233,3 +1233,112 @@ public class ToListEx {
 
 Process finished with exit code 0
 ```
+
+  
+
+### 사용자 정의 컨테이너에 수집하기
+
+* List, Set, Map에 수집하는 것이 아니라 사용자 정의 컨테이너에 수집시키는 것을 말한다. 즉, 사용자거 정의한 클래스.
+
+  | 인터페이스        | 리턴타입 | 메소드(매개변수)                                |
+  | ------------ | ---- | ---------------------------------------- |
+  | Stream       | R    | collect(Supplier\<R\>, BiConsumer\<R, ?, super T\>, BiConsumer\<R, R\>) |
+  | IntStream    | R    | collect(Supplier\<R\>, ObjIntConsumer\<R\>, BiConsumer\<R, R\>) |
+  | LongStream   | R    | collect(Supplier\<R\>, ObjLongConsumer\<R\>, BiConsumer\<R, R\>) |
+  | DoubleStream | R    | collect(Supplier\<R\>, ObjDoubleConsumer\<R\>, BiConsumer\<R, R\>) |
+
+  * 매개변수
+    * 첫번째 Supplier - 요소들이 수집될 컨테이너 객체를 생성하는 역할
+      * 순차 처리(싱글 스레드) 스트림: 단 한 번 Supplier가 실행
+      * 병렬 처리(멀티 스레드) 스트림: 스레드별로 Supplier가 실행되어 스레드별로 컨테이너가 생성
+    * 두번째 XXXConsumer - 컨테이너 객체에 요소를 수집하는 역할
+      * 스트림에서 요소를 컨테이너에 누적할 때마다 실행
+    * 세번째 BiConsumer: 컨테이너 객체를 결합하는 역할
+      * 순차 처리(싱글 스레드) 스트림: 실행되지 않음
+      * 병렬 처리(멀티 스레드) 스트림: 스레드별로 생성된 컨테이너를 결합해서 최종 컨테이너를 완성한다.
+  * 리턴타입
+    * R - 최종 누적된 컨테이너 객체
+
+#### 사용자 정의 컨테이너 수집 예제
+
+```java
+package sec11.stream_collect;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MaleStudent {
+  private List<Student> list;
+
+  public MaleStudent() {
+    list = new ArrayList<>();
+    System.out.println("[" + Thread.currentThread().getName() + "] MaleStudent()");
+  }
+
+  public void accumulate(Student student) {
+    list.add(student);
+    System.out.println("[" + Thread.currentThread().getName() + "] accumulate()");
+  }
+
+  public void combine(MaleStudent other) {
+    list.addAll(other.getList());
+    System.out.println("[" + Thread.currentThread().getName() + "] combine()");
+  }
+
+  public List<Student> getList() {
+    return list;
+  }
+}
+```
+
+```java
+package sec11.stream_collect;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class MaleStudentEx {
+  public static void main(String[] args) {
+    List<Student> totalList = Arrays.asList(
+        new Student("홍길동", 10, Student.Sex.MALE),
+        new Student("홍길순", 12, Student.Sex.FEMALE),
+        new Student("김남", 10, Student.Sex.MALE),
+        new Student("김여", 8, Student.Sex.FEMALE)
+    );
+
+    System.out.println("람다");
+    MaleStudent maleStudentListLambda = totalList.stream()
+        .filter(s -> s.getSex() == Student.Sex.MALE)
+        .collect(
+            () -> new MaleStudent(),
+            (r, t) -> r.accumulate(t),
+            (r1, r2) -> r1.combine(r2));
+    maleStudentListLambda.getList().stream().forEach(s -> System.out.println(s.getName()));
+
+    System.out.println("\n메소드 참조");
+    MaleStudent maleStudentListMethodReference = totalList.stream()
+        .filter(s -> s.getSex() == Student.Sex.MALE)
+        .collect(MaleStudent::new, MaleStudent::accumulate, MaleStudent::combine);
+    maleStudentListMethodReference.getList().stream().forEach(s -> System.out.println(s.getName()));
+  }
+}
+```
+
+```java
+람다
+[main] MaleStudent()
+[main] accumulate()
+[main] accumulate()
+홍길동
+김남
+
+메소드 참조
+[main] MaleStudent()
+[main] accumulate()
+[main] accumulate()
+홍길동
+김남
+
+Process finished with exit code 0
+```
+
