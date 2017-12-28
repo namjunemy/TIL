@@ -1154,7 +1154,82 @@ Process finished with exit code 0
 | R    | collect(Collector\<T, A, R\> collector) | Stream |
 
 * Collector의 타입 파라미터
+
   * T : 요소
   * A : 누적기(accumulator)
   * R : 요소가 저장될 새로운 컬렉션
   * ==> T요소를 A누적기가 R에 저장한다.
+
+* Collector의 구현 객체
+
+  * Collectors 클래스의 정적 메소드를 이용
+  * A(누적기)가 ?인 이유
+    * List, Set, Map 컬렉션에 누적할 경우에는 이미 Collector에서 어느 컬렉션에 저장하는지 알기 때문에 별도의 A(누적기)가 필요 없다.
+
+  | 리턴타입                                     | 메소드                                    | 설명                           |
+  | ---------------------------------------- | -------------------------------------- | ---------------------------- |
+  | Collector\<T, ?, Collection\<T\>\>       | Collectors.toCollection(Supplier\<T\>) | Supplier가 제공한 Collection에 저장 |
+  | Collector\<T, ?, ConcurrentMap\<K, U\>\> | Collectors.toConcurrentMap(...)        | ConcurrentMap에 저장            |
+  | Collector\<T, ?, List\<T\>\>             | Collectors.toList()                    | List에 저장                     |
+  | Collector\<T, ?, Map\<K, U\>\>           | Collectors.toMap(...)                  | Map에 저장                      |
+  | Collector\<T, ?, Set\<T\>\>              | Collectors.toSet()                     | Set에 저장                      |
+
+* **전체 학생 List에서 남학생들만 별도의 List로 생성**
+
+```java
+List<Student> maleList = totalList.stream()
+  .filter(s -> s.getSex() == Student.Sex.MALE)
+  .collect(Collectors.toList());
+```
+
+* **전체 학생 List에서 여학생들만 별도의 HashSet으로 생성**
+  * HashSet 객체를 Supplier가 생성하도록 했다.
+  * Collectors.toSet()을 이용해도 상관없다.
+
+```java
+Set<Student> femaleSet = totalList.stream()
+  .filter(s -> s.getSet() == Student.Set.FEMALE)
+  .collect(Collectors.toCollection(HashSet::new));
+```
+
+#### collect() 실습 예제
+
+```java
+package sec11.stream_collect;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class ToListEx {
+  public static void main(String[] args) {
+    List<Student> totalList = Arrays.asList(
+        new Student("홍길동", 10, Student.Sex.MALE),
+        new Student("홍길순", 12, Student.Sex.FEMALE),
+        new Student("김남", 10, Student.Sex.MALE),
+        new Student("김여", 8, Student.Sex.FEMALE)
+    );
+
+    List<Student> maleList = totalList.stream()
+        .filter(s -> s.getSex() == Student.Sex.MALE)
+        .collect(Collectors.toList());
+    maleList.forEach(s -> System.out.println(s.getName()));
+
+    Set<Student> femaleSet = totalList.stream()
+        .filter(s -> s.getSex() == Student.Sex.FEMALE)
+        .collect(Collectors.toCollection(HashSet::new));
+    femaleSet.forEach(s -> System.out.println(s.getName()));
+  }
+}
+```
+
+```java
+홍길동
+김남
+김여
+홍길순
+
+Process finished with exit code 0
+```
