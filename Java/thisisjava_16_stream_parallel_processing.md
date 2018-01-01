@@ -172,7 +172,6 @@ stream.forEach(name -> System.out.println(name));
   Process finished with exit code 0
   ```
 
-    
 
 ## 2. 스트림의 종류
 
@@ -1340,5 +1339,137 @@ public class MaleStudentEx {
 김남
 
 Process finished with exit code 0
+```
+
+  
+
+### 요소를 그룹핑해서 수집
+
+* collect()메소드는 단순히 요소를 수집하는 기능 이외에 컬렉션의 요소들을 그룹핑해서 Map 객체로 생성하는 기능도 제공
+  * Collectors.groupingBy() 의 리턴 객체를 매개값으로 대입
+    * Thread Safe하지 않은 Map 생성(싱글스레드에서 사용)
+  * Collectors.groupingByConcurrent()의 리턴 객체를 매개값으로 대입
+    * Thread Safe한 concurrentMap 생성(멀티스레드에서 사용)
+
+  ![](https://github.com/namjunemy/TIL/blob/master/Java/img/16_6.png?raw=true)
+
+* 학생의 성을 키(Key)로해서 남학생 List와 여학생 List가 저장된 Map 얻기
+
+  * groupingBy(Function\<T, K\> classifier) 사용
+    * 아래 처럼 groupingBy(Student::getSex)를 이용하면, getSex()가 리턴하는 키값에 따른 Map 객체가 생성된다. 여기서는 MALE과 FEMALE을 key로 하는 그룹핑 된 Map객체가 생성된다.
+
+  ```java
+  Map<Student.Sex, List<Student>> mapBySex = totalList.stream
+  .collect(Collectors.groupingBy(Student::getSex));
+  ```
+
+* 학생의 거주 도시를 키(Key)로해서 학생의 이름 List가 저장된 Map얻기
+
+  * groupingBy(Function\<T, K\> classifier, Collector\<T, A, D\> downstream) 사용
+
+  ```java
+  Map<Student.City, List<String>> mapByCity = totalList.stream()
+    .collect(
+      Collectors.groupingBy(
+        Student::getCity,
+        Collectors.mapping(Student::getName, Collectors.toList())
+      )
+    );
+  ```
+
+
+#### 그룹핑 수집 실습 예제
+
+```java
+package sec11.stream_collect;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class GroupingEx {
+  public static void main(String[] args) {
+    List<Student> totalList = Arrays.asList(
+        new Student("홍길동", 10, Student.Sex.MALE, Student.City.BUSAN),
+        new Student("홍길순", 12, Student.Sex.FEMALE, Student.City.SEOUL),
+        new Student("김남", 10, Student.Sex.MALE, Student.City.SEOUL),
+        new Student("김여", 8, Student.Sex.FEMALE, Student.City.BUSAN)
+    );
+
+    Map<Student.Sex, List<Student>> mapBySex = totalList.stream()
+        .collect(Collectors.groupingBy(Student::getSex));
+
+    System.out.println("[남학생]");
+    mapBySex.get(Student.Sex.MALE)
+        .forEach(s -> System.out.print(s.getName() + " "));
+    System.out.println("\n[여학생]");
+    mapBySex.get(Student.Sex.FEMALE)
+        .forEach(s -> System.out.print(s.getName() + " "));
+
+    System.out.println();
+
+    Map<Student.City, List<String>> mapByCity = totalList.stream()
+        .collect(
+            Collectors.groupingBy(
+                Student::getCity,
+                Collectors.mapping(Student::getName, Collectors.toList())
+            )
+        );
+
+    System.out.println("\n[서울]");
+    mapByCity.get(Student.City.SEOUL)
+        .forEach(name -> System.out.print(name + " "));
+    System.out.println("\n[부산]");
+    mapByCity.get(Student.City.BUSAN)
+        .forEach(name -> System.out.print(name + " "));
+  }
+}
+```
+
+  
+
+### 그룹핑 후 매핑 및 집계(리덕션)
+
+* Collectors.groupingBy() 메소드는 그룹핑 후, 매핑이나 집계(평균, 카운팅, 연결, 최대, 최소, 합계)를 할 수 있도록 하기위해 두번째 매개값으로 다음과 같은 Collector를 가질 수 있다.
+
+| 리턴타입      | 메소드(매개변수)                                | 설명         |
+| --------- | ---------------------------------------- | ---------- |
+| Collector | Collectors.mapping(Function, Collector)  | 매핑         |
+| Collector | Collectors.averageingDouble(ToDoubleFunction) | 평균값        |
+| Collector | Collectors.counting()                    | 요소수        |
+| Collector | Collectors.joining(...)                  | 문자 요소들을 연결 |
+| Collector | Collectors.maxBy(Comparator)             | 최대값        |
+| Collector | Collectors.minBy(Comparator)             | 최소값        |
+| Collector | Collectors.reducing(...)                 | 커스텀 리덕션 값  |
+| Collector | Collectors.summarizingXXX(ToXXXFunction) | XXX 타입의 합계 |
+
+* 성별(Sex)을 키로, 남/여 학생평균 점수를 값으로 갖는 Map 얻기
+  * 전체 리스트에서 스트림을 얻어내고, collect()로 그룹핑을 하는데, Collectors.groupingBy()의 리턴값을 받아서 collect()의 매개값으로 제공을 하겠다는 의미이다.
+
+```java
+Map<Student.Sex, Double> map = totalList.stream()
+  .collect(
+    Collectors.groupingBy(
+      Student::getSex,
+      Collectors.averagingDouble(Student::getScore)
+    )
+  );
+```
+
+* 성별(Sex)을 키로, 쉼표로 구분된 학생 이름 문자열을 값으로 갖는 Map 얻기
+  * 성별을 기준으로 Collectors.mapping()을 사용하여 학생객체를 이름요소로 매핑하고 ,로 joining한다.
+
+```java
+Map<Student.Sex, String> mapByName = totalList.stream()
+  .collect(
+    Collectors.groupingBy(
+      Student::getSex,
+      Collectors.mapping(
+        Student::getName,
+        Collectors.joining(",")
+      )
+    )
+  );
 ```
 
