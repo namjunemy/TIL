@@ -1473,3 +1473,249 @@ Map<Student.Sex, String> mapByName = totalList.stream()
   );
 ```
 
+  
+
+## 12절. 병렬 처리
+
+### 병렬 처리(Parallel Operation)
+
+* 멀티 코어 CPU환경에서 하나의 작업을 분할해서 각각의 코어가 병렬적으로 처리
+  * 병렬 처리의 목적: 작업 처리 시간을 줄임
+  * 자바8 부터 병렬 스트림을 제공하므로 컬렉션(배열)의 전체 요소 처리 시간을 줄여줌
+* 동시성(Concurrency)과 병렬성(Parallelism)
+  * 동시성: 멀티 스레드 환경에서 스레드가 번갈아 가며 실행하는 성질 (싱글 코어 CPU)
+  * 병렬성: 멀티 스레드 환경에서 코어들이 스레드를 병렬적으로 실행하는 성질(멀티 코어 CPU)
+
+- 병렬성(Parallelism) 구분
+  - 데이터 병렬성
+    - 데이터 병렬성은 한 작업 내에 있는 전체 데이터를 쪼개어 서브 데이터들로 만들고 이 서브 데이터들을 병렬 처리해서 작업을 빨리 끝내는 것을 말한다.
+  - 작업 병렬성
+    - 작업 병렬성은 서로 다른 작업을 병렬 처리하는 것을 말한다.
+    - 작업 병렬성의 대표적인 예는 웹서버(Web Server)이다. 웹 서버는 각각의 브라우저에 요청한 내용(다른 작업)을 개별 스레드에서 병렬로 처리한다.
+- 병렬 스트림은 데이터 병렬성을 구현한 것이다.
+  - 멀티코어의 수만큼 대용량 요소를 서브 요소들로 나누고, 각각의 서브 요소들을 분리된 스레드에서 병렬 처리시킨다.
+  - 예를 들어 쿼드 코어(Quad Core) CPU일 경우 4개의 서브 요소들로 나누고, 4개의 스레드가 각각의 서브 요소들을 병렬 처리한다.
+  - 병렬 스트림은 내부적으로 포크조인 프레임워크를 이용한다.
+
+### 포크조인(ForkJoin) 프레임워크
+
+- 포크조인 프레임워크 동작 방식
+
+  - 포크 단계
+    - 데이터를 서브 데이터로 반복적으로 분리한다.
+    - 서브 데이터를 멀티 코어에서 병렬로 처리한다.
+  - 조인 단계
+    - 서브 결과를 결합해서 최종 결과를 만들어 낸다.
+  - 실제로 병렬 처리 스트림은 포크 단계에서 차례대로 요소를 4등분하지 않는다. 이해하기 쉽도록 하기 위해 옆 그림은 차례대로 4등분 했지만, 내부적으로 서브 요소로 나누는 알고리즘이 있기 때문에 개발자는 신경쓸 필요가 없다.
+
+  ![](https://raw.githubusercontent.com/namjunemy/TIL/d9a402c0049762bb04e238f1e4996c315b36342b/Java/img/16_7.png)
+
+- 포크조인풀(ForkJoinPool)
+
+  - 각각의 코어에서 서브 요소를 처리하는 것은 개별 스레드가 해야하므로 스레드 관리가 필요하다.
+  - 포크조인 프레임워크는 ExecutorService의 구현 객체인 ForkJoinPool을 사용해서 작업 스레드를 관리한다. 
+
+### 병렬 스트림 생성
+
+| 인터페이스                  | 리턴타입         | 메소드(매개변수)        |
+| ---------------------- | ------------ | ---------------- |
+| java.util.Collection   | Stream       | parallelStream() |
+| java.util.Stream       | Stream       | parallel()       |
+| java.util.IntStream    | IntStream    | parallel()       |
+| java.util.LongStream   | LongStream   | parallel()       |
+| java.util.DoubleStream | DoubleStream | parallel()       |
+
+- parallelStream()
+
+  - 컬렉션으로부터 병렬 스트림을 바로 리턴
+
+- parallel()
+
+  - 순차 처리 스트임을 병렬 스트림으로 변환해서 리턴
+
+- 병렬 스트림의 예
+
+  - 11절 수집 - 사용자 정의 컨테이너에 수집하기(순차 처리 스트림)
+    - MaleStudent 객체는 하나만 생성
+    - 남학생일 결루 accumulate()가 호출되어 MaleStudent 객체 내부에 계속 누적
+    - combine() 메소드는 전혀 호출되지 않음
+
+  ```java
+  MaleStudent maleStudent = totalList.Stream()
+    .filter(s -> s.getSex() == Student.Sex.MALE)
+    .collect(MaleStudent::new, MaleStudent::accumulate, MaleStudent::combine);
+  ```
+
+  - 병렬 스트림으로 수정
+    - 코어의 개수 만큼 전체 요소는 서브 요소로 나뉘어지고, 해당 개수 만큼 스레드가 생성된다.
+    - 각 스레드는 서브 요소를 수집해야하므로 4개의 MaleStudent 객체를 생성하기 위해 collect()의 첫번째 메소드 참조인 MaleStudent::new를 4번 실행시킨다.
+    - 각 스레드는 MaleStudent 객체에 남학생 요소를 수집하기 위해 collect()의 두번째 메소드 참조인 MaleStudent::accumulate를 매번 실행시킨다.
+    - 수집 완료된 MaleStudent는 (코어 개수 - 1) 번의 결합으로 최종 수집된 MaleStudent로 만들어 진다. 따라서 collect()의 세번째 메소드 참조인 MaleStudent::combine() 이 (코어 개수 -1)번 실행된다.
+
+  ```java
+  MaleStudent maleStudent = totalList.parallelStream()
+    .filter(s -> s.getSex() == Student.Sex.MALE)
+    .collect(MaleStudent::new, MaleStudent::accumulate, MaleStudent::combine);
+  ```
+
+  ### 병렬 스트림 실습 예제
+
+  ```java
+  package sec12.stream_parallelism;
+
+  import sec11.stream_collect.Student;
+
+  import java.util.ArrayList;
+  import java.util.List;
+
+  public class MaleStudent {
+    private List<Student> list;
+
+    public MaleStudent() {
+      list = new ArrayList<>();
+      System.out.println("[" + Thread.currentThread().getName() + "] MaleStudent()");
+    }
+
+    public void accumulate(Student student) {
+      list.add(student);
+      System.out.println("[" + Thread.currentThread().getName() + "] accumulate()");
+    }
+
+    public void combine(MaleStudent other) {
+      list.addAll(other.getList());
+      System.out.println("[" + Thread.currentThread().getName() + "] combine()");
+    }
+
+    public List<Student> getList() {
+      return list;
+    }
+  }
+  ```
+
+  ```java
+  package sec12.stream_parallelism;
+
+  import sec11.stream_collect.Student;
+
+  import java.util.Arrays;
+  import java.util.List;
+
+  public class MaleStudentEx {
+    public static void main(String[] args) {
+      List<Student> totalList = Arrays.asList(
+          new Student("홍길동", 10, Student.Sex.MALE),
+          new Student("홍길순", 12, Student.Sex.FEMALE),
+          new Student("김남", 10, Student.Sex.MALE),
+          new Student("김여", 8, Student.Sex.FEMALE)
+      );
+
+      System.out.println("람다");
+      MaleStudent maleStudentListLambda = totalList.parallelStream()
+          .filter(s -> s.getSex() == Student.Sex.MALE)
+          .collect(
+              () -> new MaleStudent(),
+              (r, t) -> r.accumulate(t),
+              (r1, r2) -> r1.combine(r2));
+      maleStudentListLambda.getList().stream().forEach(s -> System.out.println(s.getName()));
+
+      System.out.println("\n메소드 참조");
+      MaleStudent maleStudentListMethodReference = totalList.parallelStream()
+          .filter(s -> s.getSex() == Student.Sex.MALE)
+          .collect(MaleStudent::new, MaleStudent::accumulate, MaleStudent::combine);
+      maleStudentListMethodReference.getList().stream().forEach(s -> System.out.println(s.getName()));
+    }
+  }
+  ```
+
+  ```java
+  람다
+  [ForkJoinPool.commonPool-worker-1] MaleStudent()
+  [ForkJoinPool.commonPool-worker-2] MaleStudent()
+  [main] MaleStudent()
+  [ForkJoinPool.commonPool-worker-3] MaleStudent()
+  [main] accumulate()
+  [ForkJoinPool.commonPool-worker-2] accumulate()
+  [ForkJoinPool.commonPool-worker-2] combine()
+  [main] combine()
+  [main] combine()
+  홍길동
+  김남
+
+  메소드 참조
+  [ForkJoinPool.commonPool-worker-1] MaleStudent()
+  [main] MaleStudent()
+  [ForkJoinPool.commonPool-worker-3] MaleStudent()
+  [ForkJoinPool.commonPool-worker-2] MaleStudent()
+  [ForkJoinPool.commonPool-worker-3] accumulate()
+  [main] accumulate()
+  [ForkJoinPool.commonPool-worker-3] combine()
+  [main] combine()
+  [main] combine()
+  홍길동
+  김남
+
+  Process finished with exit code 0
+  ```
+
+### 병럴 처리 성능
+
+- 병렬 처리는 항상 빠르다?
+  - **스트림 병렬 처리가 스트림 순차 처리보다 항상 실행 성능이 좋다고 판단해서는 안된다.**
+- 병렬 처리에 영향을 미치는 3가지 요인
+  - 요소의 수와 요소당 처리 시간
+    - 컬렉션에 요소의 수가 적고 요소당 처리 시간이 짧으면 순차 처리가 오히려 병렬 처리보다 빠를 수 있다. 병렬 처리는 스레드풀 생성, 스레드 생성이라는 추가적인 비용이 발생하기 때문이다.
+  - 스트림 소스의 종류
+    - ArrayList, 배열은 랜덤 액세스를 지원(인덱스로 접근)하기 때문에 포크 단계에서 쉽게 요소를 분리할 수 있어 병렬 처리 시간이 절약된다. 반면에 HashSet, TreeSet은 요소를 분리하기가 쉽지 않고, LinkedList는 랜덤 액세스를 지원하지 않아 링크를 따라가야 하므로 역시 요소를 분리하기가 쉽지 않다. 또한 BufferedReader.lines()은 전체 요소의 수를 알기 어렵기 때문에 포크 단계에서 부분요소로 나누기 어렵다. 따라서 이들 소스들은 ArrayList, 배열 보다는 상대적으로 병렬 처리가 늦다.
+  - 코어(Core)의 수
+    - 싱글 코어 CPU일 경우에는 순차 처리가 빠르다. 병렬 처리를 할 경우 스레드의 수만 증가하고 번갈아 가면서 스케쥴링을 해야하므로 좋지 못한 결과를 준다. 코어의 수가 많으면 많을 수록 병렬 작업 처리 속도는 빨라진다.
+- ArrayList VS LinkedList
+
+```java
+package sec12.stream_parallelism;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class ArrayListVsLinkedListEx {
+  public static void work(int value) {
+  }
+
+  public static long testParallel(List<Integer> list) {
+    long start = System.nanoTime();
+    list.stream().parallel().forEach(ArrayListVsLinkedListEx::work);
+    long end = System.nanoTime();
+    long runTime = end - start;
+    return runTime;
+  }
+
+  public static void main(String[] args) {
+    List<Integer> arrayList = new ArrayList<>();
+    List<Integer> linkedList = new LinkedList<>();
+    for (int i = 0; i < 1000000; i++) {
+      arrayList.add(i);
+      linkedList.add(i);
+    }
+
+    //워밍업
+    long arrayListParallel = testParallel(arrayList);
+    long linkedListParallel = testParallel(linkedList);
+
+    arrayListParallel = testParallel(arrayList);
+    linkedListParallel = testParallel(linkedList);
+
+    if (arrayListParallel < linkedListParallel) {
+      System.out.println("성능 테스트 결과: ArrayList가 더 빠름");
+    } else {
+      System.out.println("성능 테스트 결과: LinkedList가 더 빠름");
+    }
+  }
+}
+```
+
+```java
+성능 테스트 결과: ArrayList가 더 빠름
+
+Process finished with exit code 0
+```
+
