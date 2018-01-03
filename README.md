@@ -76,6 +76,10 @@
 * [[Node API 서버] 코드 리팩토링(라우터, 컨트롤러, 테스트 코드, 테스트 환경 개선)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_code_refactoring.md)
 * [[Node API 서버] ORM DB연동 및 학습 마무리](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_database.md)
 
+### Algorithm
+
+* [알고리즘의 분석](https://github.com/namjunemy/TIL/blob/master/Algorithm/analysis_of_algorithms.md)
+
 ### Git
 
 * [gitignore 파일 생성 및 사용자 규칙 정의](https://github.com/namjunemy/TIL/blob/master/Git/gitignore_file_create_and_customizing.md)
