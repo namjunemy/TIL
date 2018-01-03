@@ -1,5 +1,7 @@
 # 16장. 스트림과 병렬처리
 
+> '이것이 자바다 - 신용권' 16장 학습
+>
 > [소스코드 repo](https://github.com/namjunemy/this_is_java)
 >
 > 1절. 스트림 소개

@@ -1,5 +1,7 @@
 # 14장. 람다식
 
+> '이것이 자바다 - 신용권' 14장 학습
+>
 > [소스코드 repo](https://github.com/namjunemy/this_is_java)
 >
 > 1절. 람다식이란

@@ -1,5 +1,7 @@
 # 13장. 제네릭
 
+>'이것이 자바다 - 신용권' 13장 학습
+>
 >[소스코드 repo](https://github.com/namjunemy/this_is_java)
 >
 >1절. 왜 제네릭을 사용해야 하는가?
@@ -51,7 +53,7 @@ default BiConsumer<T,U> andThen(BiConsumer<? super T,? super I> after)
      ```
 
      * 위의 코드에서는 강제타입 변환이 두번 일어난다.	
-     * "hello"라는 String 객체를 Object 타입으로 저장할 때 한번, list.get(0)의 반환값인 Object 타입의 객체를 String 타입으로 저장할 때 한번. 제네릭을 적용하면 다음과 같이 코드가 변화한다.	
+       * "hello"라는 String 객체를 Object 타입으로 저장할 때 한번, list.get(0)의 반환값인 Object 타입의 객체를 String 타입으로 저장할 때 한번. 제네릭을 적용하면 다음과 같이 코드가 변화한다.
 
      ```java
      List<String> list = new ArrayList<String>();
@@ -61,7 +63,6 @@ default BiConsumer<T,U> andThen(BiConsumer<? super T,? super I> after)
 
      * List 객체를 생성할 때, String 객체를 저장하겠다고 선언하면 불필요한 타입변환이 사라지게 된다.	
 
-       
 
 
 ## 2절. 제네릭 타입

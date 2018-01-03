@@ -1,6 +1,6 @@
 # 멀티 스레드
 
-> '이것이 자바다' 12장 학습
+> '이것이 자바다 - 신용권' 12장 학습
 >
 > [소스코드 repo](https://github.com/namjunemy/this_is_java)
 >

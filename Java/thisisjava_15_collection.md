@@ -1,5 +1,7 @@
 # 15장. 컬렉션
 
+> '이것이 자바다 - 신용권' 15장 학습
+>
 > [소스코드 repo](https://github.com/namjunemy/this_is_java)
 >
 > 1절. 컬렉션 프레임워크 소개
@@ -920,10 +922,11 @@ TreeSet은 Set 인터페이스의 구현 클래스이므로 Set인터페이스�
     빼낸 값: 87 / 남은 객체 수: 2
     빼낸 값: 95 / 남은 객체 수: 1
     빼낸 값: 98 / 남은 객체 수: 0
+    ```
 
 
     Process finished with exit code 0
-    ```
+    ​```
 
 
   * 정렬 메소드
@@ -1011,7 +1014,7 @@ TreeSet은 Set 인터페이스의 구현 클래스이므로 Set인터페이스�
     Process finished with exit code 0
     ```
 
-   
+
 
 ### TreeMap
 
@@ -1182,7 +1185,7 @@ TreeMap<K, V> treeMap = new TreeMap<K, V>();
     Process finished with exit code 0
     ```
 
-  
+
 
 ### Comparable과 Comparator
 
@@ -1351,7 +1354,6 @@ TreeMap<K, V> treeMap = new TreeMap<K, V>();
   Process finished with exit code 0
   ```
 
-  
 
 ## 6. LIFO와 FIFO 컬렉션
 
