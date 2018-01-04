@@ -34,6 +34,12 @@
 * [15장. 컬렉션](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_15_collection.md)
 * [16장. 스트림과 병렬처리](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_16_stream_parallel_processing.md)
 
+### Algorithm
+
+- [알고리즘의 분석](https://github.com/namjunemy/TIL/blob/master/Algorithm/analysis_of_algorithms.md)
+- [순환의 개념과 기본 예제 1 - recursion basic](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_01.md)
+- [순환의 개념과 기본 예제 2 - recursive thinking](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_02.md)
+
 ### Spring
 
 - [[Spring] 1.스프링이란?](https://github.com/namjunemy/TIL/blob/master/Spring/what_is_spring.md)
@@ -75,10 +81,6 @@
 * [[Node API 서버] TDD로 하는 API 서버 개발](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_tdd_api_server.md)
 * [[Node API 서버] 코드 리팩토링(라우터, 컨트롤러, 테스트 코드, 테스트 환경 개선)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_code_refactoring.md)
 * [[Node API 서버] ORM DB연동 및 학습 마무리](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_database.md)
-
-### Algorithm
-
-* [알고리즘의 분석](https://github.com/namjunemy/TIL/blob/master/Algorithm/analysis_of_algorithms.md)
 
 ### Git
 
