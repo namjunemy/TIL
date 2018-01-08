@@ -85,5 +85,61 @@ int search(int[] data, int begin, int end, int target) {
 }
 ```
 
+### 매개변수의 명시화: 최대값 찾기
 
+* 이 함수의 미션은 data[begin]에서 data[end] 사이에서 최대값을 찾아 반환한다. begin<=end라고 가정한다.
+* 여기서 최대값을 찾는 법은 첫번째 인덱스에 해당하는 값과, 첫번째 인덱스를 제외한 나머지 범위에서의 값을 비교한 것들 중에 순환적으로 최대값을 찾는다.
+* Base case는 begin == end, 즉 데이터의 갯수가 1개인 경우이다.
+
+```java
+int findMax(int[] data, int begin, int end) {
+  if (begin == end)
+    return data[begin];
+  else
+    return Math.max(data[begin], findMax(data, begin+1, end));
+}
+```
+
+### 최대값 찾기: 다른 버전
+
+```java
+int findMax(int[] data, int begin, int end) {
+  if (begin==end)
+    return data[begin];
+  else {
+    int middle = (begin + end) / 2;
+    int max1 = findMax(data, begin, middle);
+    int max2 = findMax(data, middle+1, end);
+    return Math.max(max1, max2);
+  }
+}
+```
+
+### Binary Search
+
+* items[begin]에서 items[end] 사이에서 target을 검색한다.
+* 해당 메소드에 매개변수를 명시적으로 표시하지 않는다면, recursion으로 구현할 때 내부에서 resursive하게 호출되는 함수를 표현할 수 있는 방법이 없어진다.
+
+```java
+public static int binarySearch(String[] items, String target, int begin, int end) {
+    if (begin > end)
+      return -1;
+    else {
+      int middle = (begin + end) / 2;
+      int compResult = target.compareTo(items[middle]);
+      if (compResult == 0)
+        return middle;
+      else if (compResult < 0)
+        return binarySearch(items, target, begin, middle - 1);
+      else
+        return binarySearch(items, target, middle - 1, end);
+    }
+  }
+```
+
+### 따라서, 순환 알고리즘을 설계하는데에 있어서 가장 중요한 것은
+
+* 적어도 하나의 base case, 즉 순환되지 않고 종료되는 case가 있어야 함
+* 모든 case는 결국 base case로 수렴해야 함
+* **암시적(implicit) 매개변수를 명시적(explicit) 매개변수로 바꾸어라!**
 
