@@ -56,7 +56,7 @@ boolean findPath(x, y)
       return false;
   ```
 
-* 다른 방법으로 Recursion 호출(finfPath(x', y'))을 하기전에 pathway체크와 방문여부를 체크하지 않고, 메소드의 시작지점에서 pathway체크와 방문여부를 체크하여 false를 리턴하는 방법도 있다.
+* 다른 방법으로 Recursion 호출(findPath(x', y'))을 하기전에 pathway체크와 방문여부를 체크하지 않고, 메소드의 시작지점에서 pathway체크와 방문여부를 체크하여 false를 리턴하는 방법도 있다.
 
   * 이렇게 하면, recursion이 호출되는 횟수는 더 많아 지지만 코드가 간결해지는 면이 있다.
 
@@ -156,4 +156,3 @@ public class Maze {
 
 Process finished with exit code 0
 ```
-
