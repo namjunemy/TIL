@@ -39,6 +39,10 @@
 - [알고리즘의 분석](https://github.com/namjunemy/TIL/blob/master/Algorithm/analysis_of_algorithms.md)
 - [순환의 개념과 기본 예제 1 - recursion basic](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_01.md)
 - [순환의 개념과 기본 예제 2 - recursive thinking](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_02.md)
+- [순환의 개념과 기본 예제 3 - designing_recursion](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_03.md)
+- [Recursion 응용 1 - maze, 미로찾기](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_04.md)
+- [Recursion 응용 2 - counting_cells_in_a_blob](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_05.md)
+- [Recursion 응용 3 - n queens problem(backtracking)](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_06.md)
 
 ### Spring
 
