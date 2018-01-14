@@ -43,6 +43,7 @@
 - [Recursion 응용 1 - maze, 미로찾기](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_04.md)
 - [Recursion 응용 2 - counting_cells_in_a_blob](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_05.md)
 - [Recursion 응용 3 - n queens problem(backtracking)](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_06.md)
+- [Recursion 응용 4 - powerset, 멱집합](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_07.md)
 
 ### Spring
 
