@@ -65,5 +65,15 @@ bubbleSort(A[], n) {
 * T(n) = (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
   * 최악, 최선, 평균 항상 n(n-1) / 2번의 비교연산을 수행하게 되므로 O(n<sup>2</sup>)이다.
 
+### Insertion Sort
+
+* 맨 처음 인덱스에 있는 원소를 정렬되어있는 상태라고 보고, 두번째 인덱스에 있는 데이터를 이 정렬된 배열에 삽입하면서, 두개의 데이터가 다시 정렬된 상태가 되도록 만드는 정렬 방법이다. 반복적으로.
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/sort_03.png?raw=true)
+
+
+
+
+
 
 
