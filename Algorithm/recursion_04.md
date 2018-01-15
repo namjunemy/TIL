@@ -1,4 +1,4 @@
-# Recursion의 응용 1 - 미로찾기
+# 2-4. Recursion의 응용 1 - 미로찾기
 
 ## Maze - 미로찾기
 

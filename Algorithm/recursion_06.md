@@ -1,4 +1,4 @@
-# Recursion의 응용 3 - n queens problem
+# 2-6. Recursion의 응용 3 - n queens problem
 
 ### N-Queens problem(n=8)
 

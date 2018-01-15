@@ -1,4 +1,4 @@
-# 순환(Recursion)의 개념과 기본 예제 2
+# 2-2. 순환(Recursion)의 개념과 기본 예제 2
 
 ## Recursive Thinking - 순환적으로 사고하기
 

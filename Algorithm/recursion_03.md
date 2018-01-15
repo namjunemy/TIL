@@ -1,4 +1,4 @@
-# 순환(Recursion)의 개념과 기본 예제 3
+# 2-3. 순환(Recursion)의 개념과 기본 예제 3
 
 ## Designing Recursion - 순환 알고리즘의 설계
 

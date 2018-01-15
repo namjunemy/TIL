@@ -1,4 +1,4 @@
-# Recursion의 응용 4 - 멱집합
+# 2-7. Recursion의 응용 4 - 멱집합
 
 ### 멱집합 - Powerset
 

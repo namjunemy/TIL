@@ -1,4 +1,4 @@
-# Recursion의 응용 2 - Counting Cells in a Blob
+# 2-5. Recursion의 응용 2 - Counting Cells in a Blob
 
 ## Counting cells in a Blob
 
