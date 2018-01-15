@@ -39,6 +39,31 @@ selectionSort(A[], n) {
   * 2에서 가장 큰 수를 찾기 위한 비교횟수: n-1, n-2, ... , 2, 1
   * 3의 교환은 상수시간 작업
 * 시긴복잡도  T(n) = (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
+  * 최악, 최선, 평균 항상 n(n-1) / 2번의 비교연산을 수행하게 되므로 O(n<sup>2</sup>)이다.
+
+### Bubble Sort
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/sort_02.png?raw=true)
+
+* 실행시간
+  * (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
+* pseudocode
+
+```java
+bubbleSort(A[], n) {
+  for last <- n downto 2 {                    == 1
+    for i <- to last-1                        == 2
+      if (A[i] > A[i+1]) the A[i] <-> A[i+1]; == 3
+  }
+}
+```
+
+* 수행시간
+  * 1의 for 루프는 n-1번 반복
+  * 2의 for 루프는 각각 n-1, n-2, … , 2, 1번 반복
+  * 3의 교환은 상수시간 작업
+* T(n) = (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
+  * 최악, 최선, 평균 항상 n(n-1) / 2번의 비교연산을 수행하게 되므로 O(n<sup>2</sup>)이다.
 
 
 
