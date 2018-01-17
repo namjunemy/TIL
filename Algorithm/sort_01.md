@@ -40,6 +40,57 @@ selectionSort(A[], n) {
   * 3의 교환은 상수시간 작업
 * 시긴복잡도  T(n) = (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
   * 최악, 최선, 평균 항상 n(n-1) / 2번의 비교연산을 수행하게 되므로 O(n<sup>2</sup>)이다.
+* 구현
+
+```java
+public class Selection {
+  private static int[] input = {5, 6, 2, 8, 7, 23, 4, 1};
+
+  public static void main(String[] args) {
+    selectionSortMin(input, input.length);
+    for (int a : input) {
+      System.out.print(a + " ");
+    }
+  }
+
+  private static void selectionSortMin(int[] input, int length) {
+    int min;
+    int tmp;
+    for (int i = 0; i < length - 1; i++) {
+      min = i;
+      for (int j = i + 1; j < length; j++) {
+        if (input[j] < input[min])
+          min = j;
+      }
+      tmp = input[i];
+      input[i] = input[min];
+      input[min] = tmp;
+    }
+  }
+
+  private static void selectionSortMax(int[] input, int length) {
+    int max;
+    int tmp;
+    for (int i = length - 1; i > 0; i--) {
+      max = i;
+      for (int j = i -1; j >= 0; j--) {
+        if (input[j] > input[max])
+          max = j;
+      }
+      tmp = input[i];
+      input[i] = input[max];
+      input[max] = tmp;
+    }
+  }
+}
+```
+
+```java
+1 2 4 5 6 7 8 23 
+Process finished with exit code 0
+```
+
+  
 
 ### Bubble Sort
 
@@ -64,6 +115,39 @@ bubbleSort(A[], n) {
   * 3의 교환은 상수시간 작업
 * T(n) = (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
   * 최악, 최선, 평균 항상 n(n-1) / 2번의 비교연산을 수행하게 되므로 O(n<sup>2</sup>)이다.
+* 구현
+
+```java
+public class Bubble {
+  private static int[] input = {5, 6, 2, 8, 7, 23, 4, 1};
+
+  public static void main(String[] args) {
+    bubbleSort(input, input.length);
+    for (int a : input) {
+      System.out.print(a + " ");
+    }
+  }
+
+  private static void bubbleSort(int[] input, int length) {
+    int tmp;
+    for (int i = length - 1; i > 0; i--)
+      for (int j = 0; j < i; j++) {
+        if (input[j] > input[j + 1]) {
+          tmp = input[j];
+          input[j] = input[j + 1];
+          input[j + 1] = tmp;
+        }
+      }
+  }
+}
+```
+
+```java
+1 2 4 5 6 7 8 23 
+Process finished with exit code 0
+```
+
+  
 
 ### Insertion Sort
 
@@ -102,4 +186,36 @@ insertionSort(A[], n) { // 배열 A[1...n]을 정렬한다.
   * T(n) = (n-1) + (n-2) + … + 2 + 1 = O(n<sup>2</sup>)
 * 최선의 경우 = 즉,  배열이 정렬되어있는 경우에는 O(n)의 시간 복잡도를 가진다.
 * 따라서, selection sort나 bubble sort와 비교했을때, 최악의 경우에는 차이가 없지만 평균적으로는 대략 절반 정도의 정렬 시간을 필요로 한다.
+* 구현
+
+```java
+public class Insertion {
+  private static int[] input = {5, 6, 2, 8, 7, 23, 4, 1, 44};
+
+  public static void main(String[] args) {
+    insertionSort(input, input.length);
+    for (int a : input) {
+      System.out.print(a + " ");
+    }
+  }
+
+  private static void insertionSort(int[] input, int length) {
+    int tmp;
+    for (int i = 1; i < length; i++) {
+      for (int j = i; j > 0; j--) {
+        if (input[j - 1] > input[j]) {
+          tmp = input[j - 1];
+          input[j - 1] = input[j];
+          input[j] = tmp;
+        }
+      }
+    }
+  }
+}
+```
+
+```java
+1 2 4 5 6 7 8 23 44 
+Process finished with exit code 0
+```
 
