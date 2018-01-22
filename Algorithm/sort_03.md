@@ -81,7 +81,7 @@ else
 
 * 마지막으로 j와 r이 같아지면, pivot값과 pivot보다 큰 값들중 첫번째 값인 73을 교환하고, 
 * 결과적으로 pivot보다 작은 값들의 집합, pivot, pivot보다 큰 값들의 집합으로 partition이 형성된다. 그리고 pivot의 index를 리턴해주면 된다.
-* 이것을 **psedocode**로 표현하면 다음과 같다.
+* 이것을 **pseudocode**로 표현하면 다음과 같다.
   * 시작인덱스 = p
   * 마지막인덱스 = r
   * pivot = x
