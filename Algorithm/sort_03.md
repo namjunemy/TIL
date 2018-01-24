@@ -91,12 +91,12 @@ else
 
 ```java
 partition(A, p, r) {
-  x <- A[r];  //pivot
+  x <- A[r];    //pivot
   i <- p-1;
   for j <- p to r-1
   if A[j] <= x then
       i <- i+1;
-      exchange A[i] and A[r];
+      exchange A[i] and A[j];
   exchange A[i+1] and A[r];
   return i+1;
 }
