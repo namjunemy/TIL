@@ -1,4 +1,4 @@
-# 3-4. 힙 정렬(Heap Sort) 1
+# 3-4. 힙 정렬(Heap Sort)
 
 ## Heap과 Heap sort
 
@@ -23,7 +23,6 @@
   * A[i]의 왼쪽 자식 = A[2i]
   * A[i]의 오른쪽 자식 = A[2i + 1]
 
-  
 
 ### Full vs Complete Binary Trees
 
@@ -101,7 +100,6 @@ maxHeapify(A, i) {
 * heap은 complete binary tree이기 때문에 노드의 수를 n이라고 했을 때, h는 Θ(logn)이 된다.
 * 따라서, Θ(logn)이며 n은 노드의 갯수이다.
 
-  
 
 ## 정렬할 배열을 힙으로 만들기
 
