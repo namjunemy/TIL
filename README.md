@@ -44,6 +44,12 @@
 - [Recursion 응용 2 - counting_cells_in_a_blob](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_05.md)
 - [Recursion 응용 3 - n queens problem(backtracking)](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_06.md)
 - [Recursion 응용 4 - powerset, 멱집합](https://github.com/namjunemy/TIL/blob/master/Algorithm/recursion_07.md)
+- [기본 정렬 알고리즘(selection, bubble, insertion)](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_01.md)
+- [Merge Sort(합병정렬)](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_02.md)
+- [Quick Sort(빠른정렬)](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_03.md)
+- [Heap Sort(힙정렬)](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_04.md)
+- [Priority Queue(우선순위 큐)](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_05.md)
+- [정렬의 하한(lower bound)](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_06.md)
 
 ### Spring
 
