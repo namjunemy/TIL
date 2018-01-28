@@ -1,4 +1,4 @@
-# 3-7 Counting Sort - 선형시간 정렬 알고리즘
+# 3-7. Counting Sort - 선형시간 정렬 알고리즘
 
 * 선형시간 = O(n)
 * 즉, comparison sort가 아니다.(comparison sort의 하한은 O(nlogn)이다.)
