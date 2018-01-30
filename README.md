@@ -34,6 +34,10 @@
 * [15장. 컬렉션](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_15_collection.md)
 * [16장. 스트림과 병렬처리](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_16_stream_parallel_processing.md)
 
+### Design Pattern
+
+* [Strategy Pattern]()
+
 ### Algorithm
 
 - [1-1. 알고리즘의 분석](https://github.com/namjunemy/TIL/blob/master/Algorithm/analysis_of_algorithms.md)
