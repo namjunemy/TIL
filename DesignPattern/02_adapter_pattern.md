@@ -1,8 +1,10 @@
 # 2. Adapter Pattern
 
+> 출처 : Head First Design Patterns & 인프런 - '자바 디자인 패턴의 이해'(GoF Design Pattern)
+>
 > [Code Repository](https://github.com/namjunemy/design_pattern)
 
-연관성 없는 두 객체 묶어 사용하기
+**"연관성 없는 두 객체 묶어 사용하기"**
 
 ### 학습목표
 

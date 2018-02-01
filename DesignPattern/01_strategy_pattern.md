@@ -1,6 +1,10 @@
 # 1. Strategy Pattern
 
+> 출처 : Head First Design Patterns & 인프런 - '자바 디자인 패턴의 이해'(GoF Design Pattern)
+>
 > [Code Repository](https://github.com/namjunemy/design_pattern)
+
+**"전략 바꾸기"**
 
 ### 학습목표
 
