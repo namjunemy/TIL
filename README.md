@@ -36,7 +36,9 @@
 
 ### Design Pattern
 
-* [Strategy Pattern]()
+* [Strategy Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/01_strategy_pattern.md)
+* [Adapter_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/02_adapter_pattern.md)
+* [Template_Method_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/03_template_method_pattern.md)
 
 ### Algorithm
 
@@ -57,6 +59,9 @@
 - [3-7. Counting Sort - 선형시간 정렬 알고리즘](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_07.md)
 - [3-8. Radix Sort](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_08.md)
 - [3-9. Sorting in Java](https://github.com/namjunemy/TIL/blob/master/Algorithm/sort_09.md)
+- [알고리즘을 위한 자바 IO](https://github.com/namjunemy/TIL/blob/master/Algorithm/java_io_for_algorithm.md)
+- [4-1. Tree, Binary Tree](https://github.com/namjunemy/TIL/blob/master/Algorithm/binary_search_tree_01.md)
+- [4-2. Binary Search Tree - 이진 탐색 트리](https://github.com/namjunemy/TIL/blob/master/Algorithm/binary_search_tree_02.md)
 
 ### Spring
 
