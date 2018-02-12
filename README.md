@@ -123,6 +123,7 @@
 * [AWS EC2 ssh 원격 접속과 scp를 통한 파일 업로드](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
 * [NVIDIA GPU CLOUD 플랫폼](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_cloud.md)
 * [NVIDIA GPU CLOUD on AWS(TensorFlow Example)](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_cloud_on_aws.md)
+* [NVIDIA GPU Server(Container Environment)](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_server_container_env.md)
 
 ### Python
 
