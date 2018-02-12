@@ -1,3 +1,5 @@
+> 인프런 - 부경대IT융합응용공학과 궘오흠 교수님의 '**영리한 프로그래밍을 위한 알고리즘 강좌** '([링크](https://www.inflearn.com/course/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%95%EC%A2%8C/))와 '**쉽게 배우는 알고리즘** 관계 중심의 사고법 - 문병로' 참조
+
 # 4-2. Binary Search Tree
 
 ## Dynamic Set
@@ -29,7 +31,6 @@
   * 이진탐색트리(Binary Search Tree), 레드-블랙 트리, AVL- 트리등의 트리에 기반한 구조들
   * Direct Address Table, **해시** 테이블 등
 
-  
 
 ## 검색트리
 
@@ -37,7 +38,6 @@
 * 일반적으로 SEARCH, INSERT, DELETE 연산이 트리의 높이(height)에 비례하는 시간복잡도를 가진다.
 * 이진검색트리, 레드-블랙트리, B-트리 등
 
-  
 
 ## 이진검색트리(BST)
 
@@ -124,7 +124,6 @@ TREE-SUCCESSOR(x)
 * 노드 x의 predecessor란 key[x]보다 작으면서 가장 큰 키를 가진 노드
 * Successor와 반대
 
-  
 
 ### INSERT
 
