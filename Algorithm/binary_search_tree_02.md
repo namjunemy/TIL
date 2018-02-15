@@ -49,7 +49,7 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/bst_07.png?raw=true)
 
-* pesedo code
+* pesudo code
 
   * 키 값에 따라서 왼쪽 서브트리 또는 오른쪽 서브트리를 recursive하게 탐색한다.
   * 시간복잡도: O(h), 여기서 h는 트리의 높이 이다.
@@ -101,7 +101,7 @@ TREE-MINIMUM(x)
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/bst_08.png?raw=true)
 
-* peudo code
+* pesudo code
   * 1,2 : 오른쪽 서브트리가 존재할 경우, 오른쪽 트리의 최소 값을 찾는다.
   * 3 : y는 x의 부모노드
   * 4, 5, 6 : 부모노드가 null이 아니고, x가 부모의 오른쪽 자식일 경우에만 계속해서 부모를 찾아 올라간다.
