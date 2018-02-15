@@ -101,7 +101,7 @@ TREE-MINIMUM(x)
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/bst_08.png?raw=true)
 
-* pesudo code
+* pseudo code
   * 1,2 : 오른쪽 서브트리가 존재할 경우, 오른쪽 트리의 최소 값을 찾는다.
   * 3 : y는 x의 부모노드
   * 4, 5, 6 : 부모노드가 null이 아니고, x가 부모의 오른쪽 자식일 경우에만 계속해서 부모를 찾아 올라간다.
