@@ -1,5 +1,7 @@
 # Today I Learned
 
+[![Version](https://img.shields.io/badge/version-2017.8.30-red.svg)](./CHANGELOG)  [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE)
+
 * 좋은 개발자가 되기 위해 하루동안 학습한 내용이나 개발관련 경험들을 간단한 기록으로 남긴다. 
 * 탄탄한 기본기를 갖추고, 변화하는 기술에 대한 지속적인 관심과 학습을 통해 배움을 멈추지 않는 것이 목표이다.
 * Today I Learned인데 날짜를 표시하지 않는 이유는 조금이라도 조급해지지 않고 꾸준하기 위함이다.
