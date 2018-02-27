@@ -4,9 +4,9 @@
 >
 > OS : Ubuntu 16.04 LTS(AWS EC2 리눅스 인스턴스)
 >
-> [EC2 인스턴스 생성](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_create_instance.md)
+> [EC2 인스턴스 생성](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_create_instance.md)
 >
-> [EC2 원격 접속](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
+> [EC2 원격 접속](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_connect_and_scp.md)
 >
 > python을 직접 설치하거나 배포판인 Anaconda를 설치한다.
 

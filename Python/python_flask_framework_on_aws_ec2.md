@@ -4,9 +4,9 @@
 >
 > OS : Ubuntu 16.04 LTS(AWS EC2 리눅스 인스턴스)
 >
-> [EC2 인스턴스 생성](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_create_instance.md)
+> [EC2 인스턴스 생성](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_create_instance.md)
 >
-> [EC2 원격 접속](https://github.com/namjunemy/TIL/blob/master/AWS/aws_ec2_connect_and_scp.md)
+> [EC2 원격 접속](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_connect_and_scp.md)
 >
 > [EC2에 Jupyter Notebook 개발환경 설치](https://github.com/namjunemy/TIL/blob/master/Python/python_jupyter_notebook_on_aws_ec2.md) 
 >
