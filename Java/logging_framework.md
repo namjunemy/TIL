@@ -122,7 +122,7 @@ public class CharacterEncodingFilter implements Filter {
 
 개발 단계에서 디버깅을 위해 로그 레벨을 DEBUG로 설정하고 개발을 한다. 그러나 실제 프로그램을 운영하는 단계에서는 DEBUG 레벨의 메시지들이 모두 로그로 찍히면 프로그램의 성능 이슈가 생긴다. 특히, 로그를 파일로 저장한다면 파일 I/O에 대한 비용이 발생하면서 성능에 직접적인 영향을 준다. 이것은 디버그 메시지와 사용자가 많을수록 더 커진다.
 
-따라서, logback 설정파일을 이용하여 로그 레벨을 변경할 수 있다. 위에서 기본으로 설정한 logback.xml 파일을 보면, root 태그에 설정한 로그 레벨이 debug로 되어 있다. 애플리케이션의 default 로그 레벨을 debug가 아닌 INFO 또는 WARN으로 설정하면, 해당 레벨의 메시지만 로그로 남길 수 있다.
+따라서, logback 설정파일을 이용하여 로그 레벨을 변경할 수 있다. 위에서 기본으로 설정한 logback.xml 파일을 보면, root 태그에 설정한 로그 레벨이 DEBUG로 되어 있다. 애플리케이션의 default 로그 레벨을 DEBUG가 아닌 INFO 또는 WARN으로 설정하면, 해당 레벨의 메시지만 로그로 남길 수 있다.
 
 ```xml
 <configuration>
@@ -138,7 +138,7 @@ public class CharacterEncodingFilter implements Filter {
 </configuration>
 ```
 
-실제로 logback 설정파일에서 로그 레벨을 info로 설정하면 `logger.debug("debug message");`를 통해 출력하는 DEBUG 레벨의 메시지는 출력하지 않는다. 따라서, 개발단계에서는 DEBUG 레벨로 개발하고, 실제로 서비스를 운영할 때에는 default 로그 레벨을 INFO 레벨이나 WARN 레벨로 변경하여 성능 이슈가 발생하지 않도록 한다.
+실제로 logback 설정파일에서 로그 레벨을 INFO로 설정하면 `logger.debug("debug message");`를 통해 출력하는 DEBUG 레벨의 메시지는 출력하지 않는다. 따라서, 개발단계에서는 DEBUG 레벨로 개발하고, 실제로 서비스를 운영할 때에는 default 로그 레벨을 INFO 레벨이나 WARN 레벨로 변경하여 성능 이슈가 발생하지 않도록 한다.
 
   
 
@@ -146,7 +146,7 @@ public class CharacterEncodingFilter implements Filter {
 
 실제로 로깅 프레임워크를 사용하다 보면, 의존하고 있는 라이브러리에 의해서 찍히는 로그들을 상당히 많이 볼 수 있다. Java Bean Validation Check를 하기 위해 Hibernate Validator를 사용하는 경우 해당 라이브러리에서 디버깅을 위해 출력하는 메시지가 자연스레 찍히는 경우가 이에 해당한다. 이렇게 개발자가 원하지 않은 로그 메시지를 출력하지 않기 위해서 패키지별로 Logger를 관리할 수 있다.
 
-아래와 같이 configuration에 logger를 등록하고 관리한다. 다음의 logback 설정은 io.namjune 패키지에 대해서는 debug 로그 레벨의 메시지를 출력하고, 애플리케이션 default 로그 레벨은 warn으로 설정한다. 이렇게 설정을 할 경우, 개발자가 의도한 패키지의 로그 메시지만 출력하고, Hibernate Validator 등 의존 라이브러리에서 찍히는 DEBUG 로그 레벨의 메시지는 출력되지 않는다.
+아래와 같이 configuration에 logger를 등록하고 관리한다. 다음의 logback 설정은 io.namjune 패키지에 대해서는 DEBUG 로그 레벨의 메시지를 출력하고, 애플리케이션 default 로그 레벨은 WARN으로 설정한다. 이렇게 설정을 할 경우, 개발자가 의도한 패키지의 DEBUG 레벨 로그 메시지만 출력하고, Hibernate Validator 등 의존 라이브러리에서 찍히는 DEBUG 로그 레벨의 메시지는 출력되지 않는다.
 
 ```xml
 <configuration>
