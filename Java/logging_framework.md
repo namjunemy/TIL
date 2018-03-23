@@ -43,7 +43,24 @@ logback에서는 위와 같은 단계로 로그 레벨을 구분한다. **TRACE 
 </configuration>
 ```
 
+* pom.xml
+  * 아래의 dependency를 추가한다.
 
+```xml
+<dependencies>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
+	...
+
+</dependencies>
+
+```
+
+  
 
 ### 예제
 
