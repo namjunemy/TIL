@@ -66,7 +66,8 @@
 - [알고리즘을 위한 자바 IO](https://github.com/namjunemy/TIL/blob/master/Algorithm/java_io_for_algorithm.md)
 - [4-1. Tree, Binary Tree](https://github.com/namjunemy/TIL/blob/master/Algorithm/binary_search_tree_01.md)
 - [4-2. Binary Search Tree - 이진 탐색 트리](https://github.com/namjunemy/TIL/blob/master/Algorithm/binary_search_tree_02.md)
-- [5-1. Red Black Tree - 레드 블랙 트리](https://github.com/namjunemy/TIL/blob/master/Algorithm/red_black_tree_01.md)
+- [5-1. Red Black Tree - 개요](https://github.com/namjunemy/TIL/blob/master/Algorithm/red_black_tree_01.md)
+- [5-2. Red Black Tree - INSERT, FIXUP 연산](https://github.com/namjunemy/TIL/blob/master/Algorithm/red_black_tree_02.md)
 
 ### Spring
 
