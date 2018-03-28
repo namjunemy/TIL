@@ -1,6 +1,6 @@
 > 인프런 - 부경대IT융합응용공학과 궘오흠 교수님의 '**영리한 프로그래밍을 위한 알고리즘 강좌** '([링크](https://www.inflearn.com/course/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%95%EC%A2%8C/))와 '**쉽게 배우는 알고리즘** 관계 중심의 사고법 - 문병로' 참조
 
-# 5-2. Red-Black Tree 02
+# 5-2. Red-Black Tree 02 - INSERT, FIXUP
 
 ## INSERT
 
@@ -124,6 +124,16 @@ p[p[z]]가 반드시 존재하는 이유는 RED - RED 위반이 발생한 경우
 * pesudo code
   * z는 새로운 노드
   * 1 : z의 부모가 RED인 동안 RED - RED 위반이 존재하므로 while문 수행
+    * 실제로 while문의 탈출조건에서 z가 루트노드가 되더라도 루트노드의 parent가 NIL이라고 구현하지 않기 때문에, 구현하는 단계에서는 while문의 탈출조건은 `color[p[z]] = RED && p[z] != null` 이 될 것이다.
+  * 2 : Case 1, 2, 3은 z의 할아버지 노드의 왼쪽자식이 z의 부모노드인 경우이다.
+  * 3 : 부모의 형제를 y에 저장한다. z의 할아버지 노드의 오른쪽 자식.
+  * 4 : y노드의 color가 레드인지 블랙인지에 따라서 Case1 과 Case2, 3으로 나뉜다.
+  * 5 - 8 : Case 1의 경우이다. z가 RED인 상황에서 부모와 부모의 형제가 모두 RED이고, 할아버지 노드는 BLACK인 상황이다. 이 상황에서 부모와 부모의 형제노드를 BLACK으로 바꾸고, 할아버지 노드를 RED로 바꾼다. 마지막으로 할아버지 노드를 다시 새로운 노드 z로 설정하여 트리를 타고 올라가면서 문제를 해결한다.
+  * 9 : Case 2, 3의 경우이다. z와 z의 부모가 RED이고, z의 부모는 z의 할아버지의 왼쪽자식인 상황에서, z의 부모의 형제노드가 NIL일수도 있고, BLACK을 가지는 노드일 수도 있다. 결국 BLACK인 노드.
+  * 10 - 11 : Case 2의 경우는 z가 z의 부모의 오른쪽 자식인 경우이므로 우선적으로 z노드를 기준으로 LEFT-ROTATE연산을 거친다. 다음으로 Case 3의 처리 로직으로 넘어간다.
+  * 12 - 14 : Case 3의 경우 z의 부모 노드를 BLACK으로 바꾸고, z의 할아버지 노드를 RED로 바꾼 다음, 할아버지 노드를 기준으로 RIGHT-ROTATE를 해준다.
+  * 15 : Case 4, 5, 6은 z의 할아버지노드의 오른쪽지식이 z의 부모노드인 경우이다. 대칭적으로 똑같이 동작한다.
+  * 16 : 결과적으로 레드블랙트리 FIXUP 메소드의 처리 로직에 따르면 Case 3또는 6에 의해서 문제를 해결하고 while문을 빠져나오게 된다. 하지만, Case 1, 4를 반복하다가 루트 노드까지 올라가서 while문이 종료되면 루트 노드는 RED이기 때문에, 마지막으로 루트 노드를 BLACK으로 만들어 준다.
 
 ```java
 RB-INSERT-FIXUP(T, z)
@@ -144,6 +154,19 @@ RB-INSERT-FIXUP(T, z)
 15      else(same as then clause with "right" and "left" exchanged)
 16 color[root[T]] <- BLACK
 ```
+
+## INSERT의 시간복잡도
+
+* BST에서의 INSERT : O(logn)
+* RB-INSERT-FIXUP
+  * Case 1, 4에 해당할 경우 z가 2레벨 상승한다.
+  * Case 2, 3, 5, 6에 해당할 경우 O(1)
+  * 따라서, 트리의 높이에 비례하는 시간복잡도를 가진다.
+* 즉, INSERT의 시간복잡도는 O(logn)
+
+### RB-INSERT-FIXUP 처리 흐름
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_06.png?raw=true)
 
 
 

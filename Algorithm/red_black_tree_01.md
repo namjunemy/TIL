@@ -1,6 +1,6 @@
 > 인프런 - 부경대IT융합응용공학과 궘오흠 교수님의 '**영리한 프로그래밍을 위한 알고리즘 강좌** '([링크](https://www.inflearn.com/course/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%95%EC%A2%8C/))와 '**쉽게 배우는 알고리즘** 관계 중심의 사고법 - 문병로' 참조
 
-# 5-1. Red-Black Tree 01
+# 5-1. Red-Black Tree 01 - 개요
 
 * 앞서 배운 BST의 search, insert, delete 세 가지 연산모두 O(h)의 시간복잡도를 가진다. (h는 트리의 높이)
 * 여기서 문제는, 트리의 높이 h가 최악의 경우 n이 될 수 있다. n은 노드의 총 수.
