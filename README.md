@@ -26,6 +26,7 @@
 
 * [2017.11.16 okky 미니 세미나 - 비전공 학원출신 SI 개발자, 유명 스타트업 들어간 ssul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20171116_okky_mini_seminar_woowahan_bros_lee.md)
 * [2018.02.27 okky 미니 세미나 - IT 회사 탐방기, 닭집 CEO보단 개발자](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180227_okky_mini_seminar_hwang_whosoon.md)
+* [2018.03.29 okky 미니 세미나 - 유명 IT 기업 입사 도전 성공기](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180329_okky_mini_seminar_kakao_leekyoungil_feedback_ok.md)
 
 ### Java
 
