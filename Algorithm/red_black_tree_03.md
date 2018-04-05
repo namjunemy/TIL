@@ -128,3 +128,69 @@ DELETE의 경우 8가지 case로 분류할 수 있다. INSERT와 마찬가지로
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_08.png?raw=true)
 
+  
+
+### Case 3 - w는 BLACK, w의 왼쪽자식이 RED
+
+* w를 RED로, w의 왼쪽자식노드를 BLACK으로 바꾼다.
+* w에 대해서 right-rotation을 적용한다.
+* x의 새로운 형제 w는 오른자식이 RED이다. 이것은 경우 4에 해당한다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_09.png?raw=true)
+
+  
+
+### Case 4 - w는 BLACK, w의 오른쪽자식이 RED
+
+* w의 색을 현재 p[x]의 색으로(unknown color)
+* p[x]를 BLACK으로, w의 오른자식을 BLACK으로 바꾼다.
+* p[x]에 대해서 left-rotation을 적용한다.
+* x의 extra-black을 제거하고 종료한다.
+* 이렇게 되면, double-black노드가 없어졌음에도 불구하고, 기존의 A노드를 지나는 블랙노드의 갯수가 로테이션 전과 똑같아 진다. 그리고 나머지 C와 E를 지나는 블랙노드의 갯수도 기존과 동일하게 유지된다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_10.png?raw=true)
+
+
+
+### RB DELETE FIXUP pesudo code
+
+```java
+RB-DELETE-FIXUP(T, x)
+01 while x != root[T] and color[x] = BLACK
+02   do if x = left[p[x]]
+03        then w <- right[p[x]] 
+04          if color[w] = RED
+05            then color[w] <- BLACK
+06                 color[p[x]] <- RED
+07                 LEFT-ROTATE(T, p[x])
+08                 w <- right[p[x]]
+09          if color[left[w]] = BLACK and color[right[w]] = BLACK
+10            then color[w] <- RED
+11                 x <- p[x]
+12          else if color[right[w]] = BLACK 
+13              then color[left[w]] <- BLACK
+14                   color[w] <- RED
+15                   RIGHT-ROTATE(T, w)
+16                   w <- right[p[x]]
+17            color[w] <- color[p[x]]
+18            color[p[x]] <- BLACK
+19            color[right[w]] <- BLACK
+20            LEFT-ROTATE(T, p[x])
+21            x <- root[T]
+22        else (same as then clause with "right" and "left" exchanged)
+23 color[x] <- BLACK
+```
+
+  
+
+### RB DELETE FIXUP - Case 흐름
+
+* 전체 케이스는 1 - 8의 경우이지만 1,2,3,4와 5,6,7,8은 대칭적인 관계이므로 1,2,3,4에 대해서만 그린 흐름이다.
+* 처음부터 Case 4의 경우에 해당하면, left-rotation과 extra-black노드를 뺏는 것으로 바로 Case가 종료가 된다.
+* Case 3으로 가면 right-rotation으로 Case 3을 처리하고, Case 4로 상황이 바뀐다.
+* Case 1으로 가면, Case 1이 해결되고 Case 2, 3, 4로 넘어간다. 
+* 처음부터 Case 2로 가는 경우에는 바로 종료되지 않고 차이가 있다.
+* Case 2가 반복되는 동안 extra-black노드는 계속해서 트리의 위로 이동한다. 이 상황에서 Case 1, 3, 4로 이동하게 되면 흐름에 따라 2 step 이내에 종료되게 된다.
+* 물론, Case 5, 6, 7, 8로 넘어가서 Case 2의 대칭인 Case 6의 경우와 왔다갔다 할 수도 있고, Case 5, 7, 8로 이동하여 끝날 수도 있다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_11.png?raw=true)
