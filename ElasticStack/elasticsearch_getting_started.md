@@ -7,12 +7,15 @@
 > 1. Elastic Stack 소개
 > 2. Elasticsearch 상세
 > 3. Demo
-> 4. Reference
+>
+> **Reference**
+>
+> * https://www.elastic.co/kr/webinars/getting-started-elasticsearch
 
 ### Elastic Stack
 
 * ELK로 많이 알려져 있지만, 2015년 Beats가 합류하고, Elastic사에서 Stack들을 계속 추가하고 있기 때문에 공식적으로 Elastic Stack으로 명명하고있다.
-* Elasticsearch, Kibana, Logstash, Beats가 포함되며
+* Elasticsearch, Kibana, Logstash, Beats가 포함된다.
 * 100% 오픈소스이며, Apache 2 라이센스로 제공
 
 ### X - Pack
@@ -70,29 +73,90 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_01.PNG?raw=true)
 
+### Elasticsearch 클러스터링 과정
+
 * 노드를 여러개 실행시키면 이 노드들은 같은 클러스터로 묶여서 같은 시스템으로 동작을 한다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_02.PNG?raw=true)
 
-* 샤드들은 각각의 노드들에 분배되어 저장된다.
+* 샤드들은 각 노드들의 샤드 레벨로 분배되어 저장된다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_03.PNG?raw=true)
 
-* 무결성과 가용성을 위해 샤드의 복제본을 만든다. 같은 내용의 복제본과 샤드는 서로 다른 노드에 저장된다.
+* 무결성과 가용성을 위해 샤드는 replica라고 하는 복제본을 만들어서 저장 한다. replica의 수는 유동적으로 조절이 가능하며, **항상 Primary 샤드와 Replica는 같은 내용의 Document를 저장**하고 있다. 같은 내용을 가지는 Primary와 Replica는 서로 다른 노드에 저장된다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_04.PNG?raw=true)
 
-* 시스템 다운이나 네트워크 단절 등으로 유실된 노드가 생기면,
+* 만약, 클러스터내에 있는 한 개 또는 여러 개의 노드가 시스템 다운이나 네트워크 단절 등으로 유실되는 경우에는,
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_05.PNG?raw=true)
 
-* 복제본이 없는 샤드들은 다른 살아있는 노드로 복제를 시작한다.
+* Replica가 없는 샤드들은 다른 살아있는 노드로 Replica를 만들기 시작한다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_06.PNG?raw=true)
 
-* 노드의 수가 줄어들어도 샤드의 수는 변함 없이 무결성을 유지한다.
+* 결과적으로 노드의 수가 줄어들어도 샤드의 수는 변함 없이 무결성을 유지한다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_shard_node_07.PNG?raw=true)
+
+### Elasticsearch 검색 과정
+
+1. Query Phase
+   * Client로 부터 검색 명령을 받은 노드가 모든 샤드에게 쿼리를 전달한다. 1차적으로 모든 샤드(Primary 또는 Replica)에서 검색을 실행한다.
+
+   ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_search_01.PNG?raw=true)
+
+   * 각 샤드에서는 클라이언트가 보낸 쿼리에 맞는 해당 도큐먼트를 찾아서, 직접 요청이 들어온 노드로 리턴을 한다. 처음에 리턴하는 결과는 전체 Document가 아닌 Lucene doc id와 해당 Document의 정확도가 가지고 있는 랭킹 점수만 리턴한다.
+
+   ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_search_02.PNG?raw=true)
+
+2. Fetch Phase
+
+   * 노드는 리턴된 결과들의 랭킹 점수를 기반으로 정렬한 뒤, 실제로 클라이언트로 리턴할 Document를 가지고 있는 샤드들에게만 요청을 한다.
+
+   ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_search_03.PNG?raw=true)
+
+   * 요청을 받은 샤드들은 전체 문서 내용(_source) 등의 정보를 요청 노드로 전달하고, 해당 노드는  클라이언트로 최종 결과를 리턴한다.
+
+   ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_search_04.PNG?raw=true)
+
+* 위의 과정을 거쳐서 검색이 이루어지기 때문에, 요청과 검색이 서로 다른 노드에서 이루어 지더라도 항상 샤드 레벨로 분배가 되어서 실행된다.
+* 예를 들어, 첫번째 노드에 있는 데이터를 조회하는 검색 요청이 세번째 노드로 가더라도 샤드 레벨로 분배되어 처리된 결과를 세번째 노드가 리턴할 수 있게 된다.
+
+### Elasticsearch is...
+
+* document-oriented
+
+  * 기본적으로 JSON Document를 사용한다.
+
+* RESTful
+
+  * REST API를 제공한다.
+  * REST API에서 host, port(기본 9200), index, type, document id 각 레벨을 한 URI로 표현하여 단일 Document를 나타낸다.
+  * 동일한 URI는 동일한 Document를 나타내며, 같은 URI로 Document를 UPDATE(PUT) 하게 되면 해당 Document의 내용을 변경할 수 있다.
+
+  ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_restful_01.PNG?raw=true)
+
+* full text search engine
+
+  * Elasticsearch는 full text search engine이라는 특성을 가지고 있다.
+  * 데이터를 저장할 때, 데이터의 처리 과정을 거치게 된다. 
+  * text 문서들을 저장할 때, 검색에 가능한 형태로 가공을 해서 역색인(inverted index) 구조로 저장을 하게 된다.
+  * 그렇기 때문에, 검색에 있어서 대소문자 구별이나 원 언어로 검색할 수 있는 기능을 모두 가지고 있다.
+
+* real-time search and analytics
+
+  * Elasticsearch는 실시간 검색 & 분석 시스템이다.
+  * 데이터가 저장됨과 동시에 데이터들을 색인 구조로 만들기 때문에, 항상 실시간 검색이나 쿼리질의가 가능하다.
+
+* aggregation
+
+  * 검색뿐만 아니라 집계기능을 제공한다.
+  * 저장하고 있는 데이터들의 통계분석, 그룹별 통계분석 등의 집계가 가능하기 때문에 검색뿐만 아니라 분석을 위해서도 Elasticsearch를 많이 사용한다.
+
+![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/elasticsearch_aggregation_01.PNG?raw=true)
+
+  
 
 
 
@@ -101,8 +165,6 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 > Web : www.elastic.co
 >
 > Products : https://www.elastic.co/products
-
-
 
 ### 다운로드
 
@@ -113,22 +175,37 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
     * 실행가능한 binary파일들이 위치한다. 
     * linux/unix 환경에서는 elasticsearch 파일을
     * windows 환경에서는 elasticsearch.bat 파일 또는 .exe을 실행하면 된다.
+
   * config
     * elasticsearch.yml
       * elasticsearch의 설정에 관련된 파일이다.
-      * cluster명, node명, 데이터가 저장될 Path, Network host설정
+
+      * cluster명, node명, 데이터가 저장될 data path, log path, network host설정
         * Network host를 설정하지 않으면, default는 localhost로 설정된다.
         * elasticsearch의 노드가 localhost로 실행이 되면, 개발자 모드로 실행되서 시작단계에서 bootstrap체크 등을 하지 않는다.
-        * 반면에, network host를 설정하게 되면 실제로 clustering을 체크하게 되기 때문에, 시작단계에서 다양한 체크가 들어가게 된다.
-      * elasticsearch는 기본적으로 9200번 포트를 사용하여 client와 통신하며, 변경 가능하다.
-      * clustering을 위해서 discovery나 unicast설정도 하게 된다. 더 자세한 내용은 documentation에 설명되어있다.
+        * 반면에, network host를 설정하게 되면 실제로 clustering을 체크하게 되기 때문에, 시작단계에서 운영환경을 위한 다양한 체크가 들어가게 된다.
+
+      * elasticsearch는 rest-api를 사용하는 기본적으로 9200번 포트를 사용하여 client와 통신하며, 변경 가능하다.
+
+      * 클러스터링을 위해서 discovery나 unicast설정도 하게 된다. 더 자세한 내용은 documentation에 설명되어있다.
+
+      * elasticsearch 노드들 사이에서는 zen discovery 프로토콜을 사용한다. zen discovery 프로토콜 설정은 연결해야할 노드들을 배열의 형태로 작성해주면 된다.
+
+        ```shell
+        discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+        ```
     * jvm.options
       * elasticsearch가 실행할 수 있는 자바 힙 메모리를 설정한다.
       * Xms와 Xmx를 동일하게 설정 해야 메모리 스왑이 적게 일어난다.
     * log4j2.properties
       * elasticsearch에서는 로그를 log4j로 남기기 때문에, 로그를 수정하려면 이 파일을 수정하면 된다.
+
   * lib
+
+  * logs
+
   * modules
+
   * plugins
 
 ## Elasticsearch 실행
