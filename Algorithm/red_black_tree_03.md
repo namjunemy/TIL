@@ -154,34 +154,50 @@ DELETE의 경우 8가지 case로 분류할 수 있다. INSERT와 마찬가지로
 
 ### RB DELETE FIXUP pesudo code
 
+* 레드블랙트리에서 실제로 삭제한 노드는 y이다. 삭제한 노드 y의 자식인 x를 넘겨주면서 Delete Fixup을 하게 된다.
+* 01 : 만약 x가 루트노드이거나, x가 레드노드라면 While문을 빠져나가서 x를 BLACK으로 만들어주고 종료하면 된다.
+* 02 : While문 안에서는 크게 둘로 나뉘어지게 된다. 만약 x가 x의 부모노드의 왼쪽 자식이라면 Case 1, 2, 3, 4에 해당하며 부모노드의 오른쪽 자식이라면 Case 5, 6, 7, 8에 해당한다.
+* 03 : 노드 x의 형제노드인 w를 저장한다. x가 p[x]의 왼쪽 자식이므로, w는 오른쪽 자식 노드가 된다.
+* 04 : 형제 노드인 w노드가 RED인 경우가 Case 1에 해당한다.
+* 05 - 08 : Case1의 경우 w노드를 BLACK으로 만들고, p[x]노드를 RED로 만든 다음, p[x]를 기준으로 LEFT-ROTATE한다. 새로운 w는 p[x]의 right가 되므로 새로 저장한다. 이때, 새로운 w노드는 BLACK 이므로(p[x]가 RED로 변경됨) 다시 While문으로 들어왔을 때, Case2, 3, 4로 가게 된다.
+* 09 : Case 2, 3, 4를 구분하게 된다. w의 왼쪽, 오른쪽 자식노드가 둘다 BLACK인 경우 Case2에 해당한다.
+* 10 - 11 : 위에서 학습한 내용과 같이 w와 x로 부터 black을 하나씩 뺏어서 부모 노드에게 전달한다. 그렇게 하기 위해서 w는 RED노드가 되고, p[x]를 x로 만들어 준다. p[x]가 RED였다면 다시 While문을 돌지 않고 x를 RED로 만든 뒤에 종료하면 되고, p[x]가 BLACK이었다면 x를 p[x]로 놓고 double-black 노드가 된 x를 다시 반복해서 처리해주면 된다.
+* 12 : w의 오른쪽 자식이 BLACK이고, 왼쪽 자식이 RED인 경우 Case 3에 해당한다.
+* 13 - 16 : RIGHT-ROTATE의 대상인 두 노드의 색을 exchange 하고(w를 RED로, w의 왼쪽 자식노드를 BLACK으로 바꾸고), w를 기준으로 RIGHT-ROTATE 한다. 이렇게 되면 w는 p[x]의 새로운 오른쪽 자식노드가 되고, 그것의 색은 RED이다. 그리고 Case 4로 바로 넘어 간다.
+* 17 - 20 : LEFT-ROTATE의 대상인 두 노드의 색을 exchange 하고(w의 색을 p[x]의 색으로, p[x]를 BLACK으로) w의 오른쪽 자식노드의 색을 BLACK으로 바꾼다. 그 다음 p[x]를 기준으로 LEFT-ROTATE를 수행한다.
+* 21 : x라는 포인터 변수를 root[T]로 변경하여 Case 4가 끝나면 while문이 종료되도록 한다. 실제 트리에는 변화가 없다. 트리의 루트가 변한것도 아니다.
+* 22 : Case 5, 6, 7, 8을 대칭적으로 처리한다.
+  * x가 p[x]의 오른쪽 자식인 경우이다.
+* 23 : 트리의 루트의 색을 BLACK으로 변경하는 것은 언제 해도 문제가 되지 않는다.
+
 ```java
 RB-DELETE-FIXUP(T, x)
 01 while x != root[T] and color[x] = BLACK
 02   do if x = left[p[x]]
 03        then w <- right[p[x]] 
 04          if color[w] = RED
-05            then color[w] <- BLACK
-06                 color[p[x]] <- RED
-07                 LEFT-ROTATE(T, p[x])
-08                 w <- right[p[x]]
+05            then color[w] <- BLACK                                  // Case1
+06                 color[p[x]] <- RED                                 // Case1
+07                 LEFT-ROTATE(T, p[x])                               // Case1
+08                 w <- right[p[x]]                                   // Case1
 09          if color[left[w]] = BLACK and color[right[w]] = BLACK
-10            then color[w] <- RED
-11                 x <- p[x]
+10            then color[w] <- RED                                    // Case2
+11                 x <- p[x]                                          // Case2
 12          else if color[right[w]] = BLACK 
-13              then color[left[w]] <- BLACK
-14                   color[w] <- RED
-15                   RIGHT-ROTATE(T, w)
-16                   w <- right[p[x]]
-17            color[w] <- color[p[x]]
-18            color[p[x]] <- BLACK
-19            color[right[w]] <- BLACK
-20            LEFT-ROTATE(T, p[x])
-21            x <- root[T]
+13              then color[left[w]] <- BLACK                          // Case3
+14                   color[w] <- RED                                  // Case3
+15                   RIGHT-ROTATE(T, w)                               // Case3
+16                   w <- right[p[x]]                                 // Case3
+17            color[w] <- color[p[x]]                                 // Case4
+18            color[p[x]] <- BLACK                                    // Case4
+19            color[right[w]] <- BLACK                                // Case4
+20            LEFT-ROTATE(T, p[x])                                    // Case4
+21            x <- root[T]                                            // Case4
 22        else (same as then clause with "right" and "left" exchanged)
 23 color[x] <- BLACK
 ```
 
-  
+ ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_12.png?raw=true)
 
 ### RB DELETE FIXUP - Case 흐름
 
@@ -194,3 +210,12 @@ RB-DELETE-FIXUP(T, x)
 * 물론, Case 5, 6, 7, 8로 넘어가서 Case 2의 대칭인 Case 6의 경우와 왔다갔다 할 수도 있고, Case 5, 7, 8로 이동하여 끝날 수도 있다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/red_black_11.png?raw=true)
+
+  
+
+## 시간복잡도
+
+* BST에서의 DELETE : O(logn)
+* RB-DELETE-FIXUP : O(logn)
+  * 가장 최악의 경우인 Case2와 6이 반복되는 경우에도 최대 트리의 높이만큼 실행된다.
+* 따라서, DELETE와 FIXUP을 합쳐도 O(logn)의 시간이 된다.
