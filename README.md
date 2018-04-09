@@ -125,6 +125,10 @@
 * [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
 
 
+### Linux
+
+* [CentOS 7](https://github.com/namjunemy/TIL/blob/master/Linux/centos7.md)
+
 ### Cloud
 
 * [AWS EC2 인스턴스 생성하기](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_create_instance.md)
