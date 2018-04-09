@@ -165,12 +165,90 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 > Web : www.elastic.co
 >
 > Products : https://www.elastic.co/products
+>
+> 실행 환경은 CentOS 7.4
 
-### 다운로드
+### 설치 및 실행
 
 * https://www.elastic.co/kr/downloads/elasticsearch 에서 OS에 맞는 파일을 다운로드 한다.
+
 * 압축을 풀고 실행한다. 실행하기 전에 Java가 설치 되어 있는지 확인해야 한다.
+
+  ```shell 
+  # java -version
+  ```
+
+* Elasticsearch Installation with tar
+
+  ```shell
+  # curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.3.tar.gz
+  # tar -xvf elasticsearch-6.2.3.tar.gz
+  # cd elasticsearch-6.2.3/bin
+  # ./elasticsearch
+  ```
+
+* Elasticsearch installation with RPM
+
+  * import PGP key
+
+    ```shell
+    # rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    ```
+
+  * create RPM repo file
+
+    ```shell
+    # vi /etc/yum.repos.d/elasticsearch.repo
+
+    [elasticsearch-6.x]
+    name=Elasticsearch repository for 6.x packages
+    baseurl=https://artifacts.elastic.co/packages/6.x/yum
+    gpgcheck=1
+    gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled=1
+    autorefresh=1
+    type=rpm-md
+    ```
+
+  * install
+
+    ```shell
+    # sudo yum install elasticsearch
+    ```
+
+* Elasticsearch 실행
+
+  * 현재 사용하는 시스템의 초기화 프로세스가 SysV init인지 systemd 인지 먼저 확인해야 한다. (centos 7 버전은 systemd이며, centos6 이하는 init 프로세스이다.)
+
+  ```shell
+  # ps -p 1
+  ```
+
+  * Running Elasticsearch with systemd
+    * 바로 elasticsearch 서비스가 올라오지 않고, 올라올때 까지 시간이 조금 걸린다.
+
+  ```shell
+  # systemctl daemon-reload
+  # systemctl enable elasticsearch.service
+  # systemctl start elasticsearch.service
+
+  # systemctl stop elaticsearch.service
+  ```
+
+* 로그에는 elsticsearch.yaml 파일에서 설정한 JVM arguments가 표시되고, 통신을 위해 사용되는 포트들이 표시된다. 기본적으로 9300번 포트를 통해 노드들끼리의 통신이 이루어지고, 9200번 포트를 통해서 client와 통신을 하게 된다.
+
+* elasticsearch의 정상적인 실행 여부를, 다음과 같은 명령어를 통해 확인할 수 있다.
+
+  * 명령을 전송하면, elasticsearch의 현재 버전과 클러스터 정보, 노드의 이름 등이 JSON형식으로 리턴 된다. 
+
+  ```shell
+  # curl -XGET localhost:200
+  ```
+
+### 디렉토리 구조
+
 * 압축이 풀린 폴더로 이동하면, 아래와 같은 파일구조로 구성되어있다.
+
   * bin
     * 실행가능한 binary파일들이 위치한다. 
     * linux/unix 환경에서는 elasticsearch 파일을
@@ -208,9 +286,5 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 
   * plugins
 
-## Elasticsearch 실행
+## Elasticsearch 클러스터링
 
-* `$ elasticsearch설치위치/bin/elasticsearch` 명령을 통해 실행(Linux)
-* 로그에는 elsticsearch.yaml 파일에서 설정한 JVM arguments가 표시되고, 통신을 위해 사용되는 포트들이 표시된다. 기본적으로 9300번 포트를 통해 노드들끼리의 통신이 이루어지고, 9200번 포트를 통해서 client와 통신을 하게 된다.
-* elasticsearch의 정상적인 실행 여부를, 다음과 같은 명령어를 통해 확인할 수 있다.
-  * `$ curl localhost:9200` 명령을 전송하면, elasticsearch의 현재 버전과 클러스터 정보, 노드의 이름 등이 JSON형식으로 리턴 된다. 
