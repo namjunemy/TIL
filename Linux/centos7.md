@@ -45,7 +45,7 @@
 
 CentOS 7 부터 서비스 데몬 관리 방법이 달라졌다. 기존의 init system에서 systemd로 기본 시스템 관리 데몬이 변경되었기 때문이다.
 
-> 서비스 예시 : elasticsearch
+> 서비스 예시 : elasticsearch / .service 확장자 생략 가능
 
 #### 서비스 등록
 
