@@ -83,3 +83,59 @@
 * 만약 n=O(m)이면 평균검색시간은 O(1)
   * 강의 맨 처음에 "적절한 가정"하에 평균 탐색, 삽입, 삭제시간 O(1)이라는 이야기를 했었는데, '적절한 가정'이 성능분석을 위해 주로 하는 현실에서는 불가능한 가정이므로 가설이라고 이야기 할 수 있다.
 
+  
+
+## Open Addressing에 의한 충돌 해결
+
+* 모든 키를 해시 테이블 자체에 저장
+* 테이블의 각 칸(slot)에는 1개의 키만 저장
+* 충돌 해결 기법
+  * Linear probing
+  * Quadratic probing
+  * Double hashing
+
+### Linear Probing
+
+* h(k), h(k) + 1, h(k) + 2, … 순서로 검사하여 처음으로 빈 슬롯에 저장 테이블의 끝에 도달하면 다시 처음으로 circular하게 돌아감
+* search하는 경우에는 순차적으로 찾을때 까지 검색하다가 빈 슬롯이 나오면 종료
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/hashing_04.png?raw=true)
+
+### 다른 방법들
+
+* Linear probing의 **단점**
+  * primary cluster : 키에 의해서 채워진 **연속된 슬롯**들을 의미
+  * 이런 cluster가 생성되면 이 cluster는 점점 더 커지는 경향이 생김
+  * 검색시간이 클러스터의 길이에 비례하게 되므로 바람직하지 않다.
+* Quadratic probing
+  * 충돌 발생시 h(k), h(k) + 1^2, h(k) + 2^2, h(k) + 3^2, … 순서로 시도
+* Double hashing
+  * 서로 다른 두 해시 함수 h1과 h2를 이용하여
+  * h(k, i) = (h1(k) + i*h2(k)) mod m
+
+### Quadratic Probing
+
+* 충돌 발생시 h(k), h(k) + 1^2, h(k) + 2^2, h(k) + 3^2, … 순서로 시도
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/hashing_05.png?raw=true)
+
+### Double Hashing
+
+* 서로 다른 두 해시 함수 h1과 h2를 이용한다.
+* 키 값에 따라서 해시 값이 달라진다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/hashing_06.png?raw=true)
+  
+
+## Open Addressing - 키의 삭제
+
+* 단순히 키를 삭제할 경우 문제가 발생한다.
+  * 가령 A2, B2, C2기 순서대로 모두 동일한 해시함수값을 가져서 linear probing으로 충돌을 해결했을 때,
+  * B2를 삭제한 후 C2를 검색하는 경우가 이에 해당한다.
+  * Linear Probing을 했을 경우 빈 슬롯에 도달하면 검색이 종료되기 때문에 검색에 문제가 생기게 된다.
+  * 이 문제를 해결하기 위해서 삭제된 슬롯에 예를 들면 DEL이라는 표시를 해둘 수도 있지만,
+  * Dynamic Set을 구현한 해시 테이블의 특성상 삽입, 삭제가 빈번하게 일어나므로 결국 거의 모든 슬롯이 DEL표시로 채워질 수 있다.
+  * 또한, 곳곳에 DEL 표시가 되어있으면 결국 배열과 같이 모든 슬롯을 검색하게 되므로 Hashing의 장점을 잃게 된다.
+* 가장 적절한 해결책은 삭제될 슬롯에 있는 값과 같은 해시값을 가지는 클러스터의 마지막 슬롯을 삭제될 슬롯으로 가져와서 클러스터의 손상을 막는 방법이다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/hashing_07.png?raw=true)
