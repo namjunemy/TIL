@@ -11,6 +11,7 @@
 > **Reference**
 >
 > * https://www.elastic.co/kr/webinars/getting-started-elasticsearch
+> * http://kimjmin.net
 
 ### Elastic Stack
 
@@ -242,12 +243,12 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
   * 명령을 전송하면, elasticsearch의 현재 버전과 클러스터 정보, 노드의 이름 등이 JSON형식으로 리턴 된다. 
 
   ```shell
-  # curl -XGET localhost:200
+  # curl -XGET localhost:9200
   ```
 
 ### 디렉토리 구조
 
-* 압축이 풀린 폴더로 이동하면, 아래와 같은 파일구조로 구성되어있다.
+* **tar로 설치한 경우**, 압축이 풀린 폴더로 이동하면, 아래와 같은 파일구조로 구성되어있다.
 
   * bin
     * 실행가능한 binary파일들이 위치한다. 
@@ -286,5 +287,20 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 
   * plugins
 
+* **RPM으로 설치한 경우** 기본 설치 경로
+
+  * 기본 설치 위치($ES_HOME) : `/usr/share/elasticsearch`
+    * 실행파일 : `bin/elasticsearch`
+    * 플러그인 : `plugins`
+  * 설정 : `/etc/elasticsearch`
+    * elasticsearch.yml
+    * jvm.options
+    * log4j2.properties
+  * 데이터 (path.data) : `/var/lib/elasticsearch`
+  * 로그 (path.logs) : `/var/log/elasticsearch`
+  * 데이터와 로그 파일의 경로는 `/etc/elasticsearch/elasticsearch.yml` 파일에서 수정이 가능하며, 모든 경로에 접근하기 위해서는 기본적으로 root권한을 필요로 한다.
+
 ## Elasticsearch 클러스터링
+
+
 
