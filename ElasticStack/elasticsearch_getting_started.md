@@ -246,6 +246,18 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
   # curl -XGET localhost:9200
   ```
 
+* 실행, 중지, 상태 확인
+
+  * .service 확장자는 생략가능
+
+  ```shell
+  # systemctl start elasticsearch
+  # systemctl stop elasticsearch
+  # systemctl status elasticsearch
+  ```
+
+  ​
+
 ### 디렉토리 구조
 
 * **tar로 설치한 경우**, 압축이 풀린 폴더로 이동하면, 아래와 같은 파일구조로 구성되어있다.
@@ -302,5 +314,4 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 
 ## Elasticsearch 클러스터링
 
-
-
+> aws로 구축중
