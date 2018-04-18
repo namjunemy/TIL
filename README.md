@@ -42,9 +42,10 @@
 ### Design Pattern
 
 * [Strategy Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/01_strategy_pattern.md)
-* [Adapter_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/02_adapter_pattern.md)
-* [Template_Method_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/03_template_method_pattern.md)
-* [Factory_Method_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/04_factory_method_pattern.md)
+* [Adapter Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/02_adapter_pattern.md)
+* [Template Method Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/03_template_method_pattern.md)
+* [Factory Method Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/04_factory_method_pattern.md)
+* [Singleton Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/05_singleton_pattern.md)
 
 ### Algorithm
 
