@@ -44,6 +44,7 @@
 * [Strategy Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/01_strategy_pattern.md)
 * [Adapter_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/02_adapter_pattern.md)
 * [Template_Method_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/03_template_method_pattern.md)
+* [Factory_Method_Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/04_factory_method_pattern.md)
 
 ### Algorithm
 
@@ -70,6 +71,8 @@
 - [5-1. Red Black Tree - 개요](https://github.com/namjunemy/TIL/blob/master/Algorithm/red_black_tree_01.md)
 - [5-2. Red Black Tree - INSERT, FIXUP 연산](https://github.com/namjunemy/TIL/blob/master/Algorithm/red_black_tree_02.md)
 - [5-3. Red Black Tree - DELETE, FIXUP 연산](https://github.com/namjunemy/TIL/blob/master/Algorithm/red_black_tree_03.md)
+- [6-1. Hashing - 개요](https://github.com/namjunemy/TIL/blob/master/Algorithm/hashing_01.md)
+- [6-2. Hashing - Hash 함수, Hashing in Java](https://github.com/namjunemy/TIL/blob/master/Algorithm/hashing_02.md)
 
 ### Spring
 
