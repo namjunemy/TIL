@@ -254,8 +254,43 @@ yo
 Process finished with exit code 0
 ```
 
-* 따라서, Cloneable 인터페이스를 구현한 객체를 clone()할 때, reference type 멤버는 명시적으로 Deep Copy를 해주면 된다.
-  * `cat.setAge(new Age(this.age.getYear(), this.age.getValue()));`
+* 따라서, Cloneable 인터페이스를 구현한 객체를 clone()할 때, reference type 멤버도 Cloneable 인터페이스를 구현한 객체로 선언하고, 명시적으로 Deep Copy를 해줘야 한다.
+  * `cat.setAge((Age) age.clone());`
+
+```java
+package deepshallow;
+
+public class Age implements Cloneable{
+  private int year;
+  private int value;
+
+  public Age(int year, int value) {
+    this.year = year;
+    this.value = value;
+  }
+
+  public int getYear() {
+    return year;
+  }
+
+  public void setYear(int year) {
+    this.year = year;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
+  public void setValue(int value) {
+    this.value = value;
+  }
+
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
+}
+```
 
 ```java
 package deepshallow;
@@ -264,9 +299,9 @@ public class Cat implements Cloneable {
  
   ...
       
-  public Cat copy() throws CloneNotSupportedException{
+  public Cat copy() throws CloneNotSupportedException {
     Cat cat = (Cat) clone();
-    cat.setAge(new Age(this.age.getYear(), this.age.getValue()));
+    cat.setAge((Age) age.clone());
     return cat;
   }
 }
