@@ -314,4 +314,7 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 
 ## Elasticsearch 클러스터링
 
-> aws로 구축중
+> 김종민 테크 에반젤리스트님의 블로그(클러스터 구성) 포스팅 & 공식 레퍼런스 참조
+>
+> * http://kimjmin.net/2018/01/2018-01-build-es-cluster-1
+> * https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
