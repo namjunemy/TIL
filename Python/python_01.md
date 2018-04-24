@@ -663,7 +663,177 @@ while idx < 10:
     idx += 1
 ```
 
-* for
+* break
+  * break는 가장 가까운 반복문을 빠져나오는 제어자
 
+```python
+idx = 1
+result = 0
 
+while True:
+    result += idx
+    if result > 100:
+        totOver = result
+        idxOver = idx
+        break;
+    idx += 1
+    
+print(totOver)
+print(idxOver)
+```
+
+* 중첩 반복문
+
+```python
+dan = 2
+
+while dan < 10:
+    idx = 1
+    while idx <= 9:
+        print('{0} X {1} = {2}'.format(dan, idx, dan * idx))
+        idx += 1
+    print()
+    dan += 1
+```
+
+* for문
+
+```python
+for i in (1, 2, 3):
+    print(i)
+    
+result = 0
+for i in range(100):
+    result += i
+print(result)
+
+result = 0
+for i in range(0, 11, 2):
+    result += i
+    print(result)
+```
+
+```shell
+1
+2
+3
+4950
+0
+2
+6
+12
+20
+30
+```
+
+```python
+for k in dic.keys():
+    print('key: {0}'.format(k))
+
+for v in dic.values():
+    print('value: {0}'.format(v))
+
+for k, v in dic.items():
+    print('key: {0}, value: {1}'.format(k, v))
+```
+
+* continue, break
+
+```python
+for i in range(10):
+    if i & 1 == 1:
+        continue
+    print(i)
+```
+
+## 06. 함수로 코드 간추리기
+
+> Contents
+>
+> * 함수 정의
+> * 매개변수를 입력받는 여러가지 방법
+> * 호출자에게 반환
+> * 함수 밖의 변수, 함수 안의 변수
+> * 재귀 함수
+> * 함수를 변수에 담아 사용하기
+> * 중첩 함수
+
+## 함수
+
+* 파이썬에서는 함수느 메소드를 정의할 때 def(definition) 키워드 사용
+
+```python
+def hello():
+    print('hello world')
+
+def add(x, y):
+    return x + y
+
+res = add(14,5)
+```
+
+```python
+def avg(a, b):
+    return (a + b) / 2
+    
+res = avg(10, 20)
+```
+
+```python
+print('국어: ', end='')
+kor = int(input())
+print('영어: ', end='')
+eng = int(input())
+print('수학: ', end='')
+math = int(input())
+
+def get_sum(a, b, c):
+    return a + b + c
+
+def get_avg(sum):
+    return sum / 3
+
+def get_grade(avg):
+    if avg >= 90:
+        grade = 'A'
+    elif avg >= 80:
+        grade = 'B'
+    elif avg >= 70:
+        grade = 'C'
+    else:
+        grade = 'D'
+    return grade
+
+tot = get_sum(kor, eng, math)
+avg = get_avg(tot)
+grade = get_grade(avg)
+
+print(tot)
+print(avg)
+print(grade)
+```
+
+```shell
+국어: 90
+영어: 90
+수학: 90
+270
+90.0
+A
+```
+
+### 매개변수
+
+* 가변 매개변수
+  * 입력 개수가 달라질 수 있는 매개변수
+  * *를 이용하여 정의된 가변 매개변수는 **튜플**
+    * 리스트가 넘어오더라도 튜플로 변경된다.
+    * 따라서, 참조만 가능하다.
+  * 가변 매개변수로 정의 된 함수를 호출할 때는,
+  * 리스트나 튜블이 저장된 변수를 매개변수로 호출하는 쪽에서도 *를 붙여서 호출한다.
+
+```python
+def 함수이름(*매개변수):
+    코드블록
+```
 
