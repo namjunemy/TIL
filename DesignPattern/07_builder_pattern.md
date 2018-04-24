@@ -1,4 +1,4 @@
-# 7. Builder Pattern
+# 7. Builder Pattern 01
 
 > 출처 : Head First Design Patterns & 인프런 - '자바 디자인 패턴의 이해'(GoF Design Pattern)
 >
@@ -56,10 +56,233 @@ public class ComputerFactory {
   }
 }
 ```
+* Computer.java
+  * 컴퓨터 클래스
+```java
+public class Computer {
+  private String cpu;
+  private String ram;
+  private String storage;
 
+  public Computer(String cpu, String ram, String storage) {
+    this.cpu = cpu;
+    this.ram = ram;
+    this.storage = storage;
+  }
 
+  public String getCpu() {
+    return cpu;
+  }
 
+  public void setCpu(String cpu) {
+    this.cpu = cpu;
+  }
 
+  public String getRam() {
+    return ram;
+  }
+
+  public void setRam(String ram) {
+    this.ram = ram;
+  }
+
+  public String getStorage() {
+    return storage;
+  }
+
+  public void setStorage(String storage) {
+    this.storage = storage;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("cpu : ").append(cpu);
+    sb.append("\nram : ").append(ram);
+    sb.append("\nstorage : ").append(storage);
+    return sb.toString();
+  }
+}
+```
+* BluePrint.java
+  * 설계도의 추상클래스이다.
+  * 각요소를 set하고, 만들어진 Computer를 return 한다.
+
+```java
+public abstract class BluePrint {
+  public abstract void setCpu();
+
+  public abstract void setRam();
+
+  public abstract void setStorage();
+
+  public abstract Computer getComputer();
+}
+```
+* MacBluePrint.java
+  * AbstractBuilder인 BluePrint 클래스의 ConcreteBuilder 클래스이다.
+```java
+public class MacBluePrint extends BluePrint {
+  private Computer computer;
+
+  public MacBluePrint() {
+    computer = new Computer("default", "default", "default");
+  }
+
+  @Override
+  public void setCpu() {
+    computer.setCpu("i5");
+  }
+
+  @Override
+  public void setRam() {
+    computer.setCpu("8gb");
+  }
+
+  @Override
+  public void setStorage() {
+    computer.setStorage("ssd-250gb");
+  }
+
+  @Override
+  public Computer getComputer() {
+    return this.computer;
+  }
+}
+```
+* Main.java
+```java
+public class Main {
+  public static void main(String[] args) {
+    ComputerFactory computerFactory = new ComputerFactory();
+    computerFactory.setBluePrint(new MacBluePrint());
+    computerFactory.make();
+    Computer computer = computerFactory.get();
+    System.out.println(computer);
+  }
+}
+```
+
+* 복잡하게 생성되어야 하는 객체의 구현을 서브클래스에게 넘겨서 단순화 시킬 수 있다.
+
+# Builder Pattern 02
+
+실제로 현업에서 쓰이는 빌더 패턴이 무엇인지 알아 본다.
+
+### 학습 목표
+
+* 많은 변수를 가진 객체의 생성을 가독성 높게 코딩 할 수 있다.
+
+### 키워드
+
+* 가독성 & 많은 멤버 변수
+
+### Builder Pattern
+
+* 많은 인자를 가진 객체의 생성을 다른 객체의 도움으로 생성하는 패턴
+
+### 구현
+
+```java
+package pattern02;
+
+public class Computer {
+  private String cpu;
+  private String ram;
+  private String storage;
+
+  public Computer(String cpu, String ram, String storage) {
+    this.cpu = cpu;
+    this.ram = ram;
+    this.storage = storage;
+  }
+
+  public String getCpu() {
+    return cpu;
+  }
+
+  public void setCpu(String cpu) {
+    this.cpu = cpu;
+  }
+
+  public String getRam() {
+    return ram;
+  }
+
+  public void setRam(String ram) {
+    this.ram = ram;
+  }
+
+  public String getStorage() {
+    return storage;
+  }
+
+  public void setStorage(String storage) {
+    this.storage = storage;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("cpu : ").append(cpu);
+    sb.append("\nram : ").append(ram);
+    sb.append("\nstorage : ").append(storage);
+    return sb.toString();
+  }
+}
+```
+
+```java
+package pattern02;
+
+public class ComputerBuilder {
+  private Computer computer;
+
+  public ComputerBuilder() {
+    computer = new Computer("default","default","default");
+  }
+
+  public static ComputerBuilder start() {
+    return new ComputerBuilder();
+  }
+
+  public ComputerBuilder setCpu(String cpu) {
+    computer.setCpu(cpu);
+    return this;
+  }
+
+  public ComputerBuilder setRam(String ram) {
+    computer.setRam(ram);
+    return this;
+  }
+
+  public ComputerBuilder setStorage(String storage) {
+    computer.setStorage(storage);
+    return this;
+  }
+
+  public Computer build() {
+    return this.computer;
+  }
+}
+```
+
+```java
+package pattern02;
+
+public class Main {
+  public static void main(String[] args) {
+    Computer computer = ComputerBuilder
+        .start()
+        .setCpu("i5")
+        .setRam("8gb")
+        .setStorage("256 ssd")
+        .build();
+
+    System.out.println(computer);
+  }
+}
+```
 
 
 
