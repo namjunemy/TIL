@@ -528,3 +528,142 @@ dict_items([('파이썬', 'www.python.org'), ('java', 'www.oracle.com/java')])
 {}
 ```
 
+## 05. 프로그램의 흐름 제어하기
+
+> Contents
+>
+> * 흐름 제어를 시작하기 전에
+>   * bool 자료형
+>   * 논리 연산자
+>   * 흐름 제어문과 조건문
+>   * 코드블록과 들여쓰기
+>   * 비교 연산자
+> * 분기문
+>   * if문
+> * 반복문
+>   * while
+>   * for
+>   * continue와 break로 반복문 제어
+
+#### bool 자료형
+
+```python
+>>> a = True
+>>> type(a)
+<class 'bool'>
+>>> a = 3 > 2
+>>> type(a)
+<class 'bool'>
+>>> b = not 3 > 2
+>>> b
+False
+>>> b = not b
+>>> b
+True
+>>> b = 100 == 10
+>>> b
+False
+>>> b = 100 != 10
+>>> b
+True
+```
+
+#### 논리 연산자
+
+```python
+>>> b = not 3 > 2
+>>> b
+False
+>>> b = not b
+>>> b
+True
+
+>>> not None
+True
+
+>>> True and True
+True
+>>> True and False
+False
+
+>>> False or True
+True
+```
+
+#### 코드블록과 들여쓰기
+
+* 코드 블록
+  * 여러 코드가 이루는 일정한 구역
+  * 파이썬은 들여쓰기로 구역을 나눔
+  * 들여쓰기는 스페이스나 탭 둘 다 사용 가능 스페이스 4칸 권장
+* 코드블록과 비교연산자
+
+```python
+data = int(input())
+
+if data > 0:
+    print('양수')
+elif data < 0:
+    print('음수')
+else:
+    print('0')
+```
+
+### 분기문
+
+* if / elif / else
+
+```python
+print('국어: ', end='')
+kor = int(input())
+print('영어: ', end='')
+eng = int(input())
+print('수학: ', end='')
+math = int(input())
+
+tot = kor + eng + math
+avg = tot / 3
+
+if avg >= 90:
+    grade = 'A'
+elif avg >= 80:
+    grade = 'B'
+elif avg >= 70:
+    grade = 'C'
+else:
+    grade = 'D'
+    
+print('총점: {0}, 평균: {1}, 학점: {2}'.format(tot, avg, grade))
+```
+
+```python
+국어: 98
+영어: 98
+수학: 98
+총점: 294, 평균: 98.0, 학점: A
+```
+
+```python
+import sys
+a = int(input())
+if a == 0:
+    sys.exit()
+else:
+    print(3/a)
+```
+
+### 반복문
+
+* while
+
+```python
+idx = 1
+while idx < 10:
+    print('2 X {0} = {1}'.format(idx, 2 * idx))
+    idx += 1
+```
+
+* for
+
+
+
