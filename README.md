@@ -46,6 +46,8 @@
 * [Template Method Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/03_template_method_pattern.md)
 * [Factory Method Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/04_factory_method_pattern.md)
 * [Singleton Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/05_singleton_pattern.md)
+* [Prototype Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/06_prototype_pattern.md)
+* [Builder Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/07_builder_pattern.md)
 
 ### Algorithm
 
