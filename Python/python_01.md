@@ -8,20 +8,20 @@
 >   - 코드 편집기로 코딩
 > - 주석
 
-## 설치하기
+## 01. 설치하기
 
 - https://www.python.org/downloads/
 - python3.6의 windows installer에는 PATH를 추가해주는 메뉴가 추가됨
   - 별도의 환경 변수 설정 필요 없음
 
-## eclipse - python 개발
+## 02. eclipse - python 개발
 
 - eclipse -> help -> eclipse marketplace -> pydev -> python ide for Eclipse 6.3.2 설치 후 개발
 - 설치 후 new project에서 python 프로젝트(PyDev Project) 생성 가능
 - windows -> preference -> PyDev -> Interpreters -> Python Interpreter -> Quick Auto-Config - 설치한 라이브러리 연동
 - new Project -> PyDev Project -> python module로 python 코드 작성
 
-## 데이터 다루기 - 수와 텍스트, 그리고 비트
+## 03. 데이터 다루기 - 수와 텍스트, 그리고 비트
 
 > * 변수
 > * 수 다루기
@@ -295,5 +295,236 @@ False
 >>> age = 20
 >>> '이름:{0}, 나이:{1}'.format(name, age)
 '이름:namjune, 나이:20'
+```
+
+### 수에서 텍스트로 텍스트에서 수로
+
+* input()
+  * 사용자로 부터 입력을 받는 input()은 문자열을 반환한다.
+* input()을 통해 입력받은 문자열을 숫자로 casting해서 연산할 수 있다.
+  * int(), float(), complex()
+
+```python
+>>> a = input()
+100
+>>> b = input()
+200
+>>> result = a + b
+>>> result
+'100200'
+>>> result = int(a) + int(b)
+>>> result
+300
+```
+
+```python
+>>> name = input()
+Namjun Kim
+>>> age = int(input())
+26
+>>> height = float(input())
+173.5
+```
+
+* 숫자를 문자열로 바꾸기 위해서는 str()을 사용
+  * 문자열 연산을 위해 자주 사용함
+
+## 04. 데이터 다루기 : List와 Tuple, Dictionary
+
+### List
+
+* List는 데이터의 목록을 다루는 자료형
+* Slot : 리스트의 데이터를 삽입할 자리
+* Element : 리스트의 요소
+
+```python
+>>> list = ['김남준', '홍길동', '양의지']
+>>> list
+['김남준', '홍길동', '양의지']
+>>> list[2]
+'양의지'
+```
+
+```python
+>>> intList = [100,200,300,400,500]
+>>> intList[1:4]
+[200, 300, 400]
+>>> list + intList
+['김남준', '홍길동', '양의지', 100, 200, 300, 400, 500]
+```
+
+* 하나의 리스트가 여러가지 타입의 element를 저장하는 것이 가능하다.
+
+#### List 메소드
+
+* append()
+* extend()
+* insert()
+* remove()
+  * 특정 데이터 삭제
+* pop()
+  * 마지막 데이터 삭제 후 리턴
+* index()
+  * 특정 데이터의 위치
+* count()
+* sort()
+* reverse()
+
+```python
+>>> list = [1, 2, 3]
+>>> list.append(6)
+>>> list
+[1, 2, 3, 6]
+
+>>> list.extend([8,9,10])
+>>> list
+[1, 2, 3, 6, 8, 9, 10]
+
+>>> list.insert(0,11)
+>>> list
+[11, 1, 2, 3, 6, 8, 9, 10]
+
+>>> list.remove(10)
+>>> list
+[11, 1, 2, 3, 6, 8, 9]
+
+>>> list.pop()
+9
+>>> list
+[11, 1, 2, 3, 6, 8]
+
+>>> list.index(11)
+0
+
+>>> list.append(1)
+>>> list.count(1)
+2
+
+>>> list.sort()
+>>> list
+[1, 1, 2, 3, 6, 8, 11]
+
+>>> list.sort(reverse=True)
+>>> list
+[11, 8, 6, 3, 2, 1, 1]
+
+>>> list.reverse()
+>>> list
+[1, 1, 2, 3, 6, 8, 11]
+```
+
+* 리스트를 리스트로 만들어서 사용 가능
+
+```python
+>>> a1 = [1, 2, 3]
+>>> b1 = [10, 20, 30]
+>>> ab = [a1, b1]
+>>> ab
+[[1, 2, 3], [10, 20, 30]]
+>>> ab[0][1]
+2
+```
+
+### Tuple
+
+* 사전적 의미는 Tuple과 List가 비슷
+  * 리스트는 목록
+  * 튜플은 "N개의 요소로 된 집합"
+* 파이썬의 List와 Tuple의 차이
+  * List는 변경 가능(List 생성 후 추가/수정/삭제 가능)
+  * Tuple은 데이터 변경 불가능(Tuple 생성 후 추가/수정/삭제 불가능)
+  * List는 이름 그대로 목록 형식의 데이터를 다루는 데 적합
+  * Tuple은 위경도 좌표나 RGB 색상처럼 불변의 작은 규모의 자료구조를 구성하기에 적합
+* Tuple은 대괄호과 아닌 소괄호를 사용한다
+  * 중괄호는 생략 가능하지만,
+  * 데이터가 하나 들어가는 Tuple이라도 , 를 생략하면 안된다.
+
+```python
+>>> tuple = (1, 2, 3)
+>>> tuple
+(1, 2, 3)
+>>> type(tuple)
+<class 'tuple'>
+
+>>> tuple2 = 10, 20, 30;
+>>> type(tuple2)
+<class 'tuple'>
+
+>>> tuple3 = (10)
+>>> type(tuple3)
+<class 'int'>
+```
+
+* 기본적인 리스트의 메소드 사용 가능
+* packing과 unpacking
+  * packing : 여러 데이터를 tuple로 묶는 것
+  * unpacking : tuple의 각 요소를 여러개의 변수에 할당하는 것
+
+```python
+# 패킹
+>>> a = 1, 2, 3
+>>> a
+(1, 2, 3)
+
+# 언패킹
+>>> tu = ('hong', 20, 175.3)
+>>> name, age, height = tu
+>>> name
+'hong'
+>>> age
+20
+>>> height
+175.3
+```
+
+```python
+>>> tu = 100, 200, 300, 100, 200, 100
+>>> tu.count(100)
+3
+>>> tu.index(200)
+1
+```
+
+### Dictionary
+
+* 사용법 측면으로 보면 리스트와 비슷
+  * 리스트처럼 첨자를 이용해서 요소에 접근
+* 리스트는 요소에 접근할 때 0부터 시작하는 수 첨자만 사용할 수 있지만 dictionary는 문자열과 숫자를 비롯해서 변경이 불가능한 형식이면 어떤 자료형이든 사용
+  * dictionary의 첨자는 키(Key)
+  * 이 키가 가리키는 슬롯에 저정되는 데이터를 Value
+  * dictionary는 Key-Value Pair로 구성
+* 탐색 속도가 빠르고, 사용하기도 편리
+* dictionary를 만들 때는 중괄호 { } 를 이용
+* 특정 슬롯에 새로운 키-값을 입력하거나 dictionary 안에 있는 요소를 참조할 때는 리스트와 튜플에서처럼 대괄호 [ ]를 이용
+
+```python
+>>> dic = {}
+>>> dic['파이썬'] = 'www.python.org'
+>>> dic['java'] = 'www.oracle.com/java'
+>>> dic['파이썬']
+'www.python.org'
+>>> type(dic)
+<class 'dict'>
+>>> dic
+{'파이썬': 'www.python.org', 'java': 'www.oracle.com/java'}
+```
+
+#### Dictionary 메소드
+
+```python
+>>> dic.keys()
+dict_keys(['파이썬', 'java'])
+
+>>> dic.items()
+dict_items([('파이썬', 'www.python.org'), ('java', 'www.oracle.com/java')])
+
+>>> dic.pop('파이썬')
+'www.python.org'
+>>> dic
+{'java': 'www.oracle.com/java'}
+
+>>> dic.clear()
+>>> dic
+{}
 ```
 
