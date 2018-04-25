@@ -527,6 +527,7 @@ from bankex.acccount_grade import AccountWithGrade
 
 
 class Bank:
+
     def __init__(self):
         self.accList = {}
     
@@ -541,33 +542,38 @@ class Bank:
         print('선택 >> ', end='')
         select = int(input())
         return select
-        
-    def makeAccount(self):
+
+    def accMenu(self):
         print('[계좌 개설]')
         print('1. 일반계좌')
         print('2. 특수계좌')
         print('선택 >> ', end='')
         select = int(input())
-        
         if select == 1:
-            print('이름: ', end='')
-            name = input()
-            print('입금액: ', end='')
-            money = int(input())
-            acc = Account(name, money)
-            self.accList[acc.id] = acc
-            print('계좌번호는 {0} 입니다.'.format(acc.id))
+            self.makeAccount()
         elif select == 2:
-            print('이름: ', end='')
-            name = input()
-            print('입금액: ', end='')
-            money = int(input())
-            print('등급(VIP-V,Gold-G,Silver-S,Normal-N): ', end='')
-            grade = input()
-            acc = AccountWithGrade(name, money, grade)
-            self.accList[acc.id] = acc
-            print('계좌번호는 {0} 입니다.'.format(acc.id))
-
+            self.makeSpecialAccount()
+    
+    def makeAccount(self):
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        acc = Account(name, money)
+        self.accList[acc.id] = acc
+        print('계좌번호는 {0} 입니다.'.format(acc.id))
+            
+    def makeSpecialAccount(self):
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        print('등급(VIP-V,Gold-G,Silver-S,Normal-N): ', end='')
+        grade = input()
+        acc = AccountWithGrade(name, money, grade)
+        self.accList[acc.id] = acc
+        print('계좌번호는 {0} 입니다.'.format(acc.id))
+        
     def deposit(self):
         print('[입금]')
         print('계좌번호 : ', end='')
@@ -610,7 +616,7 @@ if __name__ == '__main__':
     while(True):
         sel = bank.menu()
         if sel == 0: break
-        elif sel == 1: bank.makeAccount()
+        elif sel == 1: bank.accMenu()
         elif sel == 2: bank.deposit()
         elif sel == 3: bank.withdraw()
         elif sel == 4: bank.accInfo()
