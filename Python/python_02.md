@@ -427,3 +427,193 @@ if __name__ == '__main__':
     print(acc.info())
 ```
 
+### 상속
+
+```python
+class Person:
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def info(self):
+        return '이름:{0}, 나이:{1}'.format(self.name, self.age)
+
+
+class Student(Person):
+
+    def __init__(self, name, age, major):
+        super().__init__(name, age)
+        self.major = major
+
+    def info(self):
+        return '{0}, 전공:{1}'.format(super().info(), self.major)
+
+
+if __name__ == '__main__':
+    s1 = Student('namjune kim', 26, 'computer')
+    print(s1.info())
+```
+
+* 상속을 활용해서 일반 계좌와 특수 계좌 구현, 고객의 등급에 따라서 입금시 이자의 개념으로 추가금 지급
+* account.py
+
+```python
+class Account:
+    sid = 1000
+    def __init__(self, name, balance):
+        Account.sid += 1
+        self.id = str(Account.sid)
+        self.name = name
+        self.balance = balance
+    
+    def deposit(self, money):
+        self.balance += money
+    
+    def withdraw(self, money):
+        self.balance -= money
+    
+    def info(self):
+        return '계좌번호: {0}, 이름: {1}, 잔액: {2}'.format(self.id, self.name, self.balance)
+
+
+if __name__ == '__main__':
+    acc = Account('김남준', 10000000)
+    print(acc.id)
+    print(acc.info())
+    acc.deposit(20000)
+    print(acc.info())    
+    acc.withdraw(5000)
+    print(acc.info())
+```
+
+* account_grade.py
+
+```python
+from bankex.account import Account
+
+
+class AccountWithGrade(Account):
+
+    def __init__(self, name, balance, grade):
+        super().__init__(name, balance)
+        self.grade = grade
+        self.rate = 0;
+        if self.grade == 'V':
+            self.rate = 0.04
+        elif self.grade == 'G':
+            self.rate = 0.03
+        elif self.grade == 'S':
+            self.rate = 0.02
+        elif self.grade == 'N':
+            self.rate = 0.01
+    
+    def deposit(self, money):
+        super().deposit(money + int(money * self.rate))
+        
+    def info(self):
+        return '{0}, 등급: {1}'.format(super().info(), self.grade)
+
+
+if __name__ == '__main__':
+    pass
+```
+
+* bank.python
+
+```python
+from bankex.account import Account
+from bankex.acccount_grade import AccountWithGrade
+
+
+class Bank:
+    def __init__(self):
+        self.accList = {}
+    
+    def menu(self):
+        print('NJ은행')
+        print('0.종료')
+        print('1. 계좌개설')
+        print('2. 입금')
+        print('3. 출금')
+        print('4. 계좌 조회')
+        print('5. 전체 계좌 조회')
+        print('선택 >> ', end='')
+        select = int(input())
+        return select
+        
+    def makeAccount(self):
+        print('[계좌 개설]')
+        print('1. 일반계좌')
+        print('2. 특수계좌')
+        print('선택 >> ', end='')
+        select = int(input())
+        
+        if select == 1:
+            print('이름: ', end='')
+            name = input()
+            print('입금액: ', end='')
+            money = int(input())
+            acc = Account(name, money)
+            self.accList[acc.id] = acc
+            print('계좌번호는 {0} 입니다.'.format(acc.id))
+        elif select == 2:
+            print('이름: ', end='')
+            name = input()
+            print('입금액: ', end='')
+            money = int(input())
+            print('등급(VIP-V,Gold-G,Silver-S,Normal-N): ', end='')
+            grade = input()
+            acc = AccountWithGrade(name, money, grade)
+            self.accList[acc.id] = acc
+            print('계좌번호는 {0} 입니다.'.format(acc.id))
+
+    def deposit(self):
+        print('[입금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId not in self.accList.keys():
+            print('계좌가 존재하지 않습니다.')
+        else:
+            self.accList[accId].deposit(money)
+
+    def withdraw(self):
+        print('[출금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId not in self.accList.keys():
+            print('계좌가 존재하지 않습니다.')
+        else:
+            self.accList[accId].withdraw(money)
+
+    def accInfo(self):
+        print('[계좌 조회]')
+        print('계좌 번호: ', end='')
+        accId = input()
+        if accId not in self.accList.keys():
+            print('계좌가 존재하지 않습니다.')
+        else:
+            print(self.accList[accId].info())
+
+    def allAccInfo(self):
+        print('[전체 계좌 조회]')
+        for acc in self.accList.values():
+            print(acc.info())
+
+
+if __name__ == '__main__':
+    bank = Bank()
+    while(True):
+        sel = bank.menu()
+        if sel == 0: break
+        elif sel == 1: bank.makeAccount()
+        elif sel == 2: bank.deposit()
+        elif sel == 3: bank.withdraw()
+        elif sel == 4: bank.accInfo()
+        elif sel == 5: bank.allAccInfo()
+```
+
