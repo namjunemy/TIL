@@ -127,3 +127,303 @@ __main__
 
   
 
+## 객체 지향 프로그래밍과 클래스
+
+> Contents
+>
+> * 객체 지향 프로그래밍
+>   * 객체와 클래스
+> * 클래스의 정의
+>   * _\_init\_\_() 메소드를 이용한 초기화
+>   * self에 대하여
+>   * 정적 메소드와 클래스 메소드
+>   * private 멤버
+> * 상속
+>   * super()
+>   * 다중상속
+>   * 오버라이딩
+> * 데코레이터
+> * for문으로 순회 할 수 있는 객체 만들기
+>   * iterator
+>   * generator
+> * 상속의 조건 : 추상 기반 클래스
+
+### 객체와 클래스
+
+* 객체(Object) = 속성(Attribute) + 기능(Method)
+* 속성은 사물의 특징
+  * 자동차의 바퀴의 크기, 엔진의 배기량, 색
+* 기능은 어떤 것의 특징적인 동작
+  * 자동차의 전진, 후진, 좌회전, 우회전
+* 클래스 정의
+  * `class Car:`
+* 클래스 안의 \_\_init\_\_() 메소드는 생성자의 역할을 한다.
+* 객체와 관련된 멤버들은 항상 메소드 안에 멤버 변수 self를 가지고 있는다.
+
+```python
+class Calculator:
+
+    def __init__(self):
+        self.datas = []
+
+    def dataAdd(self, data):
+        self.datas.append(data)
+
+    def datasAdd(self, data):
+        self.datas.extend(data)
+
+    def sum(self):
+        tot = 0
+        for n in self.datas:
+            tot += n
+        return tot
+
+    def multiple(self):
+        mul = 1
+        for n in self.datas:
+            mul *= n
+        return mul
+
+    
+if __name__ == '__main__':
+    calc = Calculator()
+    calc.dataAdd(10)
+    calc.datasAdd([1, 2, 3])
+    print(calc.sum())
+    print(calc.multiple())
+```
+
+```shell
+16
+60
+```
+
+```python
+class Account:
+
+    def __init__(self, id, name, balance):
+        self.id = id
+        self.name = name
+        self.balance = balance
+    
+    def deposit(self, money):
+        self.balance += money
+    
+    def withdraw(self, money):
+        self.balance -= money
+    
+    def info(self):
+        return '계좌번호: {0}, 이름: {1}, 잔액: {2}'.format(self.id, self.name, self.balance)
+
+
+if __name__ == '__main__':
+    acc = Account('1001', '김남준', 10000000)
+    print(acc.info())
+    acc.deposit(20000)
+    print(acc.info())    
+    acc.withdraw(5000)
+    print(acc.info())
+```
+
+```python
+계좌번호: 1001, 이름: 김남준, 잔액: 10000000
+계좌번호: 1001, 이름: 김남준, 잔액: 10020000
+계좌번호: 1001, 이름: 김남준, 잔액: 10015000
+```
+
+* 클래스를 활용해서 은행, 계좌 구현
+
+```python
+class Account:
+
+    def __init__(self, id, name, balance):
+        self.id = id
+        self.name = name
+        self.balance = balance
+    
+    def deposit(self, money):
+        self.balance += money
+    
+    def withdraw(self, money):
+        self.balance -= money
+    
+    def info(self):
+        return '계좌번호: {0}, 이름: {1}, 잔액: {2}'.format(self.id, self.name, self.balance)
+
+
+if __name__ == '__main__':
+    acc = Account('1001', '김남준', 10000000)
+    print(acc.info())
+    acc.deposit(20000)
+    print(acc.info())    
+    acc.withdraw(5000)
+    print(acc.info())
+```
+
+```python
+from BankEx.account import Account
+
+
+
+class Bank:
+
+    def __init__(self):
+        self.accList = {}
+    
+    def menu(self):
+        print('NJ은행')
+        print('0.종료')
+        print('1. 계좌개설')
+        print('2. 입금')
+        print('3. 출금')
+        print('4. 계좌 조회')
+        print('5. 전체 계좌 조회')
+        print('선택 >> ', end='')
+        select = int(input())
+        return select
+        
+    def makeAccount(self):
+        print('[계좌 개설]')
+        print('계좌번호: ', end='')
+        accId = input()
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId in self.accList.keys():
+            print('이미 존재하는 계좌번호 입니다.')
+            return
+        self.accList[accId] = Account(accId, name, money)
+
+    def deposit(self):
+        print('[입금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId not in self.accList.keys():
+            print('계좌가 존재하지 않습니다.')
+        else:
+            self.accList[accId].deposit(money)
+
+    def withdraw(self):
+        print('[출금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId not in self.accList.keys():
+            print('계좌가 존재하지 않습니다.')
+        else:
+            self.accList[accId].withdraw(money)
+
+    def accInfo(self):
+        print('[계좌 조회]')
+        print('계좌 번호: ', end='')
+        accId = input()
+        if accId not in self.accList.keys():
+            print('계좌가 존재하지 않습니다.')
+        else:
+            print(self.accList[accId].info())
+
+    def allAccInfo(self):
+        print('[전체 계좌 조회]')
+        for acc in self.accList.values():
+            print(acc.info())
+
+
+if __name__ == '__main__':
+    bank = Bank()
+    while(True):
+        sel = bank.menu()
+        if sel == 0: break
+        elif sel == 1: bank.makeAccount()
+        elif sel == 2: bank.deposit()
+        elif sel == 3: bank.withdraw()
+        elif sel == 4: bank.accInfo()
+        elif sel == 5: bank.allAccInfo()
+```
+
+### 정적 메소드와 클래스 메소드
+
+* 인스턴스 메소드 - 인스턴스에 속한 메소드
+  * 인스턴스를 통해 호출이 가능하다는 뜻
+* 정적 메소드와 클래스 메소드는 클래스에 귀속된다
+* 정적 메소드
+  * @staticmethod 데코레이터로 수식
+  * self 키워드 없이 정의
+* 클래스 메소드
+  * 객체를 생성하더라도 새로 생성되지 않는 클래스 변수를 클래스 메소드를 통해서 접근 가능
+  * 객체들이 클래스 변수를 공유하고 있어야 하는 상황에서 사용
+  * @classmethod 데코레이터로 수식
+  * cls 매개변수 사용
+
+```python
+class Card:
+    width = 15
+    height = 20
+    def __init__(self, shape, num):
+        self.shape = shape
+        self.num =  num
+    
+    @classmethod
+    def setWidth(cls, w):
+        cls.width = w
+        
+    @classmethod
+    def setHeight(cls, h):
+        cls.height = h
+    
+    def info(self):
+        print('{0},{1},{2},{3}'.format(self.shape, self.num,Card.height, Card.width))
+
+if __name__ == '__main__':
+    h1 = Card('Hart', 'A')
+    dQ = Card('Dia', 'Q')
+    h1.info()
+    dQ.info()
+    
+    h1.setHeight(25)
+    dQ.setWidth(20)
+    h1.info()
+    dQ.info()
+```
+
+```python
+Hart,A,20,15
+Dia,Q,20,15
+Hart,A,25,20
+Dia,Q,25,20
+```
+
+* 계좌의 번호 관리를 클래스 변수로 관리할 수 있다
+
+```python
+class Account:
+    sid = 1000
+    def __init__(self, name, balance):
+        Account.sid += 1
+        self.id = str(Account.sid)
+        self.name = name
+        self.balance = balance
+    
+    def deposit(self, money):
+        self.balance += money
+    
+    def withdraw(self, money):
+        self.balance -= money
+    
+    def info(self):
+        return '계좌번호: {0}, 이름: {1}, 잔액: {2}'.format(self.id, self.name, self.balance)
+
+
+if __name__ == '__main__':
+    acc = Account('김남준', 10000000)
+    print(acc.id)
+    print(acc.info())
+    acc.deposit(20000)
+    print(acc.info())    
+    acc.withdraw(5000)
+    print(acc.info())
+```
+
