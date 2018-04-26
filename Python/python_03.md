@@ -530,3 +530,362 @@ with open('movie_quotes.txt', 'w') as file:
     file.writelines(lines)
 ```
 
+### 바이너리 파일 다루기
+
+* struct 모듈
+  * 일반 데이터 형식과 bytes 형식 사이의 변환을 수행하는 함수 정의
+* pack() 함수와 unpack() 함수
+  * struct.pack()
+    * 데이터 -> bytes
+  * struct.unpack()
+    * bytes -> 튜플(데이터)
+
+```python
+import struct
+
+fmt = '2d2i'
+packed = struct.pack(fmt, 3.14, 10.56, 123, 245)
+ 
+with open('file.bin', 'wb') as file:
+    file.write(packed)
+     
+with open('file.bin', 'rb') as file:
+    packed = file.read()
+    unpacked = struct.unpack(fmt, packed)
+
+for n in unpacked:
+    print(n)
+    
+```
+
+* pack() 결과 값 파일로 쓰기
+
+```python
+import struct
+
+name = '김남준'
+age = 20
+height=178.3
+
+fmt = '12sid'
+
+packed = struct.pack(fmt, name.encode(encoding='utf_8'), age, height)
+with open('info.bin', 'wb') as file:
+    file.write(packed)
+```
+
+### Bank 프로젝트에 file I/O 적용
+
+* 텍스트 파일로 Account 관리
+
+```python
+def save_account_t(self):
+    with open('accs.txt', 'w', encoding='utf_8') as file:
+        for acc in self.accList.values():
+            line = acc.id
+            line += ',' + acc.name
+            line += ',' + str(acc.balance)
+            try:
+                line += ',' + acc.grade
+            except:
+                pass
+            line += '\n'
+            file.write(line)
+
+def load_account_t(self):
+    try:
+        with open('accs.txt', 'r', encoding='utf_8') as file:
+            lines = file.readlines()
+            
+        for line in lines:
+            cols = line.replace('\n', '').split(',')
+            if len(cols) == 3:
+                acc = Account(cols[0], cols[1], cols[2])
+            elif len(cols) == 4:
+                acc = AccountWithGrade(cols[0], cols[1], cols[2], cols[3])
+            self.accList[acc.id] = acc
+    except:
+        pass
+```
+
+* 바이너리 파일로 Account 관리
+
+```python
+def save_account_b(self):
+    fmt = '10s20si2s'
+    file = open('accs.bin', 'wb')
+    for acc in self.accList.values():
+        try:
+            bacc = struct.pack(fmt, acc.id.encode('utf-8'), acc.name.encode('utf-8'), acc.balance, acc.grade.encode('utf-8'))
+        except:
+            bacc = struct.pack(fmt, acc.id.encode('utf-8'), acc.name.encode('utf-8'), acc.balance, ''.encode('utf-8'))
+        file.write(bacc)
+    file.close()
+    
+def load_account_b(self):
+    fmt = '10s20si2s'
+    fmtlen = struct.calcsize(fmt)
+    file = open('accs.bin', 'rb')
+    while True:
+        buff = file.read(fmtlen)
+        if not buff: break
+        items = struct.unpack(fmt, buff)
+        accId = items[0].decode('utf-8').replace('\x00', '')
+        name = items[1].decode('utf-8').replace('\x00', '')
+        money = items[2]
+        grade = items[3].decode('utf-8').replace('\x00', '').strip()
+        if grade == '':
+            acc = Account(accId, name, money)
+        else:
+            acc = AccountWithGrade(accId, name, money, grade)
+        self.accList[acc.id] = acc
+    file.close()
+```
+
+* pickle 로 리스트(튜플, 딕셔너리) 다루기
+
+```python
+def save_account_p(self):
+    with open('accsp.bin', 'wb') as f:
+        pickle.dump(self.accList, f)
+
+def load_account_p(self):
+    try:
+        with open('accsp.bin', 'rb') as f:
+            self.accList = pickle.load(f)
+    except:
+        pass
+```
+
+* 텍스트, 바이너리, pickle 적용 Bank 프로젝트 소스 
+
+```python
+import pickle
+import struct
+
+import acc
+from acc.acccount_grade import AccountWithGrade
+from acc.account import Account
+from exception.account_exception import AccountException, ERRCODE
+
+
+class Bank:
+
+    def __init__(self):
+        self.accList = {}
+    
+    def menu(self):
+        print('NJ은행')
+        print('0.종료')
+        print('1. 계좌개설')
+        print('2. 입금')
+        print('3. 출금')
+        print('4. 계좌 조회')
+        print('5. 전체 계좌 조회')
+        print('선택 >> ', end='')
+        select = int(input())
+        if select < 0 or select > 5:
+            raise AccountException(ERRCODE.MENU)
+        return select
+
+    def accMenu(self):
+        print('[계좌 개설]')
+        print('1. 일반계좌')
+        print('2. 특수계좌')
+        print('선택 >> ', end='')
+        select = int(input())
+        if select == 1:
+            self.makeAccount()
+        elif select == 2:
+            self.makeSpecialAccount()
+        else:
+            raise AccountException(ERRCODE.ACCMENU)
+    
+    def makeAccount(self):
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        acc = Account(0, name, money)
+        self.accList[acc.id] = acc
+        print('계좌번호는 {0} 입니다.'.format(acc.id))
+            
+    def makeSpecialAccount(self):
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        print('등급(VIP-V,Gold-G,Silver-S,Normal-N): ', end='')
+        grade = input()[0]
+        acc = AccountWithGrade(0, name, money, grade)
+        self.accList[acc.id] = acc
+        print('계좌번호는 {0} 입니다.'.format(acc.id))
+        
+    def deposit(self):
+        print('[입금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId not in self.accList.keys():
+            raise AccountException(ERRCODE.NOTEXIST_ACC)
+        self.accList[accId].deposit(money)
+
+    def withdraw(self):
+        print('[출금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        if accId not in self.accList.keys():
+            raise AccountException(ERRCODE.NOTEXIST_ACC)
+        self.accList[accId].withdraw(money)
+
+    def accInfo(self):
+        print('[계좌 조회]')
+        print('계좌 번호: ', end='')
+        accId = input()
+        if accId not in self.accList.keys():
+            raise AccountException(ERRCODE.NOTEXIST_ACC)
+        print(self.accList[accId].info())
+
+    def allAccInfo(self):
+        print('[전체 계좌 조회]')
+        for acc in self.accList.values():
+            print(acc.info())
+            
+    def save_account_t(self):
+        with open('accs.txt', 'w', encoding='utf_8') as file:
+            for acc in self.accList.values():
+                line = acc.id
+                line += ',' + acc.name
+                line += ',' + str(acc.balance)
+                try:
+                    line += ',' + acc.grade
+                except:
+                    pass
+                line += '\n'
+                file.write(line)
+
+    def load_account_t(self):
+        try:
+            with open('accs.txt', 'r', encoding='utf_8') as file:
+                lines = file.readlines()
+                
+            for line in lines:
+                cols = line.replace('\n', '').split(',')
+                if len(cols) == 3:
+                    acc = Account(cols[0], cols[1], cols[2])
+                elif len(cols) == 4:
+                    acc = AccountWithGrade(cols[0], cols[1], cols[2], cols[3])
+                self.accList[acc.id] = acc
+        except:
+            pass
+        
+    def save_account_b(self):
+        fmt = '10s20si2s'
+        file = open('accs.bin', 'wb')
+        for acc in self.accList.values():
+            try:
+                bacc = struct.pack(fmt, acc.id.encode('utf-8'), acc.name.encode('utf-8'), acc.balance, acc.grade.encode('utf-8'))
+            except:
+                bacc = struct.pack(fmt, acc.id.encode('utf-8'), acc.name.encode('utf-8'), acc.balance, ''.encode('utf-8'))
+            file.write(bacc)
+        file.close()
+        
+    def load_account_b(self):
+        fmt = '10s20si2s'
+        fmtlen = struct.calcsize(fmt)
+        file = open('accs.bin', 'rb')
+        while True:
+            buff = file.read(fmtlen)
+            if not buff: break
+            items = struct.unpack(fmt, buff)
+            accId = items[0].decode('utf-8').replace('\x00', '')
+            name = items[1].decode('utf-8').replace('\x00', '')
+            money = items[2]
+            grade = items[3].decode('utf-8').replace('\x00', '').strip()
+            if grade == '':
+                acc = Account(accId, name, money)
+            else:
+                acc = AccountWithGrade(accId, name, money, grade)
+            self.accList[acc.id] = acc
+        file.close()
+        
+    def save_account_p(self):
+        with open('accsp.bin', 'wb') as f:
+            pickle.dump(self.accList, f)
+
+    def load_account_p(self):
+        try:
+            with open('accsp.bin', 'rb') as f:
+                self.accList = pickle.load(f)
+            keys = [*self.accList.keys()]
+            Account.sid = int(keys[len(keys) - 1])
+        except Exception as err:
+            print(err)
+            pass
+
+
+if __name__ == '__main__':
+    bank = Bank()
+    bank.load_account_p()
+    while(True):
+        try:
+            sel = bank.menu()
+            if sel == 0:
+                bank.save_account_p()
+                break
+            elif sel == 1: bank.accMenu()
+            elif sel == 2: bank.deposit()
+            elif sel == 3: bank.withdraw()
+            elif sel == 4: bank.accInfo()
+            elif sel == 5: bank.allAccInfo()
+        except AccountException as err:
+            print(err)
+```
+
+* text, binary 입출력시 자동 계좌 발급이 문제 되므로, Account 변경
+
+```python
+from exception.account_exception import AccountException, ERRCODE
+
+
+class Account:
+    sid = 1000
+
+    def __init__(self, aid, name, balance):
+        if aid == 0:
+            Account.sid += 1;
+            self.id = str(Account.sid)
+        else:
+            self.id = aid
+            Account.sid = int(aid)
+            
+        self.name = name
+        self.balance = balance
+    
+    def deposit(self, money):
+        if money <= 0:
+            raise AccountException(ERRCODE.DEPOSIT)
+        self.balance += money
+    
+    def withdraw(self, money):
+        if money > self.balance:
+            raise AccountException(ERRCODE.WITHDRAW)
+        self.balance -= money
+    
+    def info(self):
+        return '계좌번호: {0}, 이름: {1}, 잔액: {2}'.format(self.id, self.name, self.balance)
+
+
+if __name__ == '__main__':
+    acc = Account('김남준', 10000000)
+    print(acc.id)
+    print(acc.info())
+    acc.deposit(20000)
+    print(acc.info())    
+    acc.withdraw(5000)
+    print(acc.info())
+```
+
