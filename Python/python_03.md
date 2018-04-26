@@ -355,3 +355,178 @@ if __name__ == '__main__':
             print(err)
 ```
 
+## 파일에 데이터 읽고 쓰기
+
+> Contents
+>
+> * 열고, 읽고(쓰고), 닫고
+>   * 자원 누수 방지를 돕는 with ~ as
+>   * with문의 비밀 : 컨텍스트 매니저
+>   * open() 함수 다시 보기
+> * 텍스트 파일 읽기/쓰기
+>   * 문자열을 담은 리스트를 파일에 쓰는 writelines() 메소드
+>   * 줄 단위로 텍스트를 읽는 readline()과 readlines() 메소드
+>   * 문자 집합과 인코딩에 대하여
+> * 바이너리 파일 다루기
+
+### 열고 읽고(쓰고), 닫고
+
+* 애플리케이션이 운영체제에게 파일 처리를 API 함수를 통해 의뢰하면, 운영체ㅔ제가 요청한 업무를 수행해주고 그 결과를 애플리케이션에게 돌려준다
+* 애플리케이션이 파일 처리 업무를 의뢰하는 과정과 각 과정에서 사용되는 파이썬 함수
+  * 파일열기 
+    * file = open(파일명, 모드)
+  * 파일 읽기/쓰기
+    * file.read() / file.write()
+  * 파일닫기
+    * file.close()
+
+```python
+file = open('news.txt', 'r')
+msg = file.read()
+file.close()
+print(msg)
+
+file = open('file.txt', 'w')
+file.write('good afrernoon')
+file.close()
+```
+
+#### 누수 방지를 돕는 with ~ as
+
+* open() 함수와 함께 with ~ as 문을 사용하면 명시적으로 close() 함수를 호출하지 않아도 파일이 항상 닫힘
+* with ~ as 문을 사용하는 방법은 다음과 같음
+
+```python
+with open('news.txt', 'r') as file:
+    msg = file.read()
+    print(msg)
+```
+
+#### with문의 비밀 : 컨텍스트 매니저
+
+* with문은 Context Manager를 제공하는 함수여야 사용 가능
+* Context Manager는 \_\_enter\_\_()메소드와 \_\_exit_\_() 메소드를 구현하고 있는 객체
+  * with문은 Context Manager를 획득한 후 코드 블록의 실행을 시작할 때 Context Manager의 \_\_enter\_\_() 메소드를 호출하고, 코드 블록이 끝날때 \_\_exit_\_()를 호출
+
+#### @contextmanager 데코레이터
+
+* \_\_call\_\_() 메소드는 물론이고, 컨텍스트 매니저 규약을 준수하는데 필요한 \_\_enter\_\_() 메소드와 \_\_exit\_\_() 메소드를 모두 갖추고 있음
+* 함수를 하나 만들고 데코레이터로 수식하면 컨텍스트 매니저의 구현이 마무리 됨
+
+```python
+@contextmanager
+def fileOpen(path, mode):
+    try:
+        file = open(path, mode)
+        yield file
+    finally:
+        file.close()
+
+        
+with fileOpen('write.txt', 'w') as file:
+    file.write('write ex')
+    
+with fileOpen('news.txt', 'r') as file:
+    msg = file.read()
+    print(msg)
+```
+
+#### open() 함수 다시 보기
+
+* open() 함수의 매개 변수는 모두 8개
+  * 필수 매개변수 1개, 7개의 optional 한 매개변수
+  * 반환값은 물론 파일 객체
+
+```python
+open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None) 
+```
+
+* file
+  * 파일의 경로를 나타내는 문자열 또는 이미 생성해놓은 파일 객체의 파일 기술자(file 객체의 fileno)
+  * mode(파일 열기 모드)
+    * r
+      *  읽기용으로 열기(기본값)
+    * w
+      * 쓰기용으로 열기. 이미 같은 경로에 파일이 존재하면 파일내용을 비움
+    * x
+      * 배타적 생성모드로 열기. 파일이 존재하면 IOError 예외가 발생
+    * a
+      * 쓰기용으로 열기. 단, w와는 달리 이미 같은 경로에 파일이 존재하는 경우 기존 내용에 덧붙임
+    * b
+      * 바이너리 모드
+    * t
+      * 텍스트 모드
+    * +
+      * 읽기/쓰기용으로 파일 읽기
+* buffering
+  * 0은 파일 입출력시에 버퍼링을 수행하지 않음
+  * 1은 개행 문자(\\n)를 만날 때까지 버퍼링을 하는 라인  버퍼링을 수행(텍스트 모드에서만 사용가능)
+  * 임의의 값으로 직접 버퍼의 크기를 지정하고 싶을 때는 매개변수에 1보다 큰 수를 입력
+*  encoding
+  * 텍스트 모드에서만 사용. 한글파일을 저장할때 UTF-8 지정
+* errors
+  * 텍스트 모드에서만, 인코딩/디코딩 수행시의 에러 처리옵션
+  * errors
+    * strict
+      * 인코딩 에러가 발생할 때 ValueError예외를 일으킴, None과 똑같은 효과
+    * ignore
+      * 에러를 무시
+    * replace
+      * 기형적인 데이터가 있는 곳에 대체 기호를 삽입
+    * ...
+* newline
+  * 파일을 읽고 쓸 때 줄바꿈을 어떻게 처리할지 결정
+  * None, '', '\n', '\r', '\r\n' 5가지 중 하나를 입력
+    * None으로 설정되어있으면 개행문자를 \n으로 변환하여 읽기 메소드에게 반환
+* closefd
+  * 첫 번째 매개변수에 파일의 경로가 아닌 파일 기술자가 입력됐을 때만 사용
+  * file 매개변수에 파일 기술자를 입력하고 closefd 매개 변수에는 False를 입력하면 파일이 닫히더라도 파일 기술자를 계속 열어둔 상태로 유지
+* opener
+  * opener는 파일을 여는 함수를 직접 구현하고 싶을 때 이용
+  * opener에 구현한 함수 또는 호출가능 객체(\_\_call\_\_()메소드를 구현하는 객체)를 넘기면 됨
+  * 이 때 opener에 넘기는 함수/호출가능 객체는 반드시 파일 기술자를 반환해야함
+
+### 텍스트 파일 읽기/쓰기
+
+* readline()
+
+```python
+with open('news.txt', 'r', encoding='utf-8') as file:
+    while(True):
+        line = file.readline()
+        if line == '': break
+        print(line, end=' ')
+```
+
+* readlines()
+
+```python
+with open('news.txt', 'r', encoding='utf-8') as file:
+    lines = file.readlines()
+    for line in lines:
+        print(line, end=' ')
+```
+
+* write()
+
+```python
+lines = ["we'll find a way we always have - Interstellar\n",
+         "I'll find you and I'll kill you - Taken\n",
+         "I'll be back - Terminator 2\n"]
+
+with open('movie_quotes.txt', 'w') as file:
+    for line in lines:
+        file.write(line)
+```
+
+* writelines()
+
+```python
+lines = ["we'll find a way we always have - Interstellar\n",
+         "I'll find you and I'll kill you - Taken\n",
+         "I'll be back - Terminator 2\n"]
+
+with open('movie_quotes.txt', 'w') as file:
+    file.writelines(lines)
+```
+
