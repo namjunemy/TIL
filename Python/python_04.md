@@ -334,3 +334,214 @@ if __name__ == '__main__':
 
 * account_exception.py, account.py, account_grade.py는 동일
 
+## C/C++ 연동
+
+### C/C++ 에서 python embedding 하기
+
+* 파이썬은 많은 기능을 가진 모듈들을 간단한 형태로 모듈화하여 제공한다. embedding하는 이유는 c++에서 복잡한 것을 파이썬으로 간단하게 해결할 수 있기 때문이다.
+
+```c++
+#include <Python.h>
+
+
+int main()
+{
+	char filename[] = "python.py";
+	FILE* fp;
+	Py_Initialize();
+	fp = _Py_fopen(filename, "r");
+	PyRun_SimpleFile(fp, filename);
+	Py_Finalize();
+	
+    return 0;
+}
+```
+
+## 엑셀파일 다루기
+
+### Anaconda 설치
+
+* Anaconda 는 Continuum Analytics라는 곳에서 만든 파이썬 배포판으로 445개 정도의 파이썬 패키지를 포함하고 있다.
+* https://repo.continuum.io/archive/
+  * OS에 맞는 설치 파일 다운로드
+
+### 엑셀에 데이터 저장
+
+```python
+[1] import win32com
+
+[2] client excel =win32com.client.Dispatch("Excel.Application") 
+
+[3] excel.Visible = True 
+
+[4] wb = excel.Workbooks.Add() 
+
+[5] ws = wb.Worksheets("Sheet1") 
+
+[6] ws.Cells(1, 1).Value ="hello world" 
+
+[7] wb.SaveAs(‘d:\hyj\work\test.xlsx') 
+
+[8] excel.Quit()
+```
+
+### 엑셀 파일 읽기 
+
+```python
+[1] import win32com.client 
+
+[2] excel = win32com.client.Dispatch("Excel.Application") 
+
+[3] excel.Visible = True 
+
+[4] wb = excel.Workbooks.Open(‘d:\\hyj\\work\\test.xlsx') 
+
+[5] ws = wb.ActiveSheet 
+
+[6] print(ws.Cells(1,1).Value) 
+
+[7] excel.Quit()
+```
+
+### 셀에 컬러 입히기
+
+* 참고로 ColorIndex 속성은 0~56까지의 값을 가질 수 있으며 숫자별로 색상이 정해져 있는데 색상 값은마이크로소프트사에서 제공. excel.application colorindex 로 검색
+
+```python
+[1] import win32com.client 
+
+[2] excel = win32com.client.Dispatch("Excel.Application") 
+
+[3] excel.Visible = True 
+
+[4] wb = excel.Workbooks.Add() 
+
+[5] ws = wb.Worksheets("Sheet1") 
+
+[6] ws.Cells(1, 1).Value = “python"
+
+[7] ws.Range(“B1:C1”).Value = “is good"
+
+[8] ws.Range("A1:B1").Interior.ColorIndex=10
+```
+
+### csv 파일 2차원 배열로 읽어오기
+
+* numpy 모듈을 사용하면 된다.
+
+```python
+import numpy
+
+data = numpy.loadtxt(fname = 'C:\\NJ\\download\\inflammation.csv', delimiter=',')
+print(data)
+```
+
+```python
+[[  0.   0.   1.   3.   1.   2.   4.   7.   8.   3.   3.   3.  10.   5.
+    7.   4.   7.   7.  12.  18.   6.  13.  11.  11.   7.   7.   4.   6.
+    8.   8.   4.   4.   5.   7.   3.   4.   2.   3.   0.   0.]
+ [  0.   1.   2.   1.   2.   1.   3.   2.   2.   6.  10.  11.   5.   9.
+    4.   4.   7.  16.   8.   6.  18.   4.  12.   5.  12.   7.  11.   5.
+   11.   3.   3.   5.   4.   4.   5.   5.   1.   1.   0.   1.]
+ [  0.   1.   1.   3.   3.   2.   6.   2.   5.   9.   5.   7.   4.   5.
+    4.  15.   5.  11.   9.  10.  19.  14.  12.  17.   7.  12.  11.   7.
+    4.   2.  10.   5.   4.   2.   2.   3.   2.   2.   1.   1.]
+ [  0.   0.   2.   0.   4.   2.   2.   1.   6.   7.  10.   7.   9.  13.
+    8.   8.  15.  10.  10.   7.  17.   4.   4.   7.   6.  15.   6.   4.
+    9.  11.   3.   5.   6.   3.   3.   4.   2.   3.   2.   1.]
+ [  0.   1.   1.   3.   3.   1.   3.   5.   2.   4.   4.   7.   6.   5.
+    3.  10.   8.  10.   6.  17.   9.  14.   9.   7.  13.   9.  12.   6.
+    7.   7.   9.   6.   3.   2.   2.   4.   2.   0.   1.   1.]]
+```
+
+* numpy 메소드
+
+  * data.shape : 행과 열의 수를 반환
+
+  ```python
+  print(data.shape)
+
+  (5, 40)
+  ```
+
+  * 부분 추출
+
+  ```python
+  small = data[0:4, 0:10]
+  print(small)
+
+  [[ 0.  0.  1.  3.  1.  2.  4.  7.  8.  3.]
+   [ 0.  1.  2.  1.  2.  1.  3.  2.  2.  6.]
+   [ 0.  1.  1.  3.  3.  2.  6.  2.  5.  9.]
+   [ 0.  0.  2.  0.  4.  2.  2.  1.  6.  7.]]
+  ```
+
+  * 모든 데이터 * 2
+
+  ```python
+  double = small * 2
+  print(double)
+
+  [[  0.   0.   2.   6.   2.   4.   8.  14.  16.   6.]
+   [  0.   2.   4.   2.   4.   2.   6.   4.   4.  12.]
+   [  0.   2.   2.   6.   6.   4.  12.   4.  10.  18.]
+   [  0.   0.   4.   0.   8.   4.   4.   2.  12.  14.]]
+  ```
+
+  * numpy 데이터 끼리의 합
+
+  ```python
+  sum = small + double
+  print(sum)
+
+  [[  0.   0.   3.   9.   3.   6.  12.  21.  24.   9.]
+   [  0.   3.   6.   3.   6.   3.   9.   6.   6.  18.]
+   [  0.   3.   3.   9.   9.   6.  18.   6.  15.  27.]
+   [  0.   0.   6.   0.  12.   6.   6.   3.  18.  21.]]
+  ```
+
+  * numpy 함수
+
+  ```python
+  print(data.min())
+  print(data.max())
+  print(data.mean())
+  print(data.std())
+  0.0
+  19.0
+  5.685
+  4.27969333013
+
+  print(data[2,:].max())
+  19.0
+
+  print(data.mean(axis=0))
+  [  0.    0.6   1.4   2.    2.6   1.6   3.6   3.4   4.6   5.8   6.4   7.
+     6.8   7.4   5.2   8.2   8.4  10.8   9.   11.6  13.8   9.8   9.6   9.4
+     9.   10.    8.8   5.6   7.8   6.2   5.8   5.    4.4   3.6   3.    4.
+     1.8   1.8   0.8   0.8]
+  ```
+
+* matplotlib으로 그래프 그리기
+
+```python
+from matplotlib import pyplot as plt
+
+plt.figure(figsize=(10.0, 3.0))
+plt.subplot(1, 3, 1)
+plt.ylabel('average')
+plt.plot(data.mean(0))
+
+plt.subplot(1, 3, 2)
+plt.ylabel('max')
+plt.plot(data.max(0))
+
+plt.subplot(1, 3, 3)
+plt.ylabel('min')
+plt.plot(data.min(0))
+
+plt.tight_layout()
+plt.show()
+```
+
+![](https://github.com/namjunemy/TIL/blob/master/Python/image/matplotlib_graph.PNG?raw=true)
