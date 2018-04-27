@@ -461,6 +461,7 @@ print(data)
   ```python
   print(data.shape)
 
+  >>
   (5, 40)
   ```
 
@@ -470,6 +471,7 @@ print(data)
   small = data[0:4, 0:10]
   print(small)
 
+  >>
   [[ 0.  0.  1.  3.  1.  2.  4.  7.  8.  3.]
    [ 0.  1.  2.  1.  2.  1.  3.  2.  2.  6.]
    [ 0.  1.  1.  3.  3.  2.  6.  2.  5.  9.]
@@ -482,6 +484,7 @@ print(data)
   double = small * 2
   print(double)
 
+  >>
   [[  0.   0.   2.   6.   2.   4.   8.  14.  16.   6.]
    [  0.   2.   4.   2.   4.   2.   6.   4.   4.  12.]
    [  0.   2.   2.   6.   6.   4.  12.   4.  10.  18.]
@@ -494,6 +497,7 @@ print(data)
   sum = small + double
   print(sum)
 
+  >>
   [[  0.   0.   3.   9.   3.   6.  12.  21.  24.   9.]
    [  0.   3.   6.   3.   6.   3.   9.   6.   6.  18.]
    [  0.   3.   3.   9.   9.   6.  18.   6.  15.  27.]
@@ -545,3 +549,237 @@ plt.show()
 ```
 
 ![](https://github.com/namjunemy/TIL/blob/master/Python/image/matplotlib_graph.PNG?raw=true)
+
+## Pandas를 이용한 데이터 분석
+
+> Contents
+>
+> * Pandas Series
+> * Pandas DataFrame
+> * DataReader
+> * 주식 차트 그리기
+
+### Pandas
+
+* Pandas는 효가적인 데이터 분석을 위한 고수준의 자료구조와 데이터 분석 도구를 제공
+* Pandas의 Series는 1차원 데이터를 다루는 데 효과적인 자료구조이며, DataFrame은 행과 열로 구성된 2차원 데이터를 다루는 데 효과적인 자료구조이다.
+
+### Pandas Series : 1차원 자료구조
+
+* 생성자로 파이썬 리스트를 넘겨주면 해당 값에 포함하는 Series 객체를 생성해준다.
+
+```python
+from pandas import Series, DataFrame
+kakao = Series([92600, 92400, 92100, 94300, 92300]) 
+print(kakao)
+
+>>
+0    92600
+1    92400
+2    92100
+3    94300
+4    92300
+dtype: int64
+```
+
+```python
+from pandas import Series, DataFrame
+kakao = Series([92600, 92400, 92100, 94300, 92300], index=['2016-02-19', '2016-02-18', '2016-02-17', '2016-02-	16', '2016-02-15']) 
+print(kakao)
+print(kakao['2016-02-19'])
+
+>>
+2016-02-19    92600
+2016-02-18    92400
+2016-02-17    92100
+2016-02-16    94300
+2016-02-15    92300
+dtype: int64
+92600
+```
+
+```python
+for v in kakao.values:
+    print(v)
+
+>>
+92600
+92400
+92100
+94300
+92300
+```
+
+```python
+mine = Series([10, 20, 30], index = ['lg', 'lotte', 'sk'])
+friend = Series([10, 30, 20], index = ['lotte', 'sk', 'lg'])
+
+print(mine)
+print(friend)
+merge = mine + friend
+print(merge)
+
+>>
+lg       10
+lotte    20
+sk       30
+dtype: int64
+lotte    10
+sk       30
+lg       20
+dtype: int64
+lg       30
+lotte    30
+sk       60
+dtype: int64
+```
+### Pandas DataFrame : 2차원 자료구조
+
+```python
+from pandas import DataFrame
+
+raw_data = {'col0': [1, 2, 3, 4], 'col1': [10, 20, 30, 40], 'col2': [100, 200, 300, 400]} 
+
+data = DataFrame(raw_data)
+print(data)
+
+>>
+   col0  col1  col2
+0     1    10   100
+1     2    20   200
+2     3    30   300
+3     4    40   400
+```
+
+```python
+from pandas import Series, DataFrame 
+daeshin = {'open': [11650, 11100, 11200, 11100, 11000], 
+               'high': [12100, 11800, 11200, 11100, 11150], 
+               'low' : [11600, 11050, 10900, 10950, 10900], 
+               'close': [11900, 11600, 11000, 11100, 11050]} 
+daeshin_day = DataFrame(daeshin, columns=['open', 'high', 'low', 'close'])
+print(daeshin_day)
+
+>>
+    open   high    low  close
+0  11650  12100  11600  11900
+1  11100  11800  11050  11600
+2  11200  11200  10900  11000
+3  11100  11100  10950  11100
+4  11000  11150  10900  11050
+```
+
+```python
+from pandas import Series, DataFrame 
+daeshin = {'open': [11650, 11100, 11200, 11100, 11000], 
+               'high': [12100, 11800, 11200, 11100, 11150], 
+               'low' : [11600, 11050, 10900, 10950, 10900], 
+               'close': [11900, 11600, 11000, 11100, 11050]} 
+date = ['16.02.29', '16.02.26', '16.02.25', '16.02.24', '16.02.23']
+daeshin_day = DataFrame(daeshin, columns=['open', 'high', 'low', 'close'], index=date)
+
+print(daeshin_day)
+
+>>
+           open   high    low  close
+16.02.29  11650  12100  11600  11900
+16.02.26  11100  11800  11050  11600
+16.02.25  11200  11200  10900  11000
+16.02.24  11100  11100  10950  11100
+16.02.23  11000  11150  10900  11050
+```
+* open column의 전체 데이터
+```python
+print(daeshin_day['open'])
+
+>>
+16.02.29    11650
+16.02.26    11100
+16.02.25    11200
+16.02.24    11100
+16.02.23    11000
+Name: open, dtype: int64
+```
+* 특정 날짜의 전체 데이터
+```python
+print(daeshin_day.loc['16.02.25'])
+
+>>
+open     11200
+high     11200
+low      10900
+close    11000
+Name: 16.02.25, dtype: int64
+```
+
+* 컬럼과 인덱스 가져오기
+
+```python
+print(daeshin_day.columns)
+print(daeshin_day.index)
+
+>>
+Index(['open', 'high', 'low', 'close'], dtype='object')
+Index(['16.02.29', '16.02.26', '16.02.25', '16.02.24', '16.02.23'], dtype='object')
+```
+
+## 주식차트 그리기
+
+### pandas-datareader 패키지 설치
+
+* Anaconda prompt에서
+* conda install pandas-datareader
+
+### datareader 사용
+
+```python
+import pandas as pd 
+import pandas_datareader.data as web 
+import matplotlib.pyplot as plt 
+
+# Get GS Data from Yahoo 
+gs = web.DataReader("078930.KS", "yahoo", "2014-01-01", "2016-03-06") 
+new_gs = gs[gs['Volume']!=0]   #거래량 0인것 제외
+print(new_gs)
+```
+
+```python
+new_gs = new_gs.dropna()
+```
+* csv 파일 만들기
+```python
+new_gs.to_csv('out.csv', sep = ',')
+```
+
+* 이동평균 구하기
+
+```python
+ma5 = new_gs['Adj Close'].rolling(window=5).mean() 
+ma20 = new_gs['Adj Close'].rolling(window=20).mean() 
+ma60 = new_gs['Adj Close'].rolling(window=60).mean() 
+ma120 = new_gs['Adj Close'].rolling(window=120).mean() 
+```
+
+* Insert Columns
+
+```python
+new_gs.insert(len(new_gs.columns), "MA5", ma5) new_gs.insert(len(new_gs.columns), "MA20", ma20) new_gs.insert(len(new_gs.columns), "MA60", ma60) new_gs.insert(len(new_gs.columns), "MA120", ma120)
+```
+
+* plot 차트 그리기
+
+```python
+import matplotlib.pyplot as plt 
+
+plt.plot(new_gs.index, new_gs['Adj Close'], label='Adj Close')
+plt.plot(new_gs.index, new_gs['MA5'], label='MA5') 
+plt.plot(new_gs.index, new_gs['MA20'], label='MA20')
+plt.plot(new_gs.index, new_gs['MA60'], label='MA60')
+plt.plot(new_gs.index, new_gs['MA120'], label='MA120')
+plt.legend(loc="best") 
+plt.grid() 
+plt.show()
+```
+
+![](https://github.com/namjunemy/TIL/blob/master/Python/image/plot_chart.PNG?raw=true)
+
