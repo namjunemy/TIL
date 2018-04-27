@@ -138,3 +138,199 @@ con.close()
 
 ### Bank 프로젝트 DB로 변경
 
+* account_dao.py
+
+```python
+import sqlite3
+
+from acc.acccount_grade import AccountWithGrade
+from acc.account import Account
+
+
+class AccountDao:
+
+    def __init__(self):
+        self.conn = sqlite3.connect('bank.db')
+        
+    def insert(self, acc):
+        if type(acc) == AccountWithGrade:
+            grade = acc.grade
+        else:
+            grade = ''
+        cursor = self.conn.cursor()
+        cursor.execute("""
+        insert into account (id, name, balance, grade)
+        values(?, ?, ?, ?)
+        """, (acc.id, acc.name, acc.balance, grade))
+        self.conn.commit()
+        cursor.close()
+        
+    def update(self, acc):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+        update account set balance = ? where id = ?
+        """, (acc.balance, acc.id))
+        self.conn.commit()
+        cursor.close()
+    
+    def select(self, aid):
+        cursor = self.conn.cursor()
+        cursor.execute("""
+        select id, name, balance, grade from account
+        where id = ?
+        """, (aid,))
+        rows = cursor.fetchall()
+        acc = None
+        for row in rows:
+            if row[3] == '':
+                acc = Account(row[0], row[1], row[2])
+            else:
+                acc = AccountWithGrade(row[0], row[1], row[2], row[3])
+        cursor.close()
+        return acc
+
+    def selectAll(self):
+        accs = []
+        cursor = self.conn.cursor()
+        cursor.execute("""
+        select id, name, balance, grade from account
+        """)
+        rows = cursor.fetchall()
+        for row in rows:
+            if row[3] == '':
+                accs.append(Account(row[0], row[1], row[2]))
+            else:
+                accs.append(AccountWithGrade(row[0], row[1], row[2], row[3]))
+        cursor.close()
+        return accs
+    
+    def destroy(self):
+        self.conn.close()
+```
+
+* bank.py
+
+```python
+from acc.acccount_grade import AccountWithGrade
+from acc.account import Account
+from db.account_dao import AccountDao
+from exception.account_exception import AccountException, ERRCODE
+
+
+class Bank:
+
+    def __init__(self):
+        self.db = AccountDao()
+        
+    def destroy(self):
+        self.db.destroy()
+    
+    def menu(self):
+        print('NJ은행')
+        print('0.종료')
+        print('1. 계좌개설')
+        print('2. 입금')
+        print('3. 출금')
+        print('4. 계좌 조회')
+        print('5. 전체 계좌 조회')
+        print('선택 >> ', end='')
+        select = int(input())
+        if select < 0 or select > 5:
+            raise AccountException(ERRCODE.MENU)
+        return select
+
+    def accMenu(self):
+        print('[계좌 개설]')
+        print('1. 일반계좌')
+        print('2. 특수계좌')
+        print('선택 >> ', end='')
+        select = int(input())
+        if select == 1:
+            self.makeAccount()
+        elif select == 2:
+            self.makeSpecialAccount()
+        else:
+            raise AccountException(ERRCODE.ACCMENU)
+    
+    def makeAccount(self):
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        acc = Account(0, name, money)
+        self.db.insert(acc)
+        print('계좌번호는 {0} 입니다.'.format(acc.id))
+            
+    def makeSpecialAccount(self):
+        print('이름: ', end='')
+        name = input()
+        print('입금액: ', end='')
+        money = int(input())
+        print('등급(VIP-V,Gold-G,Silver-S,Normal-N): ', end='')
+        grade = input()[0]
+        acc = AccountWithGrade(0, name, money, grade)
+        self.db.insert(acc)
+        print('계좌번호는 {0} 입니다.'.format(acc.id))
+        
+    def deposit(self):
+        print('[입금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        
+        acc = self.db.select(accId)
+        if not acc:
+            raise AccountException(ERRCODE.NOTEXIST_ACC)
+        acc.deposit(money)
+        self.db.update(acc)
+
+    def withdraw(self):
+        print('[출금]')
+        print('계좌번호 : ', end='')
+        accId = input()
+        print('입금액: ', end='')
+        money = int(input())
+        
+        acc = self.db.select(accId)
+        if not acc:
+            raise AccountException(ERRCODE.NOTEXIST_ACC)
+        acc.withdraw(money)
+        self.db.update(acc)
+
+    def accInfo(self):
+        print('[계좌 조회]')
+        print('계좌 번호: ', end='')
+        accId = input()
+        
+        acc = self.db.select(accId)
+        if not acc:
+            raise AccountException(ERRCODE.NOTEXIST_ACC)
+        print(acc.info())
+
+    def allAccInfo(self):
+        print('[전체 계좌 조회]')
+        accs = self.db.selectAll()
+        for acc in accs:
+            print(acc.info())
+
+
+if __name__ == '__main__':
+    bank = Bank()
+    while(True):
+        try:
+            sel = bank.menu()
+            if sel == 0:
+                bank.destroy()
+                break
+            elif sel == 1: bank.accMenu()
+            elif sel == 2: bank.deposit()
+            elif sel == 3: bank.withdraw()
+            elif sel == 4: bank.accInfo()
+            elif sel == 5: bank.allAccInfo()
+        except AccountException as err:
+            print(err)
+```
+
+* account_exception.py, account.py, account_grade.py는 동일
+
