@@ -1,16 +1,16 @@
 > 인프런 - 부경대IT융합응용공학과 궘오흠 교수님의 '**영리한 프로그래밍을 위한 알고리즘 강좌** '([링크](https://www.inflearn.com/course/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%95%EC%A2%8C/))와 '**쉽게 배우는 알고리즘** 관계 중심의 사고법 - 문병로' 참조
 
-# 7-2. Graph 02 - BFS(Breadth-First Search, 너비우선순회)
+# 7-2. Graph 02 - BFS(Breadth-First Search, 너비우선탐색)
 
 ## 그래프 순회
 
 * 순회(traversal)
   * 그래프의 모든 노드들을 방문하는 일
 * 대표적 두 가지 방법
-  * BFS (Breadth-First Search, 너비우선순회)
-  * DFS (Depth-First Search, 깊이우선순회)
+  * BFS (Breadth-First Search, 너비우선탐색)
+  * DFS (Depth-First Search, 깊이우선탐색)
 
-### 너비우선순회(BFS)
+### 너비우선탐색(BFS)
 
 * BFS 알고리즘은 다음 순서로 노드들을 방문
 
@@ -23,7 +23,7 @@
 
   ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/graph_06.png?raw=true)
 
-### 큐를 이용한 너비우선순회
+### 큐를 이용한 너비우선탐색
 
 * 출발노드를 check하고 시작한다.
 * 큐에 스타트 노드(1번노드)를 삽입한다.
@@ -123,7 +123,7 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/graph_11.png?raw=true)
 
-### 너비우선순회: 최단 경로 출력하기
+### 너비우선탐색: 최단 경로 출력하기
 
 * 출발점 s에서 노드 v까지의 경로 출력하기
   * resursion으로 해결한다.
@@ -140,7 +140,7 @@
 07    print v;
 ```
 
-### 너비우선순회(BFS) 정리
+### 너비우선탐색(BFS) 정리
 
 * 그래프가 connected 라면 모든 노드를 방문하게 된다. 하지만, 그래프가 **disconnected** 이거나 혹은 방향 그래프라면 BFS에 의해서 모든 노드가 방문되지 않을 수도 있다.
 * disconnected 그래프의 모든 노드를 방문하려면 BFS를 반복하여 모든 노드 방문

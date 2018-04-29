@@ -1,11 +1,11 @@
 > 인프런 - 부경대IT융합응용공학과 궘오흠 교수님의 '**영리한 프로그래밍을 위한 알고리즘 강좌** '([링크](https://www.inflearn.com/course/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%95%EC%A2%8C/))와 '**쉽게 배우는 알고리즘** 관계 중심의 사고법 - 문병로' 참조
 
-# 7-3. Graph 03 - DFS(Depth-First Search, 깊이우선순회)
+# 7-3. Graph 03 - DFS(Depth-First Search, 깊이우선탐색)
 
 - 이진트리의 순회 방법인 inorder, preorder, postorder 순회방법이 DFS의 이진트리 버전에 해당한다.
 - lever order는 BFS의 이진트리 순회 버전이다.
 
-## 깊이우선순회(DFS)
+## 깊이우선탐색(DFS)
 
 * 출발점 s에서 시작한다.
 * 현재 노드를 visited로 mark하고 인접한 노드들 중 unvisited 노드가 존재하면 그 노드로 간다.
@@ -16,7 +16,7 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/graph_12.png?raw=true)
 
-* 다음과 같은 흐름으로 깊이우선순회가 이루어 진다.
+* 다음과 같은 흐름으로 깊이우선탐색이 이루어 진다.
 
 ![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/graph_13.png?raw=true)
 
