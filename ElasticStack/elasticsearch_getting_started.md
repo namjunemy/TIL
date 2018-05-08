@@ -2,34 +2,27 @@
 
 > 김종민 - Elastic 테크 에반젤리스트
 >
-> **Contents**
->
-> 1. Elastic Stack 소개
-> 2. Elasticsearch 상세
-> 3. Demo
->
 > **Reference**
 >
 > * https://www.elastic.co/kr/webinars/getting-started-elasticsearch
 > * http://kimjmin.net
 
-### Elastic Stack
+## Elastic Stack
 
 * ELK로 많이 알려져 있지만, 2015년 Beats가 합류하고, Elastic사에서 Stack들을 계속 추가하고 있기 때문에 공식적으로 Elastic Stack으로 명명하고있다.
 * Elasticsearch, Kibana, Logstash, Beats가 포함된다.
 * 100% 오픈소스이며, Apache 2 라이센스로 제공
 
-### X - Pack
+## X - Pack
 
 * Elastic Stack과 별개의 확장팩으로 배포하는 상용 플러그인
 * 기능은 Security, Alerting, Monitoring, Reporting, Graph Analytics, Machine Learning
 
-### Elastic Cloud
+## Elastic Cloud
 
 * Elaticsearch 클러스터를 Cloud에서 SaaS 형태로 몇번의 클릭만으로 만들 수 있다. 
 
-
-### Elastic Cloud Enterprise
+## Elastic Cloud Enterprise
 
 * 추가적으로 기업 또는 거대한 조직에서 필요한 클라우드 서비스가 있는 경우 Elastic Cloud Enterprise 서비스를 이용할 수 있다.
 * IDC 또는 Private Network환경에서 Elastic Cloud Enterprise를 설치하면, 조직내의 서로 다른 부서에서 각각 다른 Elasticsearch환경이 필요하다고 할 때, 해당 환경에 맞는 Elastic 클러스터를 X-Pack이 포함된 상태로 생성할 수 있다.
@@ -342,241 +335,4 @@ Elasticsearch는 Elastic Stack의 심장이라고 불릴만큼 중요한 역할�
 * 각 VM에 설치된 X-Pack Monitoring을 통해서 ES 클러스터의 VM 상태 모니터링 가능
 
 ![](https://github.com/namjunemy/TIL/blob/master/ElasticStack/img/es_cluster_architecture_01.png?raw=true)
-
-## Elasticsearch 데이터 관리
-
-### Index 생성
-
-* library 인덱스 생성
-  * shard 수 : 5
-  * replica 수 : 1
-
-```json
-PUT library
-{
-  "settings" : {
-    "number_of_shards": 5,
-    "number_of_replicas": 1
-  }
-}
-```
-
-### Bulk 색인
-
-* 다량의 도큐먼트를 한꺼번에 색인 할 때는 반드시 bulk API를 사용
-
-```json
-POST library/books/_bulk
-{"index":{"_id":1}}
-{"title":"The quick brow fox", "price":5, "colors":["red", "green", "blue"]}
-{"index":{"_id":2}}
-{"title":"The quick brow fox jumps over the lazy dog", "price":15, "colors":["blue", "yellow"]}
-{"index":{"_id":3}}
-{"title":"The quick brow fox jumps over the quick dog", "price":8, "colors":["red", "blue"]}
-{"index":{"_id":4}}
-{"title":"brow fox brown dog", "price":2, "colors":["black", "yellow", "red", "blue"]}
-{"index":{"_id":5}}
-{"title":"Lazy dog", "price":9, "colors":["red", "blue", "green"]}
-```
-
-### 검색
-
-* 전체 도큐먼트 검색
-  * 기본적으로 _search의 옵션을 주지 않으면 기본적으로 인덱스의 전체 도큐먼트를 검색한다.
-  * 이때는 score 검색을 하지 않아서, 모든 score는 1로 동등하다.
-
-```json
-GET library/_search
-```
-
-```json
-GET library/_search
-{
-  "query": {
-    "match_all": {}
-  }
-}
-```
-
-* 맵핑 정보 검색
-  * RDB의 스키마에 해당하는 Elasticsearch의 맵핑정보를 검색한다.]
-  * 리턴되는 값을 참조하면
-  * library라는 인덱스 밑에 books라는 도큐먼트가 있고, 도큐먼트에는 3개의 필드 colors, price, title이 존재한다.
-  * 필드안에는 타입과 하위 필드인 keyword 타입이 있다. keyword 타입은 aggregation에 쓰이는 필드를 저장하고, 이 내용들은 분석을 하지 않는다. 즉, 검색어로 쪼개지 않고 저장한다.
-
-```json
-GET library/_mapping
-```
-
-```json
-{
-  "library": {
-    "mappings": {
-      "books": {
-        "properties": {
-          "colors": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
-          "price": {
-            "type": "long"
-          },
-          "title": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-* title 필드에 fox가 포함된 도큐먼트 검색
-  * match query 사용
-
-```json
-GET library/_search
-{
-  "query": {
-    "match": {
-      "title": "fox"
-    }
-  }
-}
-```
-
-* title 필드에 quick 또는 dog이 포함된 도큐먼트 검색
-
-  * match query 사용, " "(공백)으로 분리
-
-  ```json
-  GET library/_search
-  {
-    "query": {
-      "match": {
-        "title": "quick dog"
-      }
-    }
-  }
-  ```
-
-  * 위의 검색 결과에서 중요한 점은, 검색의 정확도를 표현하는 score 값이 리턴 된다.
-  * 검색의 타겟인 quick과 dog이 많이 매칭 될수록 score 값이 높아진다.
-
-  ```json
-  {
-    "took": 64,
-    "timed_out": false,
-    "_shards": {
-      "total": 5,
-      "successful": 5,
-      "skipped": 0,
-      "failed": 0
-    },
-    "hits": {
-      "total": 5,
-      "max_score": 0.7564473,
-      "hits": [
-        {
-          "_index": "library",
-          "_type": "books",
-          "_id": "2",
-          "_score": 0.7564473,
-          "_source": {
-            "title": "The quick brow fox jumps over the lazy dog",
-            "price": 15,
-            "colors": [
-              "blue",
-              "yellow"
-            ]
-          }
-        },
-        {
-          "_index": "library",
-          "_type": "books",
-          "_id": "3",
-          "_score": 0.68324494,
-          "_source": {
-            "title": "The quick brow fox jumps over the quick dog",
-            "price": 8,
-            "colors": [
-              "red",
-              "blue"
-            ]
-          }
-        },
-        {
-          "_index": "library",
-          "_type": "books",
-          "_id": "5",
-          "_score": 0.2876821,
-          "_source": {
-            "title": "Lazy dog",
-            "price": 9,
-            "colors": [
-              "red",
-              "blue",
-              "green"
-            ]
-          }
-        },
-        {
-          "_index": "library",
-          "_type": "books",
-          "_id": "1",
-          "_score": 0.2876821,
-          "_source": {
-            "title": "The quick brow fox",
-            "price": 5,
-            "colors": [
-              "red",
-              "green",
-              "blue"
-            ]
-          }
-        },
-        {
-          "_index": "library",
-          "_type": "books",
-          "_id": "4",
-          "_score": 0.21636502,
-          "_source": {
-            "title": "brow fox brown dog",
-            "price": 2,
-            "colors": [
-              "black",
-              "yellow",
-              "red",
-              "blue"
-            ]
-          }
-        }
-      ]
-    }
-  }
-  ```
-
-* "quick dog" 구문이 포함된 도큐먼트 검색
-
-```json
-GET library/_search
-{
-  "query": {
-    "match_phrase": {
-      "title": "quick dog"
-    }
-  }
-}
-```
 
