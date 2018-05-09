@@ -1081,3 +1081,62 @@ POST library/books/1/_update
 }
 ```
 
+## Mapping
+
+### 매핑 정보 확인
+
+- 데이터가 색인될 때, elasticsearch는 스스로 매핑정보를 만든다.
+- 저장되는 도큐먼트의 필드값을 확인하면서 타입을 판단한다.
+
+```json
+GET library/_mapping
+```
+
+### 직접 매핑 설정한 인덱스 생성
+
+- famous-librarians라는 인덱스를 새로 생성한다.
+- settings에는 인덱스가 가지고 있는 시스템적인 설정값을 넣는다.
+  - 샤드 수, 복제본 수, analysis(analyzer) 정보 등
+  - analysis의 analyzer를 my-desc-analyzer로 정의하고,
+  - custom type, uax_url_email 토크나이저, lowercase 필터를 사용하도록 설정한다.
+- mappings에는 매핑값을 성정한다.
+  - famous-librarians라는 인덱스 밑에 librarian이라는 타입이 정의되고,
+  - 5개의 필드가 정의 된다.
+    - 각 필드의 타입과 포맷 그리고 해당 필드를 저장할 때 사용할 analyzer를 등록한다.
+- **주의할 점**은 필드의 타입은 수정이 불가하기 때문에, 수정을 하고싶다면 인덱스와 매핑정보를 다시 만들고 데이터를 다시 넣어야 한다.
+
+```json
+PUT famous-librarians
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 0,
+    "analysis": {
+      "analyzer": {
+        "my-desc-analyzer": {
+          "type": "custom",
+          "tokenizer": "uax_url_email",
+          "filter": [
+            "lowerc"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "librarian": {
+      "name": {
+        "type": "text"
+      },
+      "favourite-colors": {
+        "type": "keyword"
+      },
+      "birth-date": {
+        "type": "date",
+        "format": "year_month_day"
+      }
+    }
+  }
+}
+```
+
