@@ -1030,3 +1030,54 @@ GET library/_search
 }
 ```
 
+## Document Update
+
+* 동일한 URL에 데이터 입력시 기존 데이터가 대체됨
+  * 반환되는 결과를 확인하면 update 된 경우 version이 +1 된다.
+  * elasticsearch에서는 transaction 개념이 없기때문에 유의해야 한다.
+
+```json
+GET library/books/1
+```
+
+```json
+POST library/books/1
+{
+  "title": "The quick brow fox",
+  "price": 10,
+  "colors": ["red","green","blue"]
+}
+```
+
+```json
+{
+  "_index": "library",
+  "_type": "books",
+  "_id": "1",
+  "_version": 3,
+  "found": true,
+  "_source": {
+    "title": "The quick brow fox",
+    "price": 10,
+    "colors": [
+      "red",
+      "green",
+      "blue"
+    ]
+  }
+}
+```
+
+### _update API 이용
+
+* elasticsearch에서 _update API를 사용하더라도 title만 업데이트 하는 것이 아닌, 전체 도큐먼트를 delete 후 insert하는 개념으로 업데이트가 이루어 진다.
+
+```json
+POST library/books/1/_update
+{
+  "doc": {
+    "title": "The quick fantastic fox"
+  }
+}
+```
+
