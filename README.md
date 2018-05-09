@@ -18,7 +18,7 @@
 * 쉴 땐 확실히 쉬고, contributions를 초록색으로 채우는 것에 집착하지 않는다.
 
 
-  
+
 
 
 ## 분류
@@ -77,7 +77,9 @@
 - [6-1. Hashing - 개요](https://github.com/namjunemy/TIL/blob/master/Algorithm/hashing_01.md)
 - [6-2. Hashing - Hash 함수, Hashing in Java](https://github.com/namjunemy/TIL/blob/master/Algorithm/hashing_02.md)
 - [7-1. Graph 01 - 개념과 표현](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_01.md)
-- [7-2. Graph 02 - BFS(Breadth-First Search, 너비우선순회)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_02.md)
+- [7-2. Graph 02 - BFS(Breadth-First Search, 너비우선탐색)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_02.md)
+- [7-3. Graph 03 - DFS(Depth-First Search, 깊이우선탐색)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_03.md)
+- [7-4. Graph 04 - DAG(Directed Acycllic Graph)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_04.md)
 
 ### Spring
 
@@ -136,6 +138,12 @@
 ### Linux
 
 * [CentOS 7](https://github.com/namjunemy/TIL/blob/master/Linux/centos7.md)
+
+### ElasticStack
+
+* [elasticsearch getting started(개념, 설치 및 실행, 클러스터 구축)](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_getting_started.md)
+* [elasticsearch relevance(ES의 검색 score 계산 알고리즘)](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_relevance.md)
+* [elasticsearch APIs](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_api.md)
 
 ### Cloud
 
