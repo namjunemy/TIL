@@ -1103,7 +1103,9 @@ GET library/_mapping
   - famous-librarians라는 인덱스 밑에 librarian이라는 타입이 정의되고,
   - 5개의 필드가 정의 된다.
     - 각 필드의 타입과 포맷 그리고 해당 필드를 저장할 때 사용할 analyzer를 등록한다.
-- **주의할 점**은 필드의 타입은 수정이 불가하기 때문에, 수정을 하고싶다면 인덱스와 매핑정보를 다시 만들고 데이터를 다시 넣어야 한다.
+- 필드의 매핑값을 설정해 놓으면, 삽입되는 데이터들은 필드의 타입에 맞게 색인 된다.
+  - 만약 매핑값이 정의되지 않은 데이터가 들어오게 되면, 삽입되는 순간 매핑정보를 판단해서 등록한다.
+- **주의할 점**은 필드의 타입은 수정이 불가하기 때문에, 수정을 하고싶다면 인덱스와 매핑정보를 다시 만들고 데이터를 처음부터 다시 넣어야 한다.
 
 ```json
 PUT famous-librarians
@@ -1117,7 +1119,7 @@ PUT famous-librarians
           "type": "custom",
           "tokenizer": "uax_url_email",
           "filter": [
-            "lowerc"
+            "lowercase"
           ]
         }
       }
@@ -1125,18 +1127,141 @@ PUT famous-librarians
   },
   "mappings": {
     "librarian": {
-      "name": {
-        "type": "text"
-      },
-      "favourite-colors": {
-        "type": "keyword"
-      },
-      "birth-date": {
-        "type": "date",
-        "format": "year_month_day"
+      "properties": {
+        "name": {
+          "type": "text"
+        },
+        "favourite-colors": {
+          "type": "keyword"
+        },
+        "birth-date": {
+          "type": "date",
+          "format": "year_month_day"
+        },
+        "hometown": {
+          "type": "geo_point"
+        },
+        "description": {
+          "type": "text",
+          "analyzer": "my-desc-analyzer"
+        }
       }
     }
   }
 }
 ```
 
+### 예제 데이터 삽입 1
+
+* favaorite-colors는 keyword 타입으로 삽입되고,
+* hometown에는 object 타입으로 데이터를 삽입할 수 있는데, object 타입 중에 geo_point 타입은 latitude, longitude 쌍으로 데이터를 넣는다.
+  * geo_point 타입의 경우 거리를 기준으로하는 쿼리가 가능하다.
+
+```json
+PUT famous-librarians/librarian/1
+{
+  "name": "Sarah Byrd Askew",
+  "favourite-colors": [
+    "Yellow",
+    "light-grey"
+  ],
+  "bitrh-date": "1877-02-15",
+  "hometown": {
+    "lat": 32.349722,
+    "lon": -87.641111
+  },
+  "description": "An American public librarian who pioneered the establishment of county libraries in the United States - https://en.wikipedia.org/wiki/Sarah_Byrd_Askew"
+}
+```
+
+```json
+PUT famous-librarians/librarian/2
+{
+  "name": "John J. Beckley",
+  "favourite-colors": [
+    "Red",
+    "off-white"
+  ],
+  "bitrh-date": "1757-08-07",
+  "hometown": {
+    "lat": 51.507222,
+    "lon": -0.1275
+  },
+  "description": "An American political campaign manager and the first Librarian of the United States Congress, - https://en.wikipedia.org/wiki/John_J._Beckley"
+}
+```
+
+### query_string - keyword 필드 확인
+
+* keyword 타입으로 저장된 favourite-colors 필드는 분석과정(analyzer를 통해서)을 거치지 않기 때문에, 대문자 Yellow가 저장되어 있다.
+* 따라서, yellow OR off-white 쿼리에 검색되지 않는다.
+* keyword 타입은 aggregation을 위해 원본데이터가 저장이 되어야 한다. 하지만, 검색을 위해서는 데이터를 가공해서 저장해야 하는데, 그 과정을 거치지 않으므로 keyword 타입을 검색 할때 주의해야한다.
+
+```json
+GET famous-librarians/_search
+{
+  "query": {
+    "query_string": {
+      "fields": [
+        "favourite-colors"
+      ],
+      "query": "yellow OR off-white"
+    }
+  }
+}
+```
+
+### range - 날짜 범위 검색
+
+* date 타입을 검색할 때에는 now 키워드를 사용할 수 있다.
+  * h - 시간
+  * d - 일
+  * M - 달
+  * y - 년
+  * `now-200y` 의 경우 지금으로부터 200년 전이다.
+
+```json
+GET famous-librarians/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ],
+      "filter": {
+        "range": {
+          "birth-date": {
+            "gte": "now-200y",
+            "lte": "2000-01-01"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### geo_distance - 특정 지점에서 반경 100km 거리 검색
+
+* 특정 지점으로부터 반경 이내에 있는 특정 위치 검색하기 등 거리 탐색에 사용
+
+```json
+GET famous-librarians/_search
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "geo_distance": {
+          "distance": "100km",
+          "hometown": {
+            "lat": 32.41,
+            "lon": -86.92
+          }
+        }
+      }
+    }
+  }
+}
+```
