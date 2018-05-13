@@ -48,6 +48,7 @@
 * [Singleton Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/05_singleton_pattern.md)
 * [Prototype Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/06_prototype_pattern.md)
 * [Builder Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/07_builder_pattern.md)
+* [Abstract Factory Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/08_abstract_factory_pattern.md)
 
 ### Algorithm
 
