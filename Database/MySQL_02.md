@@ -85,3 +85,24 @@ ORDER BY id DESC
 LIMIT 3;
 ```
 
+## Update
+
+* row의 특정 컬럼 값 update
+  * WHERE절을 생략하면 엄청난 재앙이 찾아올 수 있다. 유의해야 한다.
+
+```mysql
+UPDATE topic
+SET author = 'admin', profile = 'admin'
+WHERE title = 'Oracle';
+```
+
+## Delete
+
+* 특정 row delete
+  * 마찬가지로 WHERE절을 삭제하면 모든 row가 삭제 된다.
+
+```mysql
+DELETE FROM topic
+WHERE title = 'MongoDB';
+```
+
