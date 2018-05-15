@@ -1,4 +1,6 @@
-# MySQL 01
+# MySQL 01 - Intro
+
+> 지식 공유자 - Opentutorials의 egoing님
 
 ## 데이터베이스의 목적
 
@@ -71,17 +73,3 @@ CREATE TABLE topic (
 ```shell
 ERROR 1820(HY000): You must reset your password using ALTER USER statement before executing this statement.
 ```
-
-## CRUD
-
-* Create
-  * 생성
-* Read
-  * 조회
-
-* Update
-  * 수정
-* Delete
-  * 삭제
-* Create, Read는 데이터베이스라면 반드시 가지고 있어야 하는 개념이다.(input, output)
-* Update, Delete는 분야에 따라 없을 수도 있다. 예를 들면, 역사의 이야기, 회계에서 거래내역을 다루는 경우
