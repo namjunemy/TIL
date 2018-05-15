@@ -1,4 +1,4 @@
-# MySQL 03
+# MySQL 03 - 관계형 데이터베이스의 필요성, JOIN
 
 > 지식 공유자 - Opentutorials의 egoing님
 
@@ -76,5 +76,35 @@ CREATE TABLE topic (
 +----+------------+-------------------+---------------------+-----------+
 ```
 
+  
 
+## 데이터베이스의 꽃 JOIN
+
+* 두 개의 테이블 join 후 출력
+  * join 후 컬럼이 id로 같은 경우 테이블 식별자를 포함해야 한다.
+
+```mysql
+SELECT
+  topic.id AS topic_id,
+  title,
+  description,
+  author_id,
+  author.id,
+  name,
+  profile
+FROM topic
+  LEFT JOIN author ON topic.author_id = author.id;
+```
+
+```text
++----------+------------+-------------------+-----------+------+---------+--------------+
+| topic_id | title      | description       | author_id | id   | name    | profile      |
++----------+------------+-------------------+-----------+------+---------+--------------+
+|        1 | MySQL      | MySQL is...       |         1 |    1 | namjune | developer    |
+|        2 | Oracle     | Oracle is ...     |         1 |    1 | namjune | developer    |
+|        5 | MongoDB    | MongoDB is ...    |         1 |    1 | namjune | developer    |
+|        3 | SQL Server | SQL Server is ... |         2 |    2 | admin   | DBA          |
+|        4 | PostgreSQL | PostgreSQL is ... |         3 |    3 | user1   | data scientis|
++----------+------------+-------------------+-----------+------+---------+--------------+
+```
 
