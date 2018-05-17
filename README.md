@@ -17,9 +17,7 @@
 * 따로 정리가 필요한 학습 내용은 [블로그](http://ict-nroo.tistory.com/)에 포스팅한다.
 * 쉴 땐 확실히 쉬고, contributions를 초록색으로 채우는 것에 집착하지 않는다.
 
-
-
-
+​    
 
 ## 분류
 ### Seminar & Conference
@@ -130,11 +128,15 @@
 
 ### Database
 
+* [database의 본질](https://github.com/namjunemy/TIL/blob/master/Database/Database_Intro_Opentutorials.md)
+* [MySQL 01 - Intro](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_01.md)
+* [MySQL 02 - CRUD](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_02.md)
+* [MySQL 03 - 관계형 데이터베이스의 필요성과 JOIN](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_03.md)
+
 * [Windows10 환경에서 Mysql-5.7.19 설치 및 세팅 가이드](https://github.com/namjunemy/TIL/blob/master/Database/MySQL-5.7.19_Installation_Guide.md)
 * [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
 * [MySQL CURRENT_TIMESTAMP(vs Oracle SYSDATE)](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_CURRENT_TIMESTAMP.md)
 * [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
-* [database의 본질](https://github.com/namjunemy/TIL/blob/master/Database/Database_Intro_Opentutorials.md)
 
 
 ### Linux
