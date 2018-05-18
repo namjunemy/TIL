@@ -6,7 +6,7 @@
 
 여기서 이슈가 한 가지 더 발생한다. 실제 작성한 프로그램을 배포한 후, 추가로 문제가 발생한 상황에서는 다시 디버깅 메시지를 출력해서 해당 로직을 수정하는 작업 등을 해야 한다. 기존에 삭제했던 디버깅 메시지들을 추가해야 하는 상황이 발생할 수도 있다. 이러한 불편함이 있기 때문에 디버깅 메시지를 주석처리 해놓고 개발하기도 하지만, 그다지 매력적이지 않은 방법이다. 
 
-이런 부분을 보완하기 위해 Logging Framework를 사용한다. 가장 유명한 프레임워크인 log4j, log4j의 단점을 보완한 logging facade SLF4J 그리고 가장 최근에 등장하여 log4j를 대체하고 있는 LOGBack이라는 프레임워크가 존재한다.(세 가지 프레임워크에 대해서는 줌인터넷 포털개발팀장이신 BeyondJ2EE님의 [포스팅("logback을 사용해야 하는 이유")](https://beyondj2ee.wordpress.com/2012/11/09/logback-%EC%82%AC%EC%9A%A9%ED%95%B4%EC%95%BC-%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0-reasons-to-prefer-logback-over-log4j/)으로 대신한다.)
+이런 부분을 보완하기 위해 Logging Framework를 사용한다. 가장 유명한 프레임워크인 log4j, log4j의 단점을 보완한 logging facade SLF4J 그리고 SLF4J의 native 구현체인 LOGBack이 존재한다.(자세한 설명은 줌인터넷 포털개발팀장이신 BeyondJ2EE님의 [포스팅("logback을 사용해야 하는 이유")](https://beyondj2ee.wordpress.com/2012/11/09/logback-%EC%82%AC%EC%9A%A9%ED%95%B4%EC%95%BC-%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0-reasons-to-prefer-logback-over-log4j/)으로 대신한다.)
 
 ![](https://github.com/namjunemy/TIL/blob/master/Java/img/logging_framework_01.png?raw=true)
 
