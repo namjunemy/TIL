@@ -8,7 +8,7 @@
 
 [JayJin](https://github.com/milooy)님, [Lee HyunJoo](https://wayhome25.github.io/)님, [RingoPPA](https://github.com/ksu3101)님의 Github TIL을 보고 많은 영감을 얻었다.
 
-
+  
 
 ## 작성 규칙
 
@@ -133,7 +133,6 @@
 * [MySQL 01 - Intro](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_01.md)
 * [MySQL 02 - CRUD](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_02.md)
 * [MySQL 03 - 관계형 데이터베이스의 필요성과 JOIN](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_03.md)
-
 * [Windows10 환경에서 Mysql-5.7.19 설치 및 세팅 가이드](https://github.com/namjunemy/TIL/blob/master/Database/MySQL-5.7.19_Installation_Guide.md)
 * [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
 * [MySQL CURRENT_TIMESTAMP(vs Oracle SYSDATE)](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_CURRENT_TIMESTAMP.md)
