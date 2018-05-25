@@ -34,6 +34,8 @@ output {
 
 ## tcp input
 
+* `$ echo "hello" | nc localhost 9999` 명령을 통해 tcp input 확인
+
 ```shell
 input {
   tcp {
