@@ -53,3 +53,17 @@ output {
 }
 ```
 
+## logstash 실행
+
+* 작성한 logstash conf 파일을 로드, 로그스태시 실행
+
+  * ```text
+    Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. ~~~~~~
+    ```
+
+  * 위의 에러 로그가 발생하면 `--path.setting=/etc/logstash` 실행 옵션 추가
+
+```shell
+$ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/[파일명].conf 
+```
+
