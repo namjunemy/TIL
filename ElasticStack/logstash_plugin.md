@@ -18,7 +18,7 @@ input {
 filter {
   csv {
     separator => ","
-    columns => ["host","group","service","db","web","was","ad","etc","platform"]
+    columns =["host","group","service","db","web","was","ad","etc","platform"]
   }
 }
 output {
@@ -27,6 +27,25 @@ output {
     user => "elastic"
     password => "password"
     index => "201805_all_vm_list"
+  }
+  stdout { codec => rubydebug }
+}
+```
+
+## tcp input
+
+```shell
+input {
+  tcp {
+    port => 9999
+  }
+}
+output {
+  elasticsearch {
+    hosts => ['localhost:9200']
+    user => "elastic"
+    password => "password"
+    index => "tcp"
   }
   stdout { codec => rubydebug }
 }
