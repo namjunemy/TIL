@@ -18,7 +18,7 @@ input {
 filter {
   csv {
     separator => ","
-    columns =["host","group","service","db","web","was","ad","etc","platform"]
+    columns => ["host","group","service","db","web","was","ad","etc","platform"]
   }
 }
 output {
