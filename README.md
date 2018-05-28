@@ -149,6 +149,7 @@
 * [elasticsearch getting started(개념, 설치 및 실행, 클러스터 구축)](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_getting_started.md)
 * [elasticsearch relevance(ES의 검색 score 계산 알고리즘)](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_relevance.md)
 * [elasticsearch APIs](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_api.md)
+* [logstash plugins](https://github.com/namjunemy/TIL/blob/master/ElasticStack/logstash_plugin.md)
 
 ### Cloud
 
