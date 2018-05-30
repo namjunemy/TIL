@@ -81,6 +81,8 @@
 - [7-2. Graph 02 - BFS(Breadth-First Search, 너비우선탐색)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_02.md)
 - [7-3. Graph 03 - DFS(Depth-First Search, 깊이우선탐색)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_03.md)
 - [7-4. Graph 04 - DAG(Directed Acycllic Graph)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_04.md)
+- [8-1. Dynamic Programming 01 - Memoization, Bottom-Up(Fibonacci)](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_01.md)
+- [8-2. Dynamic Programming 02 - Metric Path(Recursion -> DP)](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_02.md)
 
 ### Spring
 
