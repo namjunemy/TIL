@@ -51,6 +51,8 @@ Longest Common Subsequence
 * 그리고 위의 순환식을 보면 L(i, j)를 구하기 위해서는 L(i, j), L(i-1, j), L(i, j-1)을 알아야 한다.
 * 이 조건을 만족하는 bottom-up 계산 순서는 가장 평범하게 행우선 순서로  한 행씩 순차적으로 계산하면 된다.
 
+![](https://github.com/namjunemy/TIL/blob/master/Algorithm/img/dp_22.png?raw=true)
+
 ### 동적계획법
 
 * 0행 0열은 0으로 초기화 하고 시작한다.
