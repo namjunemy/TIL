@@ -1,6 +1,6 @@
 # Elasticsearch Cluster Tips
 
-> rhel 7.5(서비스 데몬 => systemd) 기반으로 Elasticsearch Cluster를 구성하면서 마주한 이슈 해결 방법
+> rhel 7.5(서비스 데몬 => systemd) 기반으로 Elasticsearch Cluster를 구성하면서 마주한 이슈 해결 방법과 사소한 팁
 
 ## hostname 변경
 
@@ -18,7 +18,7 @@
 [1]: memory locking requested for elasticsearch process but memory is not locked
 ```
 
-* `/usr/lib/systemd/elasticsearch.service` 파일에 아래의 내용 추가
+* `/usr/lib/systemd/system/elasticsearch.service` 파일에 아래의 내용 추가
 
 ```
 LimitMEMLOCK=infinity
@@ -29,5 +29,11 @@ LimitMEMLOCK=infinity
 ```shell
 # systemctl daemon-reload
 # systemctl restart elasticsearch
+```
+
+## cluster에 포함된 노드 확인
+
+```shell
+# curl http://[server ip]:9200/_nodes/process?pretty
 ```
 
