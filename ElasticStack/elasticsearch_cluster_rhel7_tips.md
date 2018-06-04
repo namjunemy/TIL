@@ -37,3 +37,8 @@ LimitMEMLOCK=infinity
 # curl http://[server ip]:9200/_nodes/process?pretty
 ```
 
+## cluster x-pack password 설정
+
+* master 노드에 x-pack을 설치하고 setup-passwords를 수행할 때, discovery.zen.ping.unicast.hosts 설정을 하지 않고 default상태로 setup-passwords를 수행한다.(그렇지 않을 경우 404 error 발생)
+* 패스워드 설정이 끝나면, discovery설정을 활성화 시킨다.
+* data 노드에 x-pack을 설치하고 elasticsearch.yml에 discovery 설정이 마스터 노드로 되어있는 상태에서 elasticsearch 를 재실행 하고, cluster에 포함된 노드를 확인해서 성공적으로 클러스터 구성이 되었다면, 해당 data 노드는 클러스터의 password 설정을 따른다. 마찬가지로 나머지 data 노드들을 설정 한다.
