@@ -42,3 +42,14 @@ LimitMEMLOCK=infinity
 * master 노드에 x-pack을 설치하고 setup-passwords를 수행할 때, discovery.zen.ping.unicast.hosts 설정을 하지 않고 default상태로 setup-passwords를 수행한다.(그렇지 않을 경우 404 error 발생)
 * 패스워드 설정이 끝나면, discovery설정을 활성화 시킨다.
 * data 노드에 x-pack을 설치하고 elasticsearch.yml에 discovery 설정이 마스터 노드로 되어있는 상태에서 elasticsearch 를 재실행 하고, cluster에 포함된 노드를 확인해서 성공적으로 클러스터 구성이 되었다면, 해당 data 노드는 클러스터의 password 설정을 따른다. 마찬가지로 나머지 data 노드들을 설정 한다.
+
+## NFS 구성 issue
+
+* 마스터 노드에서 여러개의 데이터 노드를 관리하기 위해서 NFS 구성 필수
+
+* 이전 버전의 OS와 nfs설정이 살짝 달라졌다.
+  * nfs-client의 /etc/fstab 설정시 여러 설정값들을 제외하고 sync를 사용하면 된다.
+* 참조 링크 :
+  * https://www.thegeekdiary.com/centos-rhel-7-configuring-an-nfs-server-and-nfs-client/
+  * http://yangnoon.tistory.com/38
+
