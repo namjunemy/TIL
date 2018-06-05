@@ -53,3 +53,10 @@ LimitMEMLOCK=infinity
   * https://www.thegeekdiary.com/centos-rhel-7-configuring-an-nfs-server-and-nfs-client/
   * http://yangnoon.tistory.com/38
 
+## user add(use cli)
+
+* x-pack이 install 되어 있는 상태에서
+
+* `/usr/share/elasticsearch/bin/x-pack/users useradd [아이디] -p [패스워드] -r superuser`
+* superuser에는 생성을 원하는 권한
+
