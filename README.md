@@ -83,6 +83,10 @@
 - [7-4. Graph 04 - DAG(Directed Acycllic Graph)](https://github.com/namjunemy/TIL/blob/master/Algorithm/graph_04.md)
 - [8-1. Dynamic Programming 01 - Memoization, Bottom-Up(Fibonacci)](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_01.md)
 - [8-2. Dynamic Programming 02 - Metric Path(Recursion -> DP)](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_02.md)
+- [8-3. Dynamic Programming 03 - Optimal Substructure](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_03.md)
+- [8-4. Dynamic Programming 04 - Matrix Chain Multiplication](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_04.md)
+- [8-5. Dynamic Programming 05 - Longest Common Subsequence](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_05.md)
+- [8-6. Dynamic Programming 06 - Knapsack Problem](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_06.md)
 
 ### Spring
 
