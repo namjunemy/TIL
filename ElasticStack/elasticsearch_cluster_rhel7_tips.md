@@ -2,7 +2,7 @@
 
 > rhel 7.5(서비스 데몬 => systemd) 기반으로 Elasticsearch Cluster를 구성하면서 마주한 이슈 해결 방법과 사소한 팁
 
-### Red Hat Subscription-Manager
+## Red Hat Subscription-Manager
 
 * `$ subscription-manage register --force --auto-attach`
 * `$ yum repolist all`

@@ -156,6 +156,7 @@
 * [elasticsearch relevance(ES의 검색 score 계산 알고리즘)](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_relevance.md)
 * [elasticsearch APIs](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_api.md)
 * [logstash plugins](https://github.com/namjunemy/TIL/blob/master/ElasticStack/logstash_plugin.md)
+* [rhel7.5 기반 elasticsearch cluster 구성 팁](https://github.com/namjunemy/TIL/blob/master/ElasticStack/elasticsearch_cluster_rhel7_tips.md)
 
 ### Cloud
 
