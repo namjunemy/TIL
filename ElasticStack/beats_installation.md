@@ -203,5 +203,44 @@ xpack.monitoring.enabled: true
 #xpack.monitoring.elasticsearch:
 ```
 
+## File Beat
 
+로그와 파일을 경량화 된 방식으로 전달하고 중앙 집중화 하기 위한 파일 수집기
 
+### 설치
+
+- elastic package public key 등록
+
+```shell
+# sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+```
+
+- YUM repo 파일 추가
+
+```shell
+# vi /etc/yum.repos.d/elastic.repo
+```
+
+```shell
+[elastic-6.x]
+name=Elastic repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+```
+
+- install
+
+```shell
+# sudo yum install filebeat-6.2.4 -y
+```
+
+- systemctl enable
+
+```shell
+# sudo systemctl daemon-reload
+# sudo systemctl enable filebeat
+```
