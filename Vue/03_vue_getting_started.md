@@ -1,5 +1,7 @@
 # Vue 시작하기
 
+> Inflearn - Captain Pangyo
+
 ## Vue는 무엇인가?
 
 * MVVM 패턴의 ViewModel 레이어에 해당하는 View 단 라이브러리
