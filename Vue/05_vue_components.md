@@ -1,5 +1,7 @@
 # Vue Components
 
+> Inflearn - Captain Pangyo
+
 컴포넌트는 화면에 비춰지는 뷰의 단위를 쪼개어 재활용이 가능한 형태로 관리하는 것이 주된 목적이다.
 
 ## 컴포넌트 등록

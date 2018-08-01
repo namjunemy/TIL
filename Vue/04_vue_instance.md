@@ -1,5 +1,7 @@
 # Vue Instance
 
+> Inflearn - Captain Pangyo
+
 ## 인스턴스 소개
 
 Vue.js를 이용하여 UI 화면을 개발하기 위해서는 아래 절차를 따른다.
