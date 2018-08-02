@@ -4,6 +4,8 @@
 
 컴포넌트는 화면에 비춰지는 뷰의 단위를 쪼개어 재활용이 가능한 형태로 관리하는 것이 주된 목적이다.
 
+![](https://github.com/namjunemy/TIL/blob/master/Vue/img/03.PNG?raw=true)
+
 ## 컴포넌트 등록
 
 * 뷰 컴포넌트를 등록한 후, 뷰 인스턴스를 생성하면 등록된 컴포넌트에 의해서 my-component가 컴포넌트의 template 내용으로 치환되면서 화면에 뿌려진다.

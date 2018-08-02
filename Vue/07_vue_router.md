@@ -263,7 +263,32 @@ var Foo = {
 * index.html
 
 ```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Nested Router Sample</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Hello Vue Nested Router!</h1>
+      <p>
+        <router-link to="/login">Go to Login</router-link>
+        <router-link to="/list">Go to List</router-link>
+        
+        <!-- 할일 #3 -->
+        <!-- `/main` 에 반응할 Nested Router 를 아래에 추가하세요 -->
+        <router-link to="/main">Go to Main</router-link>
+      </p>
+      <router-view></router-view>
+    </div>
 
+    <script src="js/vendor/vue.js"></script>
+    <script src="js/vendor/vue-router.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
 ```
 
 * app.js
