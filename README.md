@@ -137,7 +137,7 @@
 * [Vue Instance, Lifecycle](https://github.com/namjunemy/TIL/blob/master/Vue/04_vue_instance.md)
 * [Vue Components(global, local)](https://github.com/namjunemy/TIL/blob/master/Vue/05_vue_components.md)
 * [Vue Component 통신(props, event bus, v-for)](https://github.com/namjunemy/TIL/blob/master/Vue/06_vue_component_communication.md)
-* [Vue Router](https://github.com/namjunemy/TIL/blob/master/Vue/07_vue_router.md)
+* [Vue Router(Nested Router, Named View)](https://github.com/namjunemy/TIL/blob/master/Vue/07_vue_router.md)
 
 ### Git
 
