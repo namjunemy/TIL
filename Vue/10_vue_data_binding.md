@@ -1,5 +1,7 @@
 # Data Binding
 
+> 누구나 다루기 쉬운 Vue.js 프론트 개발 - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
+
 * DOM 기반 HTML Template에 Vue 데이터를 바인딩 하는 방법은 아래와 같이 크게 3가지가 있다.
   * Interpolation(값 대입)
   * Binding Expressions(값 연결)
