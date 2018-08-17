@@ -1,6 +1,6 @@
 # Vue Loader
 
-> 누구나 다루기 쉬운 Vue.js 프론트 개발 - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
+> 누구나 다루기 쉬운 Vue.js 프론트 개발(인프런) - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
 
 * `.vue` 형태의 파일을 javascript 모듈 형태로 변환해주는 webpack loader
   * .vue 파일을 인식해서 최종적으로 페이지에 뿌릴 수 있게 변환해준다.

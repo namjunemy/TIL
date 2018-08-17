@@ -1,6 +1,6 @@
 # Vue Component 통신
 
-> 누구나 다루기 쉬운 Vue.js 프론트 개발 - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
+> 누구나 다루기 쉬운 Vue.js 프론트 개발(인프런) - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
 
 ## 상-하위 컴포넌트 간 데이터 전달 방법
 

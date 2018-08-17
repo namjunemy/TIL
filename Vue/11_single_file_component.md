@@ -1,6 +1,6 @@
 # Single File Components with JSX(ES6)
 
-> 누구나 다루기 쉬운 Vue.js 프론트 개발 - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
+> 누구나 다루기 쉬운 Vue.js 프론트 개발(인프런) - Captain Pangyo [링크](https://www.inflearn.com/course/vue-pwa-vue-js-%EA%B8%B0%EB%B3%B8/)
 
 * 앱의 복잡도가 증가할 때, `.vue` 라는 파일 단위 안에 html, js, css 를 관리할 수 있는 방법
 * 복잡도가 커짐에 따라 야기될 수 있는 문제들
