@@ -18,7 +18,6 @@
 * 쉴 땐 확실히 쉬고, contributions를 초록색으로 채우는 것에 집착하지 않는다.
 * reference를 명시하고, 원작자가 참고를 허용하는 자료만 사용한다.
 
-  
 
 ## 분류
 ### Seminar & Conference
@@ -159,6 +158,10 @@
 * [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
 * [MySQL CURRENT_TIMESTAMP(vs Oracle SYSDATE)](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_CURRENT_TIMESTAMP.md)
 * [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
+
+### Redis
+
+* [Redis on Windows](https://github.com/namjunemy/TIL/blob/master/Redis/redis_on_windows.md)
 
 
 ### Linux
