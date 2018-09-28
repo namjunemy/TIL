@@ -39,6 +39,11 @@
 * [개발서버에 소스코드를 배포하는 과정에 대한 자동화](https://github.com/namjunemy/TIL/blob/master/Java/source_code_deploy_automation.md)
 * [Java Logging Framework, LOGBack](https://github.com/namjunemy/TIL/blob/master/Java/logging_framework.md)
 
+### JavaScript
+
+* [[INSIDE JavaScript] 01. 자바스크립트 기본 개요](https://github.com/namjunemy/TIL/blob/master/JavaScript/01_js_core_concepts.md)
+* [[INSIDE JavaScript] 03. 자바스크립트 데이터 타입과 연산자](https://github.com/namjunemy/TIL/blob/master/JavaScript/03_js_data_type_operators.md)
+
 ### Design Pattern
 
 * [Strategy Pattern](https://github.com/namjunemy/TIL/blob/master/DesignPattern/01_strategy_pattern.md)
