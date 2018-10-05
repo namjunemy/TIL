@@ -79,13 +79,25 @@ TV줌의 서비스 특성상 [SMR(Smart Media Representative)사](http://www.sma
 
 ### 4-3 Single File Component 구조로 변경된 화면
 
+![](./img/06-single-file-component-structure.PNG)
+
+![](./img/07-single-file-component-structure.PNG)
+
 ### 4-4 Component의 Parent-Child 통신과 데이터 바인딩
+
+![](./img/08-events-up-props-down.PNG)
+
+![](./img/09-parent-child-communication.PNG)
 
 ## 5. Backend 구조
 
 ### 5-1. Backend 요청/응답 흐름
 
+![](./img/10-backend-flow.PNG)
+
 ### 5-2. Spring Scheduler로 Redis데이터 DB에 업데이트 하기
+
+![](./img/11-backend-scheduler.PNG)
 
 ## 6. 구현 기능 정리
 
