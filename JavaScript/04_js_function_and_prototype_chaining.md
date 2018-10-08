@@ -1,3 +1,9 @@
+
+
+
+
+
+
 # 04. 함수와 프로토타입 체이닝
 
 > 인사이드 자바스크립트
@@ -210,9 +216,79 @@ var foo = function() {
 
 var bar = foo();
 bar();
-
 ```
 
 ### 4-2-3 함수 객체의 기본 프로퍼티
 
-계속 강조했듯이 자바스크립트에서 함수 역시 객체다(굉장이 중요한 개념이므로 자꾸 반복한다고 저자가 말한다.). 이것은 함수 역시 일반적인 객체의 기능에 추가로 호출됐을 때 정의된 코드를 실행하는 기능을 가지고 있다는 것이다. 또한, 일반 객체와는 다르게 추가로 **함수 객체만의 표준 프로퍼티**가 정의되어 있다.
+계속 강조했듯이 자바스크립트에서 함수 역시 객체다(굉장이 중요한 개념이므로 자꾸 반복한다고 저자가 말한다. 이것은 함수 역시 일반적인 객체의 기능에 추가로 호출됐을 때 정의된 코드를 실행하는 기능을 가지고 있다는 것이다. 또한, 일반 객체와는 다르게 추가로 **함수 객체만의 표준 프로퍼티**가 정의되어 있다.
+
+아래의 예제 코드를 통해서 add() 함수는 arguments, caller, length 등과 같은 다양한 프로퍼티가 기본적으로 생성된 것을 알 수 있다. 이러한 프로퍼티들이 함수를 생성할 때 포함되는 표준 프로퍼티다.
+
+![](https://github.com/namjunemy/TIL/blob/master/JavaScript/img/01_function_basic_property.PNG?raw=true)
+
+* ECMA5 스크립트 명세에서는 모든 함수가 **length**와 **prototype** 프로퍼티를 가져야 한다고 기술하고 있다. 뒷부분에서 자세히 알아본다.
+* length나 prototype 이외의 프로퍼티들은 ECMA 표준이 아니다.
+* **name 프로퍼티**는 함수의 이름을 나타낸다. 익명 함수라면 name 프로퍼티는 빈 문자열이 된다.
+* **caller 프로퍼티**는 자신을 호출한 함수를 나타낸다. 여기서는 함수를 호출하지 않았으므로 null 값이 나왔다.
+* **arguments 프로퍼티**는 함수를 호출할 때 전달된 인자값을 나타낸다. 현재 add() 함수가 호출된 상태가 아니므로 null 값이 출력됐다.
+  * 뒤에서 알아볼 ECMA 표준에서 정의하고 있는 arguments 객체와 같은 이름이다. 4-4-1 arguments 객체는 함수를 호출할 때 호출된 함수의 내부로 인자값과 함께 전달되며, arguments 프로퍼티와 유사하게 함수를 호출할 때 전달 인자값의 정보를 제공해준다.
+* 앞서 설명했지만 add() 함수 역시 자바스크립트 객체이므로 **[[Prototype]] 프로퍼티(크롬 브라우저에서\_\_proto\_\_ 프로퍼티)**를 가지고 있고, 이를 통해 자신의 부모 역할을 하는 프로토타입 객체를 가리킨다.
+  * ECMA 표준에서는 add()와 같이 함수 객체의 부모 역할을 하는 프로토타입 객체를 **Function.prototype 객체** 라고 명명하고 있으며, 이것 역시 **함수 객체** 라고 정의하고 있다.
+
+* **Function.prototype 객체의 프로토타입 객체는?**
+  * 앞에서 '모든 함수들의 부모 객체는 Function Prototype 객체'라고 했다. 그런데 ECMAScript 명세서에는 Function.prototype은 함수라고 정의하고 있다. 추가적으로 ECMAScript 명세서에는 예외를 설명하고있다. Function.prototype 함수 객체의 부모는 자바스크립트의 모든 객체의 조상격인 Object.prototype 객체라고 설명한다. 때문에 위의 예제 코드에서 add() 함수의 \_\_proto\_\_ 프로퍼티의 \_\_proto\_\_ 프로퍼티는 ㅒObject객체를 가리키고 있는 것이다.
+* **Function.prototype 객체는 모든 함수들의 부모 역할**을 하는 프로토타입 객체다. 때문에 모든 함수는 Function Prototype 객체가 있는 프로퍼티나 메서드를 자신의 것처럼 상속받아 그대로 사용할 수 있다.
+  * ECMAScript 명세서에는 이러한 Function.prototype 객체가 가져야 하는 프로퍼티들을 다음과 같이 기술하고있다.
+    * constructor 프로퍼티
+    * toString() 메서드
+    * apply(thisArg, argArray) 메서드
+    * call(thisArg, [, arg1 [,arg2, ]]) 메서드
+    * bind(thisArg, [, arg1 [,arg2, ]]) 메서드5
+  * 여기서 apply(), call()는 실제로 자주 사용되는 메서드이다. 4.4.2.4에서 자세히 살펴본다.
+
+#### 4-2-3-1 length 프로퍼티
+
+함수 객체의 length 프로퍼티는 ECMAScript에서 정한 모든 함수가 가져야 하는 표준 프로퍼티로서, 함수가 정상적으로 실행될 때 기대되는 인자의 개수를 나타낸다.
+
+```javascript
+function func0() {
+
+}
+
+function func1(x) {
+  return x;
+}
+
+function func2(x, y) {
+  return x + y;
+}
+
+function func3(x, y, z) {
+  return x + y + z;
+}
+
+console.log('func0.length = ' + func0.length);
+console.log('func1.length = ' + func1.length);
+console.log('func2.length = ' + func2.length);
+console.log('func3.length = ' + func3.length);
+```
+
+```text
+func0.length = 0
+func1.length = 1
+func2.length = 2
+func3.length = 3
+```
+
+#### 4-2-3-2 prototype 프로퍼티
+
+모든 함수는 객체로서 prototype 프로퍼티를 가지고 있다. 여기서 주의할 것은 함수 객체의 prototype 프로퍼티는 앞서 설명한 모든 객체의 부모를 나타내는 내부 프로퍼티인 [[Prototype]]과(위의 예제 코드의 결과 중 \_\_proto_\_ ) 혼동하지 말아야 한다는 것이다.
+
+* prototype 프로퍼티와 [[Prototype]] 프로퍼티
+  * 두 프로퍼티 모두 프로토타입 객체를 가리킨다는 점에서 공통점이 있지만, 관점에 차이가 있다. 모든 객체에 있는 내부 프로퍼티인 [[Prototype]] 프로퍼티는 객체 입장에서 자신의 부모 역할을 하는 프로토타입 객체를 가리키는 반면에, 함수 객체가 가지는 prototype 프로퍼티는 이 함수가 생성자로 사용될 때 이 함수를 통해 생성된 객체의 부모 역할을 하는 프로토타입 객체를 가리킨다. 4-5-1에서 좀 더 자세히 알아본다.
+
+prototype 프로퍼티는 함수가 생성될 때 만들어지며, constructor 프로퍼티 하나만 있는 객체를 가리킨다. 그리고 prototype 프로퍼티가 가리키는 프로토타입 객체의 유일한 constructor 프로퍼티는 자신과 연결된 함수를 가리킨다.
+
+**즉, 자바스크립트에서는 함수를 생성할 때, 함수 자신과 연결된 프로토타입 객체를 동시에 생성하며, 이 둘은 다음 그림처럼 각각 prototype과 constructor라는 프로퍼티로 서로를 참조하게 된다.** 이 개념은 이후 프로토타입과 프로토타입 체이닝을 이해하는 기본지식인 만큼 잘 알아둬야 한다.
+
+![](https://github.com/namjunemy/TIL/blob/master/JavaScript/img/02_prototype_property.PNG?raw=true)
