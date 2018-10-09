@@ -93,7 +93,20 @@ Main 컴포넌트에는 컴포넌트의 전환을 위해서 라우터가 등록�
 
 ### 4-4 Component의 Parent-Child 통신과 데이터 바인딩
 
+Main 컴포넌트 아래에서 다시 Parent-Child로 구성되는 컴포넌트 구조를 가져가면서, 불가피하게 Child 컴포넌트 간 통신이 필요한 상황이 생겼습니다. 아래에 있는 홈 메인 상단 노출 컨텐츠 관리 화면에서 사용자는 Content Parent 컴포넌트의 왼쪽 Child인 Content 컴포넌트에서 노출시키고자 하는 컨텐츠를 추가하고, 해당 컨텐츠는 Parent 컴포넌트의 오른쪽 Child인 HomeContent 컴포넌트의 리스트에 동적으로 추가되어야 하는 상황을 예로 들 수 있습니다.
+
+하지만, Vue.js는 기본적으로 동일 레벨에 위치하는 컴포넌트간 직접 통신이 불가능하게 되어있습니다. 모든 컴포넌트는 각 컴포넌트 자체의 스코프를 가지며, 하위 컴포넌트가 상위 컴포넌트의 값을 바로 참조할 수 없습니다. 대신에 같은 레벨에 위치하는 컴포넌트간 통신을 위해서 Parent-Child 컴포넌트 통신의 개념으로 Events up, Props down이 존재합니다.
+
+* Events up : Child -> Parent 요청
+* Props down : Parent -> Child 전달
+
 ![](./img/08-events-up-props-down.PNG)
+
+통신에 있어서 Parent를 거쳐야 하는 것이 처음에 개념을 학습할 때는 불편할 수 있겠다 생각했었지만, 실제 코드로 작성하면서 이 통신 방식의 장점을 느낄 수 있었습니다.
+
+Parent의 왼쪽 Child인 Content 컴포넌트에서 Events up으로 요청과 함께 파라미터들을 넘겨줄 수 있습니다. 그러면 Parent 에서는 `v-on` 이라는 Vue.js의 디렉티브를 이용해서 해당 요청을 처리할 수 있게 됩니다. 실제로 요청을 받아서 실행되는 Parent 컴포넌트의 toggleCheck 함수에서는 오른쪽 Child인 HomeCotent 컴포넌트로 넘겨주기 위한 selectedList 등을 가공하는 비즈니스 로직이 수행되겠죠? 그 작업이 끝나고 나면 HomeContent 컴포넌트에서는 Parent로 부터 Props down을 통해 내려받은 데이터들을 사용해서 화면을 동적으로 그려낼 수 있게 됩니다.
+
+이벤트의 요청/응답의 범위가 Parent-Child 컴포넌트로 한정되고, 요청/응답의 주체를 명확하게 확인 할 수 있습니다. 또한, Child 컴포넌트에서는 이벤트를 요청하거나 props 데이터를 사용하기만 하면 되고, 핵심 비즈니스 로직과 공통으로 사용하는 데이터들은 전부 Parent 컴포넌트에서 관리할 수 있습니다.
 
 ![](./img/09-parent-child-communication.PNG)
 
