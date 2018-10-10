@@ -56,7 +56,7 @@ TV줌의 서비스 특성상 [SMR(Smart Media Representative)사](http://www.sma
 
 ![](./img/03-db-table.png)
 
-## 4. Frontend 구조
+## 4. Frontend
 
 ### 4-1 화면 설명
 
@@ -110,15 +110,109 @@ Parent의 왼쪽 Child인 Content 컴포넌트에서 Events up으로 요청과 �
 
 ![](./img/09-parent-child-communication.PNG)
 
-## 5. Backend 구조
+## 5. Backend
 
 ### 5-1. Backend 요청/응답 흐름
+
+사용자는 Vue.js로 렌더링 된 화면을 통해서 Backend로 요청을 보내게 됩니다. Spring Boot 2.0.4를 기반으로 Controller-Service-Repository 레이어 형태의 일반적인 구조와 spring-data-jpa를 사용했습니다. 마크업을 제공받아서 구현하는 미리보기 화면은 Freemarker로 서버사이드 렌더링을 하고, 뷰페이지 미리보기 화면(Video.js로 영상 컨텐츠 컨트롤)과 같이 구현한 재생수 관리 기능의 경우 Java에서 Redis를 사용하기 위한 Jedis 라이브러리와 spring-data-redis를 이용하여 redis에 저장되어있는 데이터를 조회하고 수정합니다.
 
 ![](./img/10-backend-flow.PNG)
 
 ### 5-2. Spring Scheduler로 Redis데이터 DB에 업데이트 하기
 
+앞서 말씀 드렸듯이 재생수와 좋아요수는 실시간 변동이 잦기 때문에, 저장하는 테이블을 따로 관리해서 매번 컨텐츠의 모든 정보를 포함하는 테이블을 업데이트 하는 부담을 줄이고자 했습니다. 따라서, 평소에는 Redis로 데이터를 유지하고 스케줄링을 통해 Redis에 유지중인 데이터를 DB에 업데이트하는 방식으로 재생수와 좋아요수를 관리합니다.
+
+아래의 코드처럼 스케줄링 할 Task를 정의하고, @Scheduled 애노테이션을 사용해서 주기적으로 ContentPlayCountService 클래스에 정의된 updateAll 함수를 호출합니다.
+
+여기서 `appProperty.getScheduleConf().getIsSchedulingServer()` 메서드의 리턴 값을 판단하는 이유는 서비스하고 있는 모든 서버에서 스케줄링이 일어날 필요가 없기 때문입니다. 따라서, 서비스중인 여러 대의 서버 중 application.yml에 설정된 isSchedulingServer의 값이 true(default=false)일 경우에만 스케줄링이 이루어집니다.
+
+```java
+@RequiredArgsConstructor
+@Component
+@EnableConfigurationProperties(AppProperty.class)
+public class ScheduleTasks {
+
+  private final AppProperty appProperty;
+  private final ContentPlayCountService contentPlayCountService;
+
+  private static final Logger logger = LoggerFactory.getLogger(ScheduleTasks.class);
+
+  @Scheduled(cron = "0 */1 * * * *")
+  public void updateRedisToDatabase() {
+    if (appProperty.getScheduleConf().getIsSchedulingServer()) {
+      logger.info("재생 수 Redis -> DB UPDATE 수행",
+          DateTimeFormatUtils.ofYYYYMMddHHmmss(LocalDateTime.now()));
+      contentPlayCountService.updateAll();
+    }
+  }
+}
+```
+
+실제로 아래의 그림과 같이 스케줄링이 동작합니다. 정의된 스케줄링 Task가 수행될 때, spring-data-redis의 도움을 받아 Redis에서 조회한 데이터를 주기적으로 Database에 업데이트 합니다.
+
 ![](./img/11-backend-scheduler.PNG)
+
+### 5-3. @ConfigurationProperties로 설정값 관리하기
+
+그동안 프로퍼티값을 주입하기 위해서 @Value를 사용했었습니다. 파일럿 프로젝트를 하면서 프로퍼티 정보를 Bean으로 관리할 수 있다는 것을 알았습니다. 아래의 코드에서 처럼 @ConfigurationProperties를 이용해서 application.yml 파일안에 app이라는 prefix를 가진 프로퍼티 값들을 주입할 수 있습니다. 실제로 AppProperty 클래스에서 Redis의 접속 정보와 스케줄링 서버를 판단하는 값을 관리하고 있습니다.
+
+```java
+@Getter
+@Setter
+@Component
+@NoArgsConstructor
+@ConfigurationProperties(prefix = "app")
+@Validated
+public class AppProperty {
+
+  @Valid
+  private RedisConf redisConf;
+
+  @Valid
+  private ScheduleConf scheduleConf;
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  public static class RedisConf {
+
+    @NotBlank
+    @Size(max = 15)
+    private String host;
+
+    @NotNull
+    private int port;
+
+    @NotBlank
+    private String password;
+  }
+
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  public static class ScheduleConf {
+
+    private Boolean isSchedulingServer = false;
+  }
+}
+```
+
+* application.yml
+
+```yml
+...
+
+app:
+  redisConf:
+    host: 127.0.0.1
+    port: 6379
+    password: password
+
+  scheduleConf:
+    isSchedulingServer: true
+    
+...
+```
 
 ## 6. 구현 기능 정리
 
