@@ -38,6 +38,7 @@
 * [16장. 스트림과 병렬처리](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_16_stream_parallel_processing.md)
 * [개발서버에 소스코드를 배포하는 과정에 대한 자동화](https://github.com/namjunemy/TIL/blob/master/Java/source_code_deploy_automation.md)
 * [Java Logging Framework, LOGBack](https://github.com/namjunemy/TIL/blob/master/Java/logging_framework.md)
+* [Ehcache Configuration](https://github.com/namjunemy/TIL/blob/master/Java/ehcache_config.md)
 
 ### JavaScript
 
