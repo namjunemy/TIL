@@ -35,3 +35,28 @@
 
 ## 02. 스프링 부트 시작하기
 
+* intellij idea > spring initializer
+* gradle installation config : https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/#getting-started-gradle-installation
+
+## 03. 스프링 부트 프로젝트 생성기
+
+*  https://start.spring.io/ 에서 부트 프로젝트 만드는 방법도 있다.
+
+## 04. 스프링 부트 프로젝트 구조
+
+다만, 스프링 부트에서는 @SpringBootApplication 애노테이션이 붙어있는 Main 애플리케이션 클래스의 위치를 프로젝트 디폴트 패키지의 루트에 위치시키는 것을 추천한다.(아래 구조에서 위치 참조) @ComponentScan 애노테이션이 해당 패키지 부터 시작하기 때문이다. 결과적으로 io.namjune.springbootgettingstarted 패키지 하위 패키지들을 컴포넌트 스캔해서 빈을 등록하게 된다.
+
+만약 src/java/ 아래에 바로 위치하면, 불필요하게 모든 패키지에 대해 @ComponentScan이 동작하게 된다.
+
+관련 내용 공식문서 https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-structuring-your-code
+
+* src
+  * main
+    * java(java 소스코드)
+      * io.namjune.springbootgettingstarted
+        * SpringBootGettingStarted.java(@SpringBootApplication 애노테이션 선언되어있는 Main 클래스)
+    * resources(java 소스 코드를 제외한 모든 것. classpath root이다. 이 위치를 기준으로 java 소스코드에서 resources 디렉토리의 하위 목록을 참조할 수 있다.)
+  * test
+    * java
+    * resources
+
