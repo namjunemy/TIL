@@ -125,6 +125,11 @@
 - [29. Mybatis2(리스트 출력)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_2.md)
 - [30. Mybatis1(글 작성 및 삭제, 마무리)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_3.md)
 
+### Spring Boot
+
+* [[스프링 부트 개념과 활용] 1. 스프링 부트 시작하기](https://github.com/namjunemy/TIL/blob/master/SpringBoot/01_springboot_intro.md)
+* [[스프링 부트 개념과 활용] 2. 스프링 부트 원리](https://github.com/namjunemy/TIL/blob/master/SpringBoot/02_springboot_principle.md)
+
 ### Node.js
 
 * [[Node API 서버] Hello Nodejs](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_hello_node.md)
