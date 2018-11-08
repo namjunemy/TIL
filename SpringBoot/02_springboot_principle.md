@@ -60,3 +60,24 @@ implementation('org.springframework.boot:spring-boot-starter-data-jpa:2.0.3.RELE
   * @Configuration
   * @ConditionalOnXxxYyyZzz
 
+## 4. 자동 설정 만들기 1부: Starter와 AutoConfigure
+
+* Xxx-Spring-Boot-Autoconfigure 모듈: 자동 설정
+* Xxx-Spring-Boot-Starter 모듈 : 필요한 의존성 정의
+* 그냥 하나로 만들고 싶을 때는?
+
+  * Xxx-Spring-Boot-Starter
+* 본인이 만든 의존성에 의해 만들어지는 빈이 @ComponentScan에 의해서 먼저 만들어지고,
+* 2번째 단계의 @EnableAutoConfiguration에 의해 @Configuration으로 설정되어있는 빈이 이것을 덮어 쓰는 경우도 생긴다.
+
+## 5. 자동 설정 만들기 2부: @ConfigurationProperties
+
+* 정리해서 설명하자면, 본인이 애플리케이션에서 직접 @Bean 으로 정의한 holoman 이라는 빈이 AutoConfigure로 인해 만들어진 @Configuration으로 선언된 빈으로 덮어쓰여지는 문제가 생긴다. @SpringBootApplication이 1단계, 2단계로 나눠서 빈을 스캔하기 때문이다.
+  * 이 경우에는 @AutoConfigure로 선언한 @Bean에 @ConditionalOnMissingBean 애노테이션을 추가해주면, 해당 타입	의 빈이 비어있을 경우에만 생성한다.
+  * 결과적으로 1단계로 @ComponentScan이 이루어질때 빈이 만들어졌으면, 2단계 @EnableAutoConfiguration 에서는 만들어지지 않는다.
+  * 따라서, 본인이 애플리케이션에 직접 생성한 @Bean의 우선순위가 높아지게 된다.
+
+* **추가적으로 application.yaml에 설정한 값을 @ConfigurationProperties를 통해서 빈에 주입할 수 있다.**
+
+  * 해당 커밋 내용 참조
+  * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/53b92ad92935a0568bb28c2a7d95298c995ebfdb
