@@ -76,8 +76,22 @@ implementation('org.springframework.boot:spring-boot-starter-data-jpa:2.0.3.RELE
   * 이 경우에는 @AutoConfigure로 선언한 @Bean에 @ConditionalOnMissingBean 애노테이션을 추가해주면, 해당 타입	의 빈이 비어있을 경우에만 생성한다.
   * 결과적으로 1단계로 @ComponentScan이 이루어질때 빈이 만들어졌으면, 2단계 @EnableAutoConfiguration 에서는 만들어지지 않는다.
   * 따라서, 본인이 애플리케이션에 직접 생성한 @Bean의 우선순위가 높아지게 된다.
-
 * **추가적으로 application.yaml에 설정한 값을 @ConfigurationProperties를 통해서 빈에 주입할 수 있다.**
-
   * 해당 커밋 내용 참조
   * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/53b92ad92935a0568bb28c2a7d95298c995ebfdb
+
+## 6. 내장 웹 서버 이해
+
+* 부트는 서버가 아니다.
+  * 톰캣 객체 생성
+  * 포트 설정
+  * 톰캣에 컨텍스트 추가
+  * 서블릿 만들기
+  * 톰캣에 서블릿 추가
+  * 컨텍스트에 서블릿 맵핑
+  * 톰캣 실행 및 대기
+* 이 모든 과정을 보다 상세히 또 유연하게 설정하고 실행해주는게 바로 스프링 부트의 자동 설정
+  * ServletWebServerFactoryAutoConfiguration(서블릿 웹 서버 생성)
+    * TomcatServletWebServerFactoryCustomizer(서버 커스터마이징)
+  * DispatcherServletAutoConfiguration
+    * 서블릿 만들고 등록
