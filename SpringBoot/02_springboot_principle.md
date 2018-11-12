@@ -95,3 +95,74 @@ implementation('org.springframework.boot:spring-boot-starter-data-jpa:2.0.3.RELE
     * TomcatServletWebServerFactoryCustomizer(서버 커스터마이징)
   * DispatcherServletAutoConfiguration
     * 서블릿 만들고 등록
+
+### 내장 웹 서버 응용 1부: 컨테이너와 포트
+
+![](./img/01_gradle_dependency.PNG)
+
+* spring-boot-starter-web이 spring-boot-starter-tomcat을 가져온다.
+* 만약 tomcat이 아닌, 다른 tomcat이 아닌 jetty를 내장 웹서버로 사용하고 싶다면 아래와 같이 gradle 설정 파일을 작성해주면 된다.
+
+```groovy
+...
+
+configurations {
+    compile.exclude module: 'spring-boot-starter-tomcat'
+}
+
+
+dependencies {
+    ...
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-jetty')
+    ...
+}
+```
+
+* 부트를 웹 애플리케이션으로 띄우지 않으려면, 프로퍼티 설정을 통해서 일반 애플리케이션으로 사용할 수 있다. 서버의 포트도 간단하게 설정할 수 있다.
+
+  * application.yml
+
+  ```yml
+  spring:
+    main:
+      web-application-type: none
+      
+  server:
+    port: 9090
+  ```
+
+* 서버 포트 정보를 0으로 할당하면, 사용 가능한 포트를 랜덤으로 선택한다.
+
+```yml
+server:
+  port: 0
+```
+
+* 위와 같이 할당된 포트를 애플리케이션 코드에서 사용하는 best way를 spring boot 도큐먼트에서 설명하고 있다.
+
+```java
+package io.namjune.springbootconceptandutilization;
+
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PortListener implements ApplicationListener<ServletWebServerInitializedEvent> {
+
+    @Override
+    public void onApplicationEvent(
+        ServletWebServerInitializedEvent servletWebServerInitializedEvent) {
+        ServletWebServerApplicationContext applicationContext =
+            servletWebServerInitializedEvent.getApplicationContext();
+        System.out.println(applicationContext.getWebServer().getPort());
+    }
+}
+```
+
+
+
+
+
