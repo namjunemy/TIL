@@ -162,7 +162,63 @@ public class PortListener implements ApplicationListener<ServletWebServerInitial
 }
 ```
 
+### 내장 웹 서버 응용 2부: HTTPS와 HTTP2
 
+* Spring Boot SSL key generate
+  * 명령어 수행한 위치에 키스토어가 생성된다.
+
+```shell
+$ keytool -genkey -alias tomcat -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 4000
+```
+
+* application.yml
+
+```yaml
+server:
+  ssl:
+    key-store: keystore.p12
+    key-store-type: PKCS12
+    key-store-password: 123456
+    key-alias: tomcat
+```
+
+* 이렇게 SSL 키를 등록하고 스프링부트 애플리케이션을 실행하면, localhost:8080으로 접근이 불가하다. 앞으로 애플리케이션으로의 모든 접근은 https로 해야한다.
+
+* 추가적으로 http 접근도 가능하게 설정하려면 아래와 같이 애플리케이션 코드에 http 요청을 받기 위한 커넥터를 추가해주면 된다. 대신 application.yml에서 https의 포트를 변경해준다.
+
+```java
+...
+  @Bean
+    public ServletWebServerFactory serverFactory() {
+        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
+        tomcat.addAdditionalTomcatConnectors(createStandardConnector());
+        return tomcat;
+    }
+
+    private Connector createStandardConnector() {
+        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+        connector.setPort(8080);
+        return connector;
+    }
+...
+```
+
+* 로그 확인
+
+```shell
+...
+2018-11-13 11:23:41.187  INFO 12432 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8443 (https) 8080 (http) with context path ''
+...
+```
+
+* HTTP2 설정은 SSL이 **기본적으로 적용되어있는 상태**에서 http2.enabled를 true로 할당해주면 된다.
+  * 추가적으로 해줘야하는 작업은 각 웹서버마다 다르다(undertow는 https 설정이 되어있으면 추가적인 설정 없이 http2 enable만 true로 할당하면되고, tomcat은 9.X버전과 JDK9 이상을 쓰면 추가적인 설정없이 http2를 적용할 수 있다.)
+
+```yaml
+server:
+  http2:
+    enabled: true
+```
 
 
 
