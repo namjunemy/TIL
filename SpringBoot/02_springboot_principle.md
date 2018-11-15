@@ -9,7 +9,7 @@
   * 그렇기 때문에 우리는 각 스타터의 버전을 명시하지 않아도 되고, parent가 관리하는 버전을 사용하게 된다.
 * gradle을 사용한다면 intellij의 gradle 탭에서 참조하고 있는 각 의존성들의 버전들과 하위 의존성들의 상세 버전까지 확인 할 수 있다.
 
-![](./img/01_gradle_dependency.PNG)
+![](https://github.com/namjunemy/TIL/blob/master/SpringBoot/img/01_gradle_dependency.PNG?raw=true)
 
 * 스프링 부트의 dependencies에서 관리하는 의존성의 경우 버전 명시를 하지 않고 stater 위주로 추가해서 사용하면 된다. 별도의 버전 호환을 체크 하지 않고 사용할 수 있다. 하지만, 특별히 버전을 명시해서 사용해야 하는 경우는 명시해서 사용하면 설정 값이 해당 버전으로 오버라이딩 되기 때문에 그 버전을 사용 할 수 있다.
 
@@ -29,7 +29,7 @@ dependencies {
 
 * 스타터만 추가했을뿐인데, 해당 스프링 부트 릴리즈 버전에서 관리되고 있는 의존성의 하위 의존성들까지 추가가 된다.
 
-![](./img/02_add_dependency_stater.PNG)
+![](https://github.com/namjunemy/TIL/blob/master/SpringBoot/img/02_add_dependency_stater.PNG?raw=true)
 
 ### 버전 관리 안해주는 의존성 추가
 
@@ -98,7 +98,7 @@ implementation('org.springframework.boot:spring-boot-starter-data-jpa:2.0.3.RELE
 
 ### 내장 웹 서버 응용 1부: 컨테이너와 포트
 
-![](./img/01_gradle_dependency.PNG)
+![](https://github.com/namjunemy/TIL/blob/master/SpringBoot/img/01_gradle_dependency.PNG?raw=true)
 
 * spring-boot-starter-web이 spring-boot-starter-tomcat을 가져온다.
 * 만약 tomcat이 아닌, 다른 tomcat이 아닌 jetty를 내장 웹서버로 사용하고 싶다면 아래와 같이 gradle 설정 파일을 작성해주면 된다.
