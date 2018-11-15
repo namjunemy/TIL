@@ -61,5 +61,102 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
 
 * SpringApplicationBuilder로 빌더 패턴 사용 가능
 
-### 
+### 2부
+
+* **ApplicationEvent**
+
+  * https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-spring-application.html#boot-features-application-events-and-listeners
+  * 이벤트 리스너 자체를 @Component로 만들어서 사용하면 ApplicationContext가 만들어지기 전에는 **ApplicationStartingEvent**는 반응을 안한다. 아래의 코드이다.
+
+  ```java
+  @Component
+  public class SampleListener implements ApplicationListener<ApplicationStartingEvent> {
+  
+      @Override
+      public void onApplicationEvent(ApplicationStartingEvent event) {
+          System.out.println("========================");
+          System.out.println("Application is starting");
+          System.out.println("========================");
+      }
+  }
+  ```
+
+  * **ApplicationStartingEvent** 대신 **ApplicationStartedEvent**를 사용하거나,
+
+  ```java
+    .   ____          _            __ _ _
+   /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+  ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+   \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+    '  |____| .__|_| |_|_| |_\__, | / / / /
+   =========|_|==============|___/=/_/_/_/
+   :: Spring Boot ::        (v2.1.0.RELEASE)
+  
+  2018-11-15 15:19:41.137  INFO 15600 --- [           main] i.n.s.Application                        : Starting Application on DESKTOP-EI79USO with PID 15600 (C:\document\github\spring-boot-concept-and-utilization\out\production\classes started by njkim in C:\document\github\spring-boot-concept-and-utilization)
+    ...
+    ...
+    ...
+  ========================
+  Application is started!!!
+  ========================
+  ```
+
+  * 메인 클래스에서 **SpringApplication.addListeners()**를 사용해서 이벤트를 직접 등록해주면 된다. 이 때, SampleListener클래스는 @Component 선언을 해줄 필요가 없게 된다.
+
+  ```java
+  @SpringBootApplication
+  public class Application {
+  
+      public static void main(String[] args) {
+          SpringApplication app = new SpringApplication(Application.class);
+          app.addListeners(new SampleListener());
+          app.run(args);
+      }
+  }
+  ```
+
+  ```shell
+  ========================
+  Application is starting
+  ========================
+  
+    .   ____          _            __ _ _
+   /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+  ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+   \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+    '  |____| .__|_| |_|_| |_\__, | / / / /
+   =========|_|==============|___/=/_/_/_/
+   :: Spring Boot ::        (v2.1.0.RELEASE)
+   
+   ...
+   ...
+  ```
+
+* **애플리케이션 아규먼트 사용하기**
+
+  * ApplicationArguments를 빈으로 등록해 주니까 가져다 쓰면된다.
+  * jar파일을 실행할 때, `# java -jar [path]/~~~SNAPSHOT.jar -Dfoo --bar` 명령으로 실행했을 때 아래의 결과가 나온다.
+
+  ```java
+  @Component
+  public class ArgumentsTester {
+    
+    public ArgumentsTester(ApplicationArguments arguments) {
+      System.out.println("foo: " + arguments.containsOption("foo"));
+      System.out.println("bar: " + arguments.containsOption("bar"));
+    }
+  }
+  ```
+
+  ```shell
+  ...
+  foo: false
+  bar: true
+  ...
+  ```
+
+* **애플리케이션 실행항 뒤 먼가 실행하고 싶을 때**
+
+  * ApplicationRunner(추천) 또는 CommandLineRunner
+  * @Order를 통해서 순서도 지정할 수 있다.
 
