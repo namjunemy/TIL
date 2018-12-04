@@ -197,6 +197,10 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
 
 ## 3-2. 외부설정 2부
 
+* 커밋 로그
+  * [외부설정 - 타입-세이프 프로퍼티 @ConfigurationProperties 사용하기](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/8fa0a1cd7e0b569a5aa1e9613c8a9c03564d72f5)
+  * [외부설정 - 프로퍼티 타입 컨버전, 프로퍼티 값 검증 [@Validated](https://github.com/Validated)](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/ce9c5e9f811f8fc4902d29c7a9f703e18a43609c)
+
 * 타입-세이프라는 의미는 @Value("${namjune.name}")과 같이 직접 프로퍼티 값을 입력해서 발생할수 있는 에러를 내지 않을 수 있다는 의미이다. @ConfigurationProperties으로 정의하고 빈으로 만든 뒤 getter를 통해서 값을 가져오기 때문에 @Value로 직접 쓰는 것 보다 안전하게 사용할 수있다.
 
   * 프로퍼티스 파일 자체가 타입-세이프 하다는 의미는 아니다.
@@ -266,4 +270,24 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
     * @Value에서는
       * SpEL 을 사용할 수 있지만..
       * 위에 있는 기능들은 전부 사용 못한다.
+
+## 4. 프로파일
+
+* 커밋로그
+  * [스프링 부트 프로파일 설정](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/1cc4c087672fc7771dc8c896df21bb50405eb72d)
+
+* 어떤 특정한 프로파일에서만 특정한 빈을 등록하고 싶거나, 특정 프로파일에서만 애플리케이션의 동작을 다르게 하고 싶을때 프로파일을 사용했었다.
+
+* @Profile 애노테이션은 어디에?
+  * @Configuration
+  * @Component
+* 어떤 프로파일을 활성화 할 것인가?
+  * spring.profiles.active
+* 어떤 프로파일을 추가할 것인가?
+  * 프로파일안에 특정 프로파일이 정의된 프로퍼티 파일을 인클루드 해서 사용할 수 있다.
+  * spring.profiles.include
+* 프로파일용 프로퍼티
+  * application-{profile}.properties
+
+
 
