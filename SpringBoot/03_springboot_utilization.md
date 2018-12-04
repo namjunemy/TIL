@@ -194,3 +194,76 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
 * ${random.자료형}
 
 * server.port의 경우 0을 할당해야 가용범위 안의 포트를 찾아서 맵핑해줌
+
+## 3-2. 외부설정 2부
+
+* 타입-세이프라는 의미는 @Value("${namjune.name}")과 같이 직접 프로퍼티 값을 입력해서 발생할수 있는 에러를 내지 않을 수 있다는 의미이다. @ConfigurationProperties으로 정의하고 빈으로 만든 뒤 getter를 통해서 값을 가져오기 때문에 @Value로 직접 쓰는 것 보다 안전하게 사용할 수있다.
+
+  * 프로퍼티스 파일 자체가 타입-세이프 하다는 의미는 아니다.
+
+* 타입-세이프 프로퍼티 @ConfigurationProperties
+
+  * 여러 프로퍼티를 묶어서 읽어올 수 있음
+
+  * 빈으로 등록해서 다른 빈에 주입할 수 있음
+
+    * @EnableConfigurationProperties
+    * **@Component** 
+    * @Bean
+    * **스프링부트 애플리케이션에서는 @EnableConfigurationProperties이 등록이 되어 있으므로 @ConfigurationProperties가 선언되어있는 클래스에 @Component를 추가하여 빈으로 만들어 주기만 하면 된다.**
+
+  * 융통성 있는 바인딩(RelaxedBinding)
+
+    * context-path(케밥)
+    * context_path(언더스코어)
+
+    * contextPath(카멜)
+    * CONTEXTPATH
+
+  * 프로퍼티 타입 컨버전
+
+    * 프로퍼티 파일에 txt가 문자로 입력되지만, int로 컨버전 되어서 들어간다.
+
+    * @DurationUnit
+
+      * 시간정보를 받고 싶을 때 사용하면 컨버전이 이루어 진다.
+      * AppProperties.java
+
+      ```java
+      public class AppProperties.java {
+        ...
+        @DurationUnit(ChronoUnit.SECONDS)
+      	private Duration sessionTimeout = Duration.ofSeconds(30);
+        ...
+      }
+      ```
+
+      * application.yml
+
+      ```yaml
+      nj:
+        name: namjune
+        age: ${random.int(0,100)}
+        fullName: ${nj.name} Kim
+        sessionTimeout: 30
+      ```
+
+      ```txt
+      ==========================
+      namjune
+      64
+      namjune Kim
+      PT30S
+      ==========================
+      ```
+
+  * 프로퍼티 값 검증
+
+    * 프로퍼티 값을 검증하고 싶을때, @Validated 애노테이션을 정의하고 JSR303 구현체인 hibernate-validator 애노테이션을 사용해서 검증한다.
+    * @Validated
+    * JSR-303(@NotNull, ...) 구현체 = hibernate-validator
+    * 메타 정보 생성
+    * @Value에서는
+      * SpEL 을 사용할 수 있지만..
+      * 위에 있는 기능들은 전부 사용 못한다.
+
