@@ -289,5 +289,31 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
 * 프로파일용 프로퍼티
   * application-{profile}.properties
 
+## 5-1. 로깅 1부
 
+* 스프링 부트는 기본적으로 로깅 파사드 **Commons Logging**을 사용한다. 결국 SLF4j를 사용하게 된다. 소스코드에서도 SLF4j를 사용하면 된다.
+  * 로깅 파사드는 실제 로깅을 하지 않고, 로거 API들을 추상화 해놓은 인터페이스들이다.
+  * 주로 프레임워크들은 로깅 파사드를 이용한다. 프레임워크를 사용하는 애플리케이션들의 로거 사용을 자유롭게 해주기 위해서.
+* 로깅 파사드의 장점은 로거들을 바꿔서 사용할 수 있다는 것이다.
+  * JUL(Java Utility Logging), Log4J2, **Logback**
+
+* 정리하자면 스프링부트에서 찍히는 로그는 Commons Logging -> SLF4j -> Logback의 흐름을 타고 결국 **Logback**에 의해서 찍힌다.
+* 아래의 spring-boot-stater-logging 의존성을 통해서 확인할 수 있다.
+  * jul-to-slf4j 라이브러리와 log4j-to-slf4j를 통해서 slf4j로 로그를 보내고,
+  * slf4j-api 라이브러리를 통해서 받은 로그들을 결국 logback으로 처리한다.
+
+![](https://github.com/namjunemy/TIL/blob/master/SpringBoot/img/03_logging_dependency.PNG?raw=true)
+
+* 스프링 부트 기본 로깅
+  * --debug 옵션
+    * 일부 코어 라이브러리(embedded container, Hibernate, Spring Boot)만 디버깅 모드로
+  * --trace
+    * 전부 다 디 버깅 모드로
+  * 컬러 출력
+    * spring.output.ansi.enabled
+  * 파일 출력
+    * logging.file 또는 logging.path
+    * 로그파일은 기본적으로 10M까지 저장되고, 넘치면 아카이빙하는 등 여러가지 설정도 할 수 있다.
+  * 로그 레벨 조정
+    * logging.level.패키지 = 로그 레벨
 
