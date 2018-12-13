@@ -291,12 +291,13 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
 
 ## 5-1. 로깅 1부
 
+* 커밋로그
+  * [기본 로깅 설정](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/05da2843fd7c07671ff73eb1d7e98a8bd13a1afd)
 * 스프링 부트는 기본적으로 로깅 파사드 **Commons Logging**을 사용한다. 결국 SLF4j를 사용하게 된다. 소스코드에서도 SLF4j를 사용하면 된다.
   * 로깅 파사드는 실제 로깅을 하지 않고, 로거 API들을 추상화 해놓은 인터페이스들이다.
   * 주로 프레임워크들은 로깅 파사드를 이용한다. 프레임워크를 사용하는 애플리케이션들의 로거 사용을 자유롭게 해주기 위해서.
 * 로깅 파사드의 장점은 로거들을 바꿔서 사용할 수 있다는 것이다.
   * JUL(Java Utility Logging), Log4J2, **Logback**
-
 * 정리하자면 스프링부트에서 찍히는 로그는 Commons Logging -> SLF4j -> Logback의 흐름을 타고 결국 **Logback**에 의해서 찍힌다.
 * 아래의 spring-boot-stater-logging 의존성을 통해서 확인할 수 있다.
   * jul-to-slf4j 라이브러리와 log4j-to-slf4j를 통해서 slf4j로 로그를 보내고,
@@ -317,3 +318,210 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
   * 로그 레벨 조정
     * logging.level.패키지 = 로그 레벨
 
+## 5-2. 로깅 2부
+
+* 커밋로그
+  * [커스텀 로그 설정]()
+
+* 커스텀 로그 설정 파일 사용하기
+  * Logback: logback-spring.xml
+    * https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-logback-for-logging
+  * Log4J2: log4j2-spring.xml
+  * JUL(비추천): logging.properties
+  * Logback extension
+    * **logback-spring.xml을 사용하면 logback.xml을 사용하는 것과 같고, 스프링부트에서 추가로 아래의 익스텐션을 사용할 수 있게 제공한다.**
+    * 프로파일 \<springProfile name="프로파일"\>
+    * Environment 프로퍼티\<springProperty\>
+* 로거를 Log4j2로 변경하기
+  * https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging
+
+## 6. 테스트
+
+* 시작은 일단 spring-boot-starter-test를 추가하는 것 부터
+
+  * test scope으로 추가
+
+
+### @SpringBootTest
+
+* @SpringBootTest가 하는 역할은 @SpringBootApplication을 찾아서 테스트를 위한 빈들을 다 생성한다. 그리고 @MockBean으로 정의된 빈을 찾아서 교체한다.
+
+* @RunWith(SpringRunner.class)랑 같이 써야 함
+
+* 빈 설정 파일은 안해주나? 알아서 찾는다. (@SpringBootApplication)
+
+
+#### SpringBootTest.webEnvironment
+
+* MOCK : mock servlet environment. 내장 톰캣 구동 안함.
+
+  * 커밋로그 : https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/f051482f41506c88cb64fada0ff7b975fef0c099
+
+  ```java
+  package io.namjune.springbootconceptandutilization.sample;
+  
+  import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+  import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+  
+  import org.junit.Test;
+  import org.junit.runner.RunWith;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+  import org.springframework.boot.test.context.SpringBootTest;
+  import org.springframework.test.context.junit4.SpringRunner;
+  import org.springframework.test.web.servlet.MockMvc;
+  
+  @RunWith(SpringRunner.class)
+  @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+  @AutoConfigureMockMvc
+  public class SampleControllerTest {
+  
+      @Autowired
+      MockMvc mockMvc;
+  
+      @Test
+      public void hello() throws Exception {
+          mockMvc.perform(get("/hello"))
+              .andExpect(status().isOk())
+              .andExpect(content().string("hello namjune"))
+              .andDo(print());
+      }
+  }
+  ```
+
+* RANDOM_PORT, DEFINED_PORT: 내장 톰캣 사용 함
+  * RANDOM_PORT를 사용하면 실제 내장 톰캣을 사용한다. 이때는 MockMvc 대신 **RestTemplate**를 사용할 수 있다.
+  * 실제 가용한 포트로 내장톰캣을 띄우고 응답을 받아서 테스트를 수행한다.
+    * 커밋로그 : https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/6611dc0a8f2edb50b159272c1c728ffd5860ee6d
+
+  ```java
+  package io.namjune.springbootconceptandutilization.sample;
+  
+  import static org.assertj.core.api.Assertions.assertThat;
+  
+  import org.junit.Test;
+  import org.junit.runner.RunWith;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.boot.test.context.SpringBootTest;
+  import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+  import org.springframework.boot.test.web.client.TestRestTemplate;
+  import org.springframework.test.context.junit4.SpringRunner;
+  
+  @RunWith(SpringRunner.class)
+  @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+  public class SampleControllerTest {
+  
+      @Autowired
+      TestRestTemplate testRestTemplate;
+  
+      @Test
+      public void hello() {
+          String result = testRestTemplate.getForObject("/hello", String.class);
+          assertThat(result).isEqualTo("hello namjune");
+      }
+  }
+  ```
+
+* spring5 webflux에서 추가된 RestClient중에 하나인 WebTestClient도 사용할 수 있다. 기존에 사용하던 WebClient는 synchronous하게 동작하기 때문에 요청 하나 보내고 그 요청이 끝나고 난 다음에 다음 요청을 보낼 수 있었지만, WebTestClient는 asynchronous하게 동작하므로 요청을 보내고 기다리지 않는다. 후에 응답이 오면, 콜백 이벤트를 실행할 수 있다. 따라서, Test코드에서도 WebClient와 비슷한 API를 사용할 수 있다.
+  * webflux 의존성을 추가해야 한다.
+  * API가 restTemplate보다 가독성이 좋다.(추천)
+  * **아래의 @MockBean 참고**
+    * 커밋로그 : https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/99a3bf23c989dd4c293473e54e71c492258a9543
+
+  ```java
+  implementation('org.springframework.boot:spring-boot-starter-webflux')
+  ...
+  ```
+
+  ```java
+  package io.namjune.springbootconceptandutilization.sample;
+  
+  import static org.mockito.Mockito.when;
+  
+  import org.junit.Test;
+  import org.junit.runner.RunWith;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.boot.test.context.SpringBootTest;
+  import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+  import org.springframework.boot.test.mock.mockito.MockBean;
+  import org.springframework.test.context.junit4.SpringRunner;
+  import org.springframework.test.web.reactive.server.WebTestClient;
+  
+  @RunWith(SpringRunner.class)
+  @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+  public class SampleControllerTest {
+  
+      @Autowired
+      WebTestClient webTestClient;
+  
+      @MockBean
+      SampleService mockSampleService;
+  
+      @Test
+      public void hello() {
+          when(mockSampleService.getName()).thenReturn("kim");
+  
+          webTestClient.get().uri("/hello").exchange()
+              .expectStatus().isOk()
+              .expectBody(String.class).isEqualTo("hello kim");
+  
+      }
+  }
+  ```
+
+* NONE: 서블릿 환경 제공 안 함.
+
+### @MockBean
+
+* 위의 경우 테스트가 너무 크다. Controller 테스트코드에서 Service단까지 흘러간다. 컨트롤러만 테스트하고 싶을 경우 서비스 객체를 MockBean으로 만들어서 사용할 수 있다.
+* ApplicationContext에 들어있는 빈을 Mock으로 만든 객체로 교체함
+* 모든 @Test 마다 자동으로 리셋. 직접 리셋을 관리 하지 않아도 된다.
+
+```java
+package io.namjune.springbootconceptandutilization.sample;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+public class SampleControllerTest {
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    @MockBean
+    SampleService mockSampleService;
+
+    @Test
+    public void hello() {
+        when(mockSampleService.getName()).thenReturn("kim");
+
+        String result = testRestTemplate.getForObject("/hello", String.class);
+        assertThat(result).isEqualTo("hello kim");
+    }
+}
+```
+
+### 슬라이스 테스트
+
+* 레이어 별로 잘라서 테스트 하고 싶을 때
+* @JsonTest
+  * json 테스트를 하고싶을 경우 @SpringBootTest 대신 @JsonTest를 선언하고, JacksonTester를 주입받아서 사용하면 된다.
+* @WebMvcTest
+  * 컨트롤러만 따로 테스트 할 경우 사용한다. 웹과 관련된 클래스들만 빈으로 등록이 되고 일반적인 컴포넌트들은 빈으로 등록이 되지 않는다. 이렇게 의존성이 끊기기 때문에, 사용하는 다른 의존성 예를 들면 서비스와 같은 객체들은@MockBean을 사용해서 만들어 사용해야 한다. 
+  * 커밋로그 : https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/76a0e095576f0b52b23f2cec3f60f050d1bb2042
+* @WebFluxTest
+* @DataJpaTest
+* ...
