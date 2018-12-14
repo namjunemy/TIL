@@ -335,7 +335,7 @@ SpringApplication 클래스에 대해서 조금 더 살펴 본다.
 * 로거를 Log4j2로 변경하기
   * https://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging
 
-## 6. 테스트
+## 6-1. 테스트
 
 * 시작은 일단 spring-boot-starter-test를 추가하는 것 부터
 
@@ -525,3 +525,63 @@ public class SampleControllerTest {
 * @WebFluxTest
 * @DataJpaTest
 * ...
+
+## 6-2. 테스트 유틸
+
+* 스프링 테스트가 제공하는 테스트 유틸리티가 4가지 있다.
+  * **OutputCapture**
+  * TestPropertyValues
+  * TestRestTemplate
+  * ConfigFileApplicationContextInitializer
+* Junit에 있는 Rule을 확장해서 만든 OutputCapture가 제일 많이 쓰인다.
+  * OutputCapture는 로그를 비롯해서 콘솔에 찍히는 모든 것을 캡쳐한다.
+    * 로그 메세지가 어떻게 찍히는지 테스트할 수 있다.
+  * @Rule을 선언하고,
+  * Junit이 제공하는 OutputCapture를 public으로 만든다.(@Rule의 제약사항. 빈을 주입받는게 아님)
+
+```java
+@RestController
+@RequiredArgsConstructor
+public class SampleController {
+
+    Logger logger = LoggerFactory.getLogger(SampleController.class);
+
+    private final SampleService sampleService;
+
+    @GetMapping("/hello")
+    public String hello() {
+        logger.info("hello logger");
+        System.out.println("hello sout");
+        return "hello " + sampleService.getName();
+    }
+}
+```
+
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest(SampleController.class)
+public class SampleControllerTest {
+
+    @Rule
+    public OutputCapture outputCapture = new OutputCapture();
+
+    @MockBean
+    SampleService mockSampleService;
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Test
+    public void hello() throws Exception {
+        when(mockSampleService.getName()).thenReturn("kim");
+
+        mockMvc.perform(get("/hello"))
+            .andExpect(content().string("hello kim"));
+
+        assertThat(outputCapture.toString())
+            .contains("hello")
+            .contains("sout");
+    }
+}
+```
+
