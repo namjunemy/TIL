@@ -234,19 +234,52 @@ dependencies {
 }
 ```
 
+## 4. 정적 리소스 지원
 
+정적 리소스 맵핑 "/**". 루트로 맵핑된다.
 
+* 기본 리소스 위치
 
+  * classpath:/static
 
+  * classpath:/public
 
+  * classpath:/resources/
 
+  * classpath:/META-INF/resources
 
+  * 예) "/hello.html" 접근시 /static/hello.html 응답
 
+  * spring.mvc.static-path-pattern: 맵핑 설정 변경 가능
 
+    * application.yml에서 `spring.mvc.static-path-pattern: /static/**` 으로 설정 변경시
+    * localhost:8080/hello.html => localhost:8080/static/hello.html로 접근
 
+  * spring.mvc.static-locations: 리소스 찾을 위치 변경 가능
 
+    * 기존의 기본 리소스 위치를 사용하지 않고 변경한 위치만 사용하므로 권장하지 않는 방법이다.
+    * 이방법 보다는 WebMvcConfigurer를 구현상속받아서 addResourceHandlers로 커스터마이징 하는 방법이 더 좋다. 기본 리소스 위치를 사용하면서 추가로 필요한 리소스위치만 정의해서 사용할 수 있다.
+    * localhost:8080/m/hello.html 접근시 resources/m/hello.html 리턴
+    * 여기서 주의할점은 캐시 설정을 따로 해야 한다는 것이다. **기본 리소스들은 기존의 캐싱 전략이 적용되어 있다.**
 
+    ```java
+    @Configuration
+    public class WebConfig implements WebMvcConfigurer {
+    
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+            registry.addResourceHandler("/m/**")
+                .addResourceLocations("classpath:/m/")
+                .setCachePeriod(20);
+        }
+    }
+    ```
 
+  * 기본 리소스 위치에 있는 리소스들은 **ResourceHttpRequestHandler**가 처리하는데, 브라우저에서 **304** status을 내려주는 경우가 있다.
 
+    * html 파일이 변경되는 순간 파일에 Last-Modified 라는 최종 변경시간이 기록되는데,
+    * 브라우저에서는 처음에 html파일을 요청하고 200 status를 받으면 해당 시간을 If-Modified-Since에 기록해 놓는다.
+    * 그리고 브라우저에서 다시 html요청을 하고 응답을 받을때, resopnse 헤더에 넘어오는 Last-Modified 시간이 request 헤더에 보낸 If-Modified-Since와 같다면, html 파일의 변경이 없었다는 의미이므로 다시 리소스를 받아오지 않고 304 status와 캐시된 파일을 내려준다.
+    * 하지만 html이 변경됐을 경우 response 헤더에 넘어오는 Last-Modified 시간이 request 헤더에 넘긴  If-Modified-Since 시간 이후이므로 새로 리소스를 받아서 200 status를 반환한다.
 
 
