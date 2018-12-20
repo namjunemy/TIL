@@ -8,7 +8,7 @@
 
 아래의 테스트에서 우리는 아무런 설정파일을 작성하지 않았지만 스프링 MVC의 기능을 사용할 수 있었다. 이것이 가능한 것은 스프링 부트가 제공해주는 기본설정 때문이다.
 
-자세히 말해서 spring-boot-stater의존성을 추가하면서 같이 따라온 spring-boot-autoconfigure의존성의 속을 까보면 spring.factories 파일 안에 WebMvcAutoConfiguration이라는 클래스가 존재하고, 이 클래스에 정의된 설정들 때문에 우리는 스프링 MVC의 기능을 바로 쓸 수 있다.
+자세히 말해서 spring-boot-starter의존성을 추가하면서 같이 따라온 spring-boot-autoconfigure의존성의 속을 까보면 spring.factories 파일 안에 WebMvcAutoConfiguration이라는 클래스가 존재하고, 이 클래스에 정의된 설정들 때문에 우리는 스프링 MVC의 기능을 바로 쓸 수 있다.
 
 ```java
 @RunWith(SpringRunner.class)
@@ -74,6 +74,7 @@ HTTP 요청 본문을 객체로 변경하거나, 객체를 HTTP 응답 본문으
   * MockMvc를 사용해서 post요청에 대한 응답을 확인하기 위한 테스트코드이다.
   * 요청을 @RestController에서 @RequestBody가 json을 파싱해서 User 객체로 만들고,  JsonMessageConverter에 의해 User가 JSON 형태로 만들어져서 return 된다.
   * 테스트코드에서는 jsonPath를 사용해서 결과로 받은 status와 JSON의 프로퍼티를 검증한다.
+  * POST요청의 요청 타입은 JSON이고, 응답을 원하는 타입을 의미하는 accept 헤더도 JSON으로 세팅한다.
 
 ```java
 package io.namjune.springbootconceptandutilization.user;
@@ -140,6 +141,96 @@ public class User {
     private Long id;
     private String username;
     private String password;
+}
+```
+
+## 3. ViewResolve
+
+스프링부트에 등록 되어있는 스프링 웹 MVC의 [**ContentNegotiatingViewResolver**](https://docs.spring.io/spring-framework/docs/5.0.7.RELEASE/javadoc-api/org/springframework/web/servlet/view/ContentNegotiatingViewResolver.html) 가 어떤 contentType일 때 어떤 응답을 보내고, accept header 요청에 의해서 해당 요청에 맞는 응답을 보내는 작업을 알아서 해준다.
+
+* https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web.html#mvc-multiple-representations
+
+그래서 Accept header를 XML 타입으로 설정하고 xpath를 이용해서 XML로 받는 응답을 검증하는 테스트코드를 작성하고 실행시켜보면 406 HttpMediaTypeNotAcceptableException이 떨어진다.
+
+```java
+package io.namjune.springbootconceptandutilization.user;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(UserController.class)
+public class UserControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Test
+    public void createUser_JSON() throws Exception {
+        String userJson = "{\"username\":\"namjune\", \"password\":\"123\"}";
+        mockMvc.perform(post("/users/create")
+            .contentType(MediaType.APPLICATION_JSON_UTF8)
+            .accept(MediaType.APPLICATION_XML)
+            .content(userJson)
+        )
+            .andExpect(status().isOk())
+            .andExpect(xpath("/User/username").string("namjune"))
+            .andExpect(xpath("/User/password").string("123"));
+    }
+}
+
+```
+
+스프링 부트의 HttpMessageConverters는 HttpMessageConvertersAutoConfiguration 클래스로 인해서 적용이 된다. 해당 클래스를 찾아보면 spring-boot-autoconfigure의존성 아래에 http/ 안에 존재한다. 이 클래스에 @Import 로 선언되어있는 **JacksonHttpMessageConvertersConfiguration** 클래스를 보면 MappingJackson2XmlHttpMessageConverterConfiguration 클래스가 정의 되어있고, MappingJackson2XmlHttpMessageConverterConfiguration  클래스에는 @ConditionalOnClass(XmlMapper.class)으로 XmlMapper클래스가 classpath에 존재해야만 등록되도록 정의되어 있다. 406 에러가 떨어진 이유는 xml로 변환할 수 있는 컨버터가 등록되어있지 않기 때문이다.
+
+```java
+@Configuration
+class JacksonHttpMessageConvertersConfiguration {
+  
+  ...
+    
+  @Configuration
+	@ConditionalOnClass(XmlMapper.class)
+	@ConditionalOnBean(Jackson2ObjectMapperBuilder.class)
+	protected static class MappingJackson2XmlHttpMessageConverterConfiguration {
+
+		@Bean
+		@ConditionalOnMissingBean
+		public MappingJackson2XmlHttpMessageConverter mappingJackson2XmlHttpMessageConverter(
+				Jackson2ObjectMapperBuilder builder) {
+			return new MappingJackson2XmlHttpMessageConverter(
+					builder.createXmlMapper(true).build());
+		}
+
+	}
+ 
+  ...
+    
+}
+```
+
+XML 메시지 컨버터를 classpath에 추가해주면 문제를 해결할 수 있다. 의존성을 추가해주면 된다. 이제 위에서 작성한 XML 검증 테스트를 통과시킬 수 있다.
+
+보통 JSON을 많이 사용하기 때문에 추가설정을 아무것도 하지 않아도 되지만, XML로 내보내고 싶은 경우 의존성을 추가해서 필요한 메세지 컨버터를 테스트 할 수 있다.
+
+```groovy
+dependencies {
+    ...
+      
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.6')
+  
+    ...
 }
 ```
 
