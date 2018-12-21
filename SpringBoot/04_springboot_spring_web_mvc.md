@@ -282,4 +282,40 @@ dependencies {
     * 그리고 브라우저에서 다시 html요청을 하고 응답을 받을때, resopnse 헤더에 넘어오는 Last-Modified 시간이 request 헤더에 보낸 If-Modified-Since와 같다면, html 파일의 변경이 없었다는 의미이므로 다시 리소스를 받아오지 않고 304 status와 캐시된 파일을 내려준다.
     * 하지만 html이 변경됐을 경우 response 헤더에 넘어오는 Last-Modified 시간이 request 헤더에 넘긴  If-Modified-Since 시간 이후이므로 새로 리소스를 받아서 200 status를 반환한다.
 
+## 5. 웹 JAR
+
+자바스크립트 라이브러리를 webjar형태로 dependency를 추가해서 사용할 수 있다.
+
+스프링 부트에서 추가로 제공하는 기능이있는데, jquery의 버전이 올라갈 때마다 버전을 일일히 바꿔주지 않아도 된다. **이 기능을 사용하려면 webjars-locator-core 의존성을 추가해야 한다.**
+
+이것의 내부적인 동작은 springframework의 resource chaining에 의해서 이루어진다. 필요하다면 더 자세히 공부하자.
+
+```groovy
+dependencies {
+    ...
+    compile group: 'org.webjars.bower', name: 'jquery', version: '3.3.1'
+    compile group: 'org.webjars', name: 'webjars-locator-core', version: '0.36'
+    ...
+}
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+Hello static resource!
+
+<script src="/webjars/jquery/dist/jquery.min.js"></script>
+<script>
+    $(function() {
+        alert('ready!');
+    });
+</script>
+</body>
+</html>
+```
 
