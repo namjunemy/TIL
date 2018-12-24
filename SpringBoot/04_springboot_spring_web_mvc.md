@@ -319,3 +319,19 @@ Hello static resource!
 </html>
 ```
 
+## 6. Index 페이지와 파비콘
+
+* 스프링 부트의 정적 리소스 4가지 기본 위치중 아무 곳이나 index.html을 두면된다.
+  * classpath:/static
+  * classpath:/public
+  * classpath:/resources/
+  * classpath:/META-INF/resources
+
+* 그러면 스프링부트는
+  * index.html을 찾아보고 있으면 제공
+  * index.템플릿 찾아보고 있으면 제공
+  * 둘 다 없으면 에러페이지를 내보낸다.
+* favicon.io
+  * 기본리소스 위치에 위의 파일명으로 위치시킨다.
+  * 파이콘 만들기: <https://favicon.io/>
+  * 파비콘은 캐시가 되어있으므로, 크롬에서 캐시비우고 새로고침을 하면 확인할 수 있다.
