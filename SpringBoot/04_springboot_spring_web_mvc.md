@@ -335,3 +335,19 @@ Hello static resource!
   * 기본리소스 위치에 위의 파일명으로 위치시킨다.
   * 파이콘 만들기: <https://favicon.io/>
   * 파비콘은 캐시가 되어있으므로, 크롬에서 캐시비우고 새로고침을 하면 확인할 수 있다.
+
+## 7. 템플릿 엔진
+
+* 스프링 부트가 자동 설정을 지원하는 템플릿 엔진
+  * FreeMarker
+  * Groovy
+  * Thymeleaf
+  * Mustache
+
+* JSP를 권장하지 않는 이유
+
+  * JAR 패키징 할 때는 동작하지 않고, WAR 패키징 해야함.
+  * Undertow는 JSP를 지원하지 않음
+
+  * JSP Limitations
+    * https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-jsp-limitations
