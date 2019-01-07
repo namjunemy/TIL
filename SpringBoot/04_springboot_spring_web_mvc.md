@@ -261,6 +261,8 @@ dependencies {
     * 이방법 보다는 WebMvcConfigurer를 구현상속받아서 addResourceHandlers로 커스터마이징 하는 방법이 더 좋다. 기본 리소스 위치를 사용하면서 추가로 필요한 리소스위치만 정의해서 사용할 수 있다.
     * localhost:8080/m/hello.html 접근시 resources/m/hello.html 리턴
     * 여기서 주의할점은 캐시 설정을 따로 해야 한다는 것이다. **기본 리소스들은 기존의 캐싱 전략이 적용되어 있다.**
+    * 커밋로그
+      * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/f7b9d05f0ae1b9cc61c1e21c6b1c6b3e2473a9f1
 
     ```java
     @Configuration
@@ -351,3 +353,28 @@ Hello static resource!
 
   * JSP Limitations
     * https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-jsp-limitations
+
+* 템플릿 엔진 테스트 코드 작성
+
+  * 컨트롤러 동작, 뷰 네임, 모델 값 검증 테스트 코드
+    * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/3c3084115acacec3908df83c96f6b7d7fbd15a62
+  * 뷰의 템플릿 내용 검증하는 테스트 코드 
+    * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/1b41c0b500c282b16ed272f51be5e769e42d5cd5
+
+## 8. HtmlUnit
+
+* HTML 템플릿 뷰 테스트를 보다 전문적으로 하자
+
+  * http://htmlunit.sourceforge.net/
+
+  * http://htmlunit.sourceforge.net/gettingStarted.html
+
+  * Html을 단위 테스트 하기 위해
+
+  * htmlunit 의존성을 추가한다
+
+  * webClient로 요청 페이지, 태그, 엘리먼트 등을 가져와서 단위 테스트 한다.
+
+  * 커밋로그
+
+    * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/246c37868c5301b5c8d48f4c3d0ab09b5b54de3a
