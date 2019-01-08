@@ -378,3 +378,24 @@ Hello static resource!
   * 커밋로그
 
     * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/246c37868c5301b5c8d48f4c3d0ab09b5b54de3a
+
+## 9. ExceptionHandler
+
+* 스프링 @MVC 예외 처리 방법
+  * @ControllerAdvice
+  * @ExchangeHandler
+* 스프링 부트가 제공하는 기본 예외 처리기
+  * 커밋로그
+    * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/1bb61ee2dabdca6b7b050e3948eba9ed5d6f5780
+  * BasicErrorController
+    * HTML과 JSON 응답 지원
+  * 커스터마이징 방법
+    * ErrorController 구현
+* 커스텀 에러 페이지
+  * 상태 코드 값에 따라 에러 페이지 보여주기
+    * 커밋로그
+      * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/d44eec590fb2b42e4c615ccb122182d7db893d15
+  * src/main/resources/static|template/error/
+  * 404.html
+  * 5xx.html
+  * ErrorViewResolver 구현
