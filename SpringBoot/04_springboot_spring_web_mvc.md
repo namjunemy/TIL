@@ -418,6 +418,7 @@ Hello static resource!
   * spring.jackson.*
   * Jackson2ObjectMapperBuilder
 * LinkDiscovers 제공
+
   * 클라이언트에서 링크 정보를 Rel 이름으로 찾을때 사용할 수 있는 XPath 확장 클래스 
 
 * 컨트롤러에서 Resource 추가로 Http Response Body에 링크 추가하기, 테스트 코드로 추가된 링크 검증 예제
@@ -501,3 +502,45 @@ Hello static resource!
      Redirected URL = null
             Cookies = []
   ```
+
+## 11. CORS
+
+* SOP와 CORS
+
+  * Single-Origin Policy
+    * 단일 Origin에만 요청을 보낼 수 있다는 것을 의미하는 정책
+    * 기본적으로 SOP가 적용되어 있어서, Origin이 다르면 호출할 수 없다.
+    * REST API가 http://localhost:8080 을 통해서 서비스 되고있고, 18080 포트를 사용하는 애플리케이션에서 그 REST API를 호출하려고 한다. 기본적으로 SOP에 위반 되기 때문에 호출하지 못한다.
+  * Cross-Origin Resource Sharing
+    * SOP를 우회하기 위한 표준
+    * 서로 다른 Origin이 리소스를 공유할 수 있는 기술
+
+* Origin?
+
+  * URI  스키마 (http, https)
+  * hostname (io.namjune, localhost)
+  * 포트(8080, 18080)
+
+* 스프링 MVC @CrossOrigin 
+
+  * 스프링 부트에서 @CrossOrigin에 관한 빈 설정들을 자동으로 해주기 때문에 그냥 사용하면 된다.
+  * https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web.html#mvc-cors
+  * @Controller나 @RequestMapping에 추가하거나
+  * WebMvcConfigurer 사용해서 글로벌 설정
+    * 모든 api를 localhost:9090에 CORS 허용하도록 등록
+
+  ```java
+  @Configuration
+  public class WebConfig implements WebMvcConfigurer {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+          registry.addMapping("/**")
+              .allowedOrigins("http://localhost:9090");
+      }
+  }
+  ```
+
+* ajax로 CORS 동작 확인하기
+
+  * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/25dc1a2e06d67818bcfb63cdcb4fccce83c728c7
+
