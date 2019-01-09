@@ -399,3 +399,105 @@ Hello static resource!
   * 404.html
   * 5xx.html
   * ErrorViewResolver 구현
+
+## 10. Spring HATEOAS
+
+* **H**ypermedia **A**s **T**he **E**ngine **O**f **A**pplication **S**tate
+  * 서버
+    * 현재 리소스와 연관된 링크 정보를 클라이언트에게 제공한다.
+  * 클라이언트
+    * 연관된 링크 정보를 바탕으로 리소스에 접근한다.
+  * 연관된 링크 정보
+    * **Rel**ation
+    * **H**ypertext **Ref**erence
+  * spring-boot-stater-hateoas 의존성 추가
+  * https://spring.io/understanding/HATEOAS
+  * https://spring.io/guides/gs/rest-hateoas/
+  * https://docs.spring.io/spring-hateoas/docs/current/reference/html/
+* ObjectMapper 제공(stater-web이 제공해서 우리는 stater-hateoas를 추가하지 않아도 사용가능하다.)
+  * spring.jackson.*
+  * Jackson2ObjectMapperBuilder
+* LinkDiscovers 제공
+  * 클라이언트에서 링크 정보를 Rel 이름으로 찾을때 사용할 수 있는 XPath 확장 클래스 
+
+* 컨트롤러에서 Resource 추가로 Http Response Body에 링크 추가하기, 테스트 코드로 추가된 링크 검증 예제
+
+  * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/0593873da6833a9330f238107f685b7f41e6b52c
+
+  * Controller
+    * org.springframework.hateoas.Resource 클래스를 이용해서 컨트롤러의 hello() 메소드에 link를 selfRel로 등록한다.
+
+  ```java
+  package io.namjune.springbootconceptandutilization.controller;
+  
+  import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+  import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+  
+  import io.namjune.springbootconceptandutilization.Hello;
+  import org.springframework.hateoas.Resource;
+  import org.springframework.web.bind.annotation.GetMapping;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  @RestController
+  public class SampleController {
+  
+      @GetMapping("/hello")
+      public Resource<Hello> hello() {
+          Hello hello = new Hello();
+          hello.setPrefix("Hey,");
+          hello.setName("NJ");
+  
+          Resource<Hello> helloResource = new Resource<>(hello);
+          helloResource.add(linkTo(methodOn(SampleController.class).hello()).withSelfRel());
+          return helloResource;
+      }
+  }
+  ```
+
+  * ControllerTest
+
+  ```java
+  package io.namjune.springbootconceptandutilization.controller;
+  
+  import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+  import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+  
+  import org.junit.Test;
+  import org.junit.runner.RunWith;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+  import org.springframework.test.context.junit4.SpringRunner;
+  import org.springframework.test.web.servlet.MockMvc;
+  
+  @RunWith(SpringRunner.class)
+  @WebMvcTest(SampleController.class)
+  public class SampleControllerTest {
+  
+      @Autowired
+      MockMvc mockMvc;
+  
+      @Test
+      public void hello() throws Exception {
+          mockMvc.perform(get("/hello"))
+              .andDo(print())
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("$._links.self").exists());
+      }
+  }
+  ```
+
+  * 결과
+
+  ```text
+  MockHttpServletResponse:
+             Status = 200
+      Error message = null
+            Headers = {Content-Type=[application/hal+json;charset=UTF-8]}
+       Content type = application/hal+json;charset=UTF-8
+               Body = {"prefix":"Hey,","name":"NJ","_links":{"self":{"href":"http://localhost/hello"}}}
+      Forwarded URL = null
+     Redirected URL = null
+            Cookies = []
+  ```
