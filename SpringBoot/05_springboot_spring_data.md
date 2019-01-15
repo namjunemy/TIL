@@ -54,10 +54,20 @@
 
 ## 3. MySQL
 
+스프링 부트가 지원하는 DBCP 기능과 MySQL 설정법
+
 * 지원하는 DBCP
 
   * HikariCP(기본)
     * https://github.com/brettwooldridge/HikariCP
+      * default
+        * autoCommit
+          * true
+        * connectionTimeout
+          * 30 seconds
+        * maximumPoolSize
+          * 10
+        * 등등
   * Tomcat CP
     * https://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html
   * Commons DBCP2
@@ -65,11 +75,18 @@
 
 * DBCP 설정
 
-  * spring.datasource.hikari.*
-  * spring.datasource.tomcat.*
-  * spring.datasource.dbcp2.*
+  * 설정은 각 DBCP의 문서를 보는 것이 가장 좋다.
+  * spring.datasource.{DBCP이름}.*
+    * spring.datasource.hikari.*
+      * spring.datasource.hikari.maximum-pool-size=4
+    * spring.datasource.tomcat.*
+    * spring.datasource.dbcp2.*
 
 * MySQL 커넥터 의존성 추가
+
+  * ```groovy
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
+    ```
 
 * MYSQL 추가(도커 사용)
 
@@ -97,6 +114,8 @@
       * jdbc:mysql:/localhost:3306/springboot?useSSL=false&**allowPublicKeyRetrieval=true**
   * MySQL 라이센스(GPL) 주의
     * MySQL 대신 MariaDB 사용 검토
+      * 컨테이너를 mariadb로 띄움 
+        * docker run -p 3306:3306 --name mysql_boot -e MYSQL_ROOT_PASSWORD=1 -e MYSQL_DATABASE=springboot -e MYSQL_USER=keesun -e MYSQL_PASSWORD=pass -d mariadb
     * 소스 코드 공개 의무 여부 확인
 
   
