@@ -84,9 +84,9 @@
 
 * MySQL 커넥터 의존성 추가
 
-  * ```groovy
-    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
-    ```
+  ```groovy
+  compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.13'
+  ```
 
 * MYSQL 추가(도커 사용)
 
@@ -117,5 +117,34 @@
       * 컨테이너를 mariadb로 띄움 
         * docker run -p 3306:3306 --name mysql_boot -e MYSQL_ROOT_PASSWORD=1 -e MYSQL_DATABASE=springboot -e MYSQL_USER=keesun -e MYSQL_PASSWORD=pass -d mariadb
     * 소스 코드 공개 의무 여부 확인
+
+## 4. PostgreSQL
+
+* 의존성 추가
+
+  ```groovy
+  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+  ```
+
+* PostgreSQL 설치 및 서버 실행 (docker)
+
+  ```groovy
+  docker run -p 5432:5432 -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=keesun -e POSTGRES_DB=springboot --name postgres_boot -d postgres
+  
+  docker exec -i -t postgres_boot bash
+  
+  su - postgres
+  
+  psql springboot
+  
+  데이터베이스 조회
+  \list
+  
+  테이블 조회
+  \dt
+  
+  쿼리
+  SELECT * FROM account;
+  ```
 
   
