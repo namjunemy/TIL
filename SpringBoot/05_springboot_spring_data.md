@@ -159,8 +159,18 @@
 #### 스프링 데이터 JPA
 
 *  Repository 빈 자동 생성
-* 쿼리 메소드 자동 구현
-* @EnableJpaRespositories(스프링 부트가 자동으로 설정 해줌)
+*  쿼리 메소드 자동 구현
+*  @EnableJpaRespositories(스프링 부트가 자동으로 설정 해줌)
+*  우리가 스프링 데이터 JPA를 쓰지만 그 밑단에는
+   *  Spring Data JPA -> JPA -> Hibernate -> Datasource 의 흐름이 존재한다.
+   *  따라서 우리는 spring data jdbc의 기능을 전부 다 사용할 수 있고,
+   *  추가로 Spring Data JPA, JPA, Hibernate의 기능들도 사용할 수 있다.
+*  추가된 의존성을 확인해보면 쉽게 이해할 수 있다.
+   *  spring-data-jpa가 추가되고, hibernate도 추가된다.
+   *  spring-data-jpa안에 추가된 spring-orm으로 jpa를 쓰는 걸 확인할 수 있고,
+   *  JPA 구현체인 hibernate-core를 의존성을 통해서 JPA 2.2 구현체인 것을알 수 있다.
+
+![](https://github.com/namjunemy/TIL/blob/master/SpringBoot/img/04_jpa_dependency.PNG?raw=true)
 
 #### 스프링 데이터 JPA 의존성 추가
 
