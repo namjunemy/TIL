@@ -147,6 +147,13 @@
   SELECT * FROM account;
   ```
 
+* PostgreSQL 연동시 경고 메세지 해결
+  * driver가 createClob() 메서드를 지원하지 않아서 나는 에러
+  * 경고
+    * org.postgresql.jdbcPgConnection.createClob() is not yet implemented
+  * 해결(application.yml)
+    * spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
 ## 5. Spring-Data-JPA
 
 #### ORM(Object-Relational Mapping)과 JPA(JAVA Persistence API)
@@ -181,9 +188,164 @@ implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 #### 스프링 데이터 JPA 사용하기
 
 * @Entity 클래스 만들기
+  * lombok을 사용해도 된다.
+
+```java
+package io.namjune.springbootconceptandutilization.account;
+
+import java.util.Objects;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
+public class Account {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String username;
+    private String password;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) &&
+            Objects.equals(username, account.username) &&
+            Objects.equals(password, account.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, password);
+    }
+}
+```
+
 * Repository 만들기
+
+```java
+package io.namjune.springbootconceptandutilization.account;
+
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AccountRepository extends JpaRepository<Account, Long> {
+
+    Optional<Account> findByUsername(String username);
+}
+```
 
 #### 스프링 데이터 Repository 테스트 만들기
 
-* H2 DB를 테스트 의존성에 추가하기
-* @DataJpaTest (슬라이스 테스트) 작성
+* H2 DB를 테스트 scope 의존성에 추가하기
+
+* @DataJpaTest (**슬라이스 테스트**) 작성
+
+  * @DataJpaTest가 아닌 @SpringBootTest를 사용하면 integration 테스트이다. 그 의미는 @SpringBootApplication을 찾아서 애플리케이션 코드의 모든 빈을 다 등록시킨다.
+  * @SpringBootTest로 아래의 테스트를 동작시키면, 실제 Application에서 사용중인 데이터베이스 커넥션이 연결된 결과를 확인할 수 있다.
+  * 하지만, repository 테스트 할 때는 embedded H2를 사용하는 것을 추천한다. @SpringBootTest로 실제 DB로 테스트하는 것보다 빠르고, 실제 DB를 사용한다고 했을때 테스트 코드에서 데이터를 변경하면 실제 DB의 데이터가 변경되기 때문에  별도의 Test DB 설정을 가져가야 한다.(test용 application.yml을 별도로 가져가거나, @SpringBootTest(properties = "spring.datasource.url='~~~'")의 형태로 별도의 Test DB 설정을 유지)
+    * 이 방법보다는 테스트시 embedded H2를 사용하는 것(슬라이스 테스트를 하는 것)이 쉽고 안전하다.
+  * 테스트시 H2 db를 사용하는지 확인
+    * **try resource를 사용하면 finally 블록에서 자원 해제 동작을 구현하지 않아도, 자원을 종료해준다.**
+
+  ```java
+  @RunWith(SpringRunner.class)
+  @DataJpaTest
+  public class AccountRepositoryTest {
+  
+      @Autowired
+      DataSource dataSource;
+  
+      @Autowired
+      JdbcTemplate jdbcTemplate;
+  
+      @Autowired
+      AccountRepository accountRepository;
+  
+      @Test
+      public void dependencyInjection() throws SQLException {
+          try(Connection connection = dataSource.getConnection()) {
+              DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+              System.out.println(metaData.getURL());
+              System.out.println(metaData.getDriverName());
+              System.out.println(metaData.getUserName());
+          }
+      }
+  }
+  ```
+
+  ```text
+  jdbc:h2:mem:8ac79464-2386-47d1-98d6-e48aca1e7ae9
+  H2 JDBC Driver
+  SA
+  ```
+
+  * Account Repository 테스트
+    * Optional<>로 받으면 결과값 검증을 isEmpty(), isNotEmpty()로 해야한다.
+
+  ```java
+  package io.namjune.springbootconceptandutilization.account;
+  
+  import java.util.Optional;
+  import org.springframework.data.jpa.repository.JpaRepository;
+  import org.springframework.stereotype.Repository;
+  
+  @Repository
+  public interface AccountRepository extends JpaRepository<Account, Long> {
+  
+      Optional<Account> findByUsername(String username);
+  }
+  ```
+
+  ```java
+  @Test
+      public void account() {
+          Account account = new Account();
+          account.setUsername("nj");
+          account.setPassword("1234");
+  
+          Account newAccount = accountRepository.save(account);
+          assertThat(newAccount).isNotNull();
+  
+          Optional<Account> existingAccount = accountRepository.findByUsername(newAccount.getUsername());
+          assertThat(existingAccount).isNotEmpty();
+  
+          Optional<Account> notExistingAccount = accountRepository.findByUsername("test");
+          assertThat(notExistingAccount).isNotEmpty();
+      }
+  ```
+
+  
