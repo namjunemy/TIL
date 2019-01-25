@@ -521,12 +521,52 @@ Hello static resource!
   * hostname (io.namjune, localhost)
   * 포트(8080, 18080)
 
-* 스프링 MVC @CrossOrigin 
+* Spring MVC @CrossOrigin 
 
-  * 스프링 부트에서 @CrossOrigin에 관한 빈 설정들을 자동으로 해주기 때문에 그냥 사용하면 된다.
-  * https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web.html#mvc-cors
+  * 스프링 부트에서 @CrossOrigin에 관한 빈 설정들을 자동으로 해주기 때문에 그냥 사용하면 된다. 또는 WebMvcConfigurer 사용해서 글로벌로 설정할 수 있다.
+
   * @Controller나 @RequestMapping에 추가하거나
+
+    * https://docs.spring.io/spring/docs/5.0.7.RELEASE/spring-framework-reference/web.html#mvc-cors
+
+    ```java
+    @RestController
+    @RequestMapping("/account")
+    public class AccountController {
+    
+        @CrossOrigin
+        @GetMapping("/{id}")
+        public Account retrieve(@PathVariable Long id) {
+            // ...
+        }
+    
+        @DeleteMapping("/{id}")
+        public void remove(@PathVariable Long id) {
+            // ...
+        }
+    }
+    ```
+
+    ```java
+    @CrossOrigin(origins = "http://domain2.com", maxAge = 3600)
+    @RestController
+    @RequestMapping("/account")
+    public class AccountController {
+    
+        @GetMapping("/{id}")
+        public Account retrieve(@PathVariable Long id) {
+            // ...
+        }
+    
+        @DeleteMapping("/{id}")
+        public void remove(@PathVariable Long id) {
+            // ...
+        }
+    }
+    ```
+
   * WebMvcConfigurer 사용해서 글로벌 설정
+
     * 모든 api를 localhost:9090에 CORS 허용하도록 등록
 
   ```java
@@ -542,5 +582,30 @@ Hello static resource!
 
 * ajax로 CORS 동작 확인하기
 
-  * https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/25dc1a2e06d67818bcfb63cdcb4fccce83c728c7
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>CORS Test</h1>
+<script src="/webjars/jquery/dist/jquery.min.js"></script>
+<script>
+  $(function() {
+    $.ajax("http://localhost:8080/hello")
+        .done(function(msg) {
+          alert(msg);
+        })
+        .fail(function() {
+          alert("fail");
+        });
+  });
+</script>
+</body>
+</html>
+```
+
+ 
 
