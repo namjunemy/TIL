@@ -156,14 +156,14 @@
 
 ## 5. Spring-Data-JPA
 
-#### ORM(Object-Relational Mapping)과 JPA(JAVA Persistence API)
+### ORM(Object-Relational Mapping)과 JPA(JAVA Persistence API)
 
 * 객체와 릴레이션을 맵핑할 때 발생하는 개념적 불일치를 해결하는 프레임워크
 * http://hibernate.org/orm/what-is-an-orm/
 
 * JPA: ORM을 위한 자바(EE) 표준
 
-#### 스프링 데이터 JPA
+### 스프링 데이터 JPA
 
 *  Repository 빈 자동 생성
 *  쿼리 메소드 자동 구현
@@ -268,7 +268,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 }
 ```
 
-#### 스프링 데이터 Repository 테스트 만들기
+### 스프링 데이터 Repository 테스트 만들기
 
 * H2 DB를 테스트 scope 의존성에 추가하기
 
@@ -344,8 +344,41 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
           assertThat(existingAccount).isNotEmpty();
   
           Optional<Account> notExistingAccount = accountRepository.findByUsername("test");
-          assertThat(notExistingAccount).isNotEmpty();
+          assertThat(notExistingAccount).isEmpty();
       }
   ```
 
-  
+### 데이터베이스 초기화
+
+* JPA를 사용한 데이터베이스 초기화
+
+  * spring.jpa.hibernate.ddl-auto
+
+    * : create
+      * SessionFactory 시작시 테이블 drop -> create
+    * : create-drop
+      * create 의 동작 + SessionFactory 종료시 테이블 삭제
+    * : update
+      * SessionFactory 시작시 컬럼 추가/삭제 수행. 데이터 삭제 안함
+    * : validate
+      * SessionFactory 시작시 테이블 컬럼 확인해서 @Entity와 매핑 다르면 예외 발생
+      * @Entity에 추가된 컬럼은 데이터베이스에 추가 적용 되지만, 기존의 커럼이 바뀐 경우는 적용 안된다. 예를 들어 name -> username으로 바뀐 경우 hibernate에서는 알 수 없다.
+    * 보통 개발단에서는 update를 사용하고, 운영단에서는 validate로 사용한다.
+
+  * spring.jpa.generate-ddl=true로 설정 해줘야 동작함.
+
+    * 시작시 스키마 초기화 여부 설정으로 default false로 설정 되어 있음
+
+  * spring.jpa.show-sql
+
+    * default: false
+
+    * SQL 문장의 로깅 활성화 여부
+
+* SQL 스크립트를 사용한 데이터베이스 초기화
+
+  * JPA를 사용하지 않고 DB 초기화를 진행할 수 있다.
+  * ddl-auto: validation와 generate-ddl: false를 설정하면 초기화가 진행되지 않지만, sql파일을 resources 아래에 위치 시키면 초기화를 진행할 수 있다. 순서는 schema.sql -> data.sql 이다.
+    * schema.sql 또는 schema-${platform}.sql
+    * data.sql 또는 data-${platform}.sql
+    * ${platform} 값은 spring.datasource.platform 으로 설정 가능
