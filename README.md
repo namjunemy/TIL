@@ -196,6 +196,7 @@
 * [NVIDIA GPU CLOUD 플랫폼](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_cloud.md)
 * [NVIDIA GPU CLOUD on AWS(TensorFlow Example)](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_cloud_on_aws.md)
 * [NVIDIA GPU Server(Container Environment)](https://github.com/namjunemy/TIL/blob/master/Cloud/nvidia_gpu_server_container_env.md)
+* [AWS Lambda와 Serverless Application Model Hands-on Lab](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_serverless.md)
 
 ### Python
 
