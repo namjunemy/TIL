@@ -85,6 +85,58 @@ class memberService {
 * 상속
   * 객체의 상속 관계
   * Table 슈퍼타입 서브타입 관계
+
 * 연관관계
+
+  * 객체는 참조를 사용
+
+    * member.getTeam()
+    * 객체의 연관관계에는 **방향성이 있다**. 멤버에서 팀을 조회할 수 있지만, 팀에서 멤버조회는 불가하다.
+      * Member의 필드는 id, Team, username
+      * Team의 필드는 id, name 이라고 가정.
+
+  * 테이블은 외래 키를 사용
+
+    * JOIN ON M.TEAM_ID = T.TEAM_ID
+
+      * MEMBER 테이블
+        * MEMBER_ID(PK)
+        * TEAM_ID(FK)
+        * USERNAME
+      * TEAM 테이블
+        * TEAM_ID(PK)
+        * NAME
+      * MAEMBER와 TEAM은 N:1 관계
+
+    * 테이블의 외래키에는 **방향성이 없다**. 멤버랑 팀 조인가능, 팀과 멤버 조인가능.
+
+    * 이 때, 위의 **테이블 설계에 맞추어 객체를 모델링**하게 되면 아래와 같이 FK를 그대로 필드로 포함하게 된다. 하지만, Member클래스에 Team 객체가 존재하는 것이 더 객체지향적이다 라고 할 수 있다. FK의 값을 넣는것 보단.
+
+      ```java
+      class Member {
+        String id;        //MEMBER_ID 컬럼
+        Long teamId;      //TEAM_ID FK 컬럼
+        String username;  //USERNAME 컬럼
+      }
+      ```
+
+      ```java
+      class Team {
+        Long id;
+        String name;
+      }
+      ```
+
+    * 이렇게 설계된 객체를 테이블에 저장 한다.
+
+      * 테이블 설계에 맞추어 객체를 모델링해서 INSERT 쿼리를 짠다.
+
+      ```sql
+      INSERT INTO MEMBER(MEMBER_ID, TEAM_ID, USERNAME) VALUES ...
+      ```
+
+    * 
+
 * 데이터 타입
+
 * 데이터 식별 방법
