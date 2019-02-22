@@ -156,6 +156,7 @@
 * [Single File Component(.vue)](https://github.com/namjunemy/TIL/blob/master/Vue/11_single_file_component.md)
 * [Vue CLI를 이용한 프로젝트 구성 방법 + Single File Component](https://github.com/namjunemy/TIL/blob/master/Vue/12_vue_development_workflow.md)
 * [Vue Loader, 전체 내용 정리](https://github.com/namjunemy/TIL/blob/master/Vue/13_vue_loader.md)
+* [ES6 for Vue.js](https://github.com/namjunemy/TIL/blob/master/Vue/es6_for_vuejs.md)
 
 ### Git
 
