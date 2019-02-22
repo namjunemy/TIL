@@ -49,8 +49,8 @@ module: {
       for (var i = 1; i <= 5; i++) {
         sum = sum + 1;
       }
-      console.log(sum); //15
-      console.log(i);   //6
+      console.log(sum); // 15
+      console.log(i);   // 6
       ```
 
   * **ES5 특징 - Hoisting**
@@ -81,7 +81,7 @@ module: {
       function willBeOverriden() {
         return 10;
       }
-      willBeOverriden();	//5
+      willBeOverriden();	// 5
       function willBeOverriden() {
         return 5;
       }
@@ -118,6 +118,59 @@ module: {
       i = 10;
       ```
 
-      
+* **ES6 - `{ }` 단위로 변수의 범위가 제한됨**
 
+  ```javascript
+  let sum = 0;
+  for (let i = 1; i <= 5; i++) {
+    sum = sum + i;
+  }
+  console.log(sum); // 10
+  console.log(i);   // Uncaught ReferenceError: i is not defined
+  ```
+
+* **ES6 - `const`로 지정한 값 변경 불가능**
+
+  ```javascript
+  const a = 10;
+  a = 20; // Uncaughr TypeError: Assignment to constant variable
+  ```
+
+  * 하지만, 객체나 배열의 내부는 변경할 수 있다.
+
+    ```javascript
+    const a = {};
+    a.num = 10;
+    console.log(a); // {num: 10}
     
+    const a = [];
+    a.push(20);
+    console.log(a); // [20]
+    ```
+
+* **ES6 - `let` 선언한 값에 대해 다시 선언 불가능**
+
+  ```javascript
+  let a = 10;
+  let a = 20; // Uncaught SyntaxError: Identifier 'a' has already been declared
+  ```
+
+* **ES6 - const, let**
+
+  ```javascript
+  function f() {
+    {
+      let x;
+      {
+        // 새로운 블록안에 새로운 x의 스코프가 생김
+        const x = "sneaky";
+        x = "foo"; // 위에 이미 const로 x를 선언했으므로 다시 값을 대입하면 에러 발생
+      }
+      // 이전 블록 범위로 돌아왔기 때문에 `let x`에 해당하는 메모리에 값을 대입
+      x = "bar";
+      let x = "inner"; // Uncaught SyntaxError: Identifier 'x' has already been declared
+    }
+  }
+  ```
+
+  
