@@ -239,3 +239,50 @@ var dictionary = {
 };
 ```
 
+## Modules - 자바스크립트 모듈화 방법
+
+* 자바스크립트 모듈 로더 라이브러리(AMD, Commons JS) 기능을 js 언어 자체에서 지원
+* 호출되기 전까지는 코드 실행과 동작을 하지 않는 특징이 있음
+
+```javascript
+// libs/math.js
+export function sum(x, y) {
+  return x + y;
+}
+export pi = 3.141592;
+```
+
+```javascript
+// main.js
+import {sum} from 'libs/math.js';
+sum(1, 2);
+```
+
+* Vue.js 에서 마주칠 `default` export
+
+  * default 키워드가 붙으면 한개의 파일에서 하나 밖에 export 되지 않는다.
+
+  * 다른 것들이 import 되지 않게 모듈화 한다.
+
+    ```javascript
+    // util.js
+    export default function(x) {
+      return console.log(x);
+    }
+    ```
+
+    ```javascript
+    // main.js
+    import util from 'util.js'
+    console.log(util); // function(x) { return console.log(x); }
+    util("hi");
+    ```
+
+    ```javascript
+    // app.js
+    import log from 'util.js'
+    console.log(log);
+    log(hi);
+    ```
+
+    
