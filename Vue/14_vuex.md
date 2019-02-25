@@ -43,3 +43,60 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Vue/img/07.PNG?raw=true)
 
+## Vuex가 필요한 이유
+
+* 복잡한 애플리케이션에서 컴포넌트의 개수가 많아지면 컴포넌트 간에 데이터 전달이 어려워진다.
+
+  * Vue.js의 기본 개념을 공부했다면 알겠지만, 로그인 폼에서 id를 하위 컴포넌트로 계속해서 전달해서 내려야 할 때, 중간에 거치는 컴포넌트들이 많아 질수록 계속해서 props를 선언해야 하므로 데이터 전달이 불편해진다.
+
+  ![](https://github.com/namjunemy/TIL/blob/master/Vue/img/08.PNG?raw=true)
+
+  * **이벤트 버스로 해결?**
+
+    * 어디서 이벤트를 보냈는지 혹은 어디서 이벤트를 받았는지 알기 어렵다.
+
+      ```javascript
+      // Login.vue
+      eventBus.$emit('fetch', loginInfo);
+      
+      // List.vue
+      eventBus.$on('display', data => this.displayOnScreen(data));
+      
+      // Chard.vue
+      eventBus.$emit('refreshData', chartData);
+      ```
+
+    * 즉, 컴포넌트간 데이터 전달이 명시적이지 않다.
+
+### Vuex로 해결할 수 있는 문제
+
+* MVC 패턴에서 발생하는 구조적 오류
+* 컴포넌트 간 데이터 전달 명시
+* 여러 개의 컴포넌트에서 같은 데이터를 업데이트 할 때 동기화 문제(mutation, actions)
+
+### Vuex 컨셉
+
+* **State** : 컴포넌트 간에 공유하는 데이터 `data()`
+* **View** : 데이터를 표시하는 화면 `template`
+* **Action** : 사용자의 입력에 따라 데이터를 변경하는 `methods`
+
+* **단방향 데이터 흐름** 처리를 단순하게 도식화한 그림
+
+  * View(Template)에서 버튼을 클릭했을때, 클릭이라는 Action(Method)이 발생한다.
+  * 해당 Action이 동작을 통해서 State(data)를 변경한다.
+
+  ![](https://github.com/namjunemy/TIL/blob/master/Vue/img/09.PNG?raw=true)
+
+### Vuex 구조
+
+* 뷰 컴포넌트 -> 비동기 로직 -> 동기 로직 -> 상태
+  * 시작점은 Vue Components이다.
+  * 컴포넌트에서 비동기 로직(Method를 선언해서 API 콜 하는 부분 등)인 Actions를 콜하고,
+  * Actions는 비동기 로직만 처리할 뿐 State(Data)를 직접 변경하진 않는다.
+  * Actions가 동기 로직인 Mutations를 호출해서 State(Data)를 변경한다.
+  * Mutations에서만 State(Data)를 변경할 수 있다.
+* 참고자료
+  * [자바스크립트 비동기 처리와 콜백 함수](https://joshua1988.github.io/web-development/javascript/javascript-asynchronous-operation/)
+  * [자바스크립트 Promise 쉽게 이해하기](https://joshua1988.github.io/web-development/javascript/promise-for-beginners/)
+
+![](https://github.com/namjunemy/TIL/blob/master/Vue/img/10.PNG?raw=true)
