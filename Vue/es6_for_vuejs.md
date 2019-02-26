@@ -19,13 +19,13 @@
 
 ```javascript
 module: {
-  loaders: [{
-    test: /\.js$./,
-    loader: 'babel-loader',
-    query: {
-      presets: ['es2015']
-    }
-  }]
+    loaders: [{
+        test: /\.js$./,
+        loader: 'babel-loader',
+        query: {
+            presets: ['es2015']
+        }
+  	}]
 },
 ```
 
@@ -47,7 +47,7 @@ module: {
       ```javascript
       var sum = 0;
       for (var i = 1; i <= 5; i++) {
-        sum = sum + 1;
+          sum = sum + 1;
       }
       console.log(sum); // 15
       console.log(i);   // 6
@@ -63,7 +63,7 @@ module: {
 
         ```javascript
         function sum() {
-          return 10 + 20;
+            return 10 + 20;
         }
         ```
 
@@ -71,7 +71,7 @@ module: {
 
         ```javascript
         var sum = function() {
-          return 10 + 20;
+            return 10 + 20;
         }
         ```
 
@@ -79,11 +79,11 @@ module: {
 
       ```javascript
       function willBeOverriden() {
-        return 10;
+          return 10;
       }
       willBeOverriden();	// 5
       function willBeOverriden() {
-        return 5;
+          return 5;
       }
       ```
 
@@ -98,7 +98,7 @@ module: {
       var sum = 5;
       sum = sum + i;
       function sumAllNumbers() {
-        // ...
+          // ...
       }
       
       var i = 10;
@@ -108,7 +108,7 @@ module: {
       // #1 - 함수 선언식과 변수 선언을 hoisting
       var sum;
       function sumAllNumbers() {
-        //...
+          //...
       }
       var i;
       
@@ -123,7 +123,7 @@ module: {
   ```javascript
   let sum = 0;
   for (let i = 1; i <= 5; i++) {
-    sum = sum + i;
+      sum = sum + i;
   }
   console.log(sum); // 10
   console.log(i);   // Uncaught ReferenceError: i is not defined
@@ -159,17 +159,14 @@ module: {
 
   ```javascript
   function f() {
-    {
       let x;
       {
-        // 새로운 블록안에 새로운 x의 스코프가 생김
-        const x = "sneaky";
-        x = "foo"; // 위에 이미 const로 x를 선언했으므로 다시 값을 대입하면 에러 발생
+          // 새로운 블록안에 새로운 x의 스코프가 생김
+          const x = "sneaky";x = "foo";
+          // 이전 블록 범위로 돌아왔기 때문에 `let x`에 해당하는 메모리에 값을 대입
+          x = "bar";
+          let x = "inner"; // Uncaught SyntaxError: Identifier 'x' has already been declared
       }
-      // 이전 블록 범위로 돌아왔기 때문에 `let x`에 해당하는 메모리에 값을 대입
-      x = "bar";
-      let x = "inner"; // Uncaught SyntaxError: Identifier 'x' has already been declared
-    }
   }
   ```
 
@@ -182,12 +179,12 @@ module: {
 ```javascript
 // ES5 함수 정의 방식
 var sum = function(a, b) {
-  return a + b;
+    return a + b;
 };
 
 // ES6 함수 정의 방식
 var sum = (a, b) => {
-  return a + b;
+    return a + b;
 }
 
 sum(10, 20);
@@ -199,7 +196,7 @@ sum(10, 20);
 // ES5
 var arr = ["a", "b", "c"];
 arr.forEach(function(value) {
-  console.log(value); // a, b, c
+    console.log(value); // a, b, c
 });
 
 // ES6
@@ -217,15 +214,15 @@ arr.forEach(value => console.log(value));  // a, b, c
 
 ```javascript
 var dictionary = {
-  words: 100,
-  // ES5
-  lookup: function() {
-    console.log("find words");
-  },
-  // ES6
-  lookup() {
-    console.log("find words");
-  }
+    words: 100,
+    // ES5
+    lookup: function() {
+        console.log("find words");
+    },
+    // ES6
+    lookup() {
+        console.log("find words");
+    }
 };
 ```
 
@@ -234,8 +231,8 @@ var dictionary = {
 ```javascript
 var figures = 10;
 var dictionary = {
-  // figures: figures,
-  figures
+    // figures: figures,
+    figures
 };
 ```
 
@@ -247,7 +244,7 @@ var dictionary = {
 ```javascript
 // libs/math.js
 export function sum(x, y) {
-  return x + y;
+    return x + y;
 }
 export pi = 3.141592;
 ```
@@ -267,7 +264,7 @@ sum(1, 2);
     ```javascript
     // util.js
     export default function(x) {
-      return console.log(x);
+        return console.log(x);
     }
     ```
 
@@ -298,7 +295,7 @@ sum(1, 2);
 
     ```javascript
     function sum(x, y, z) {
-      return x + y + z;
+        return x + y + z;
     }
     
     const numbers = [1, 2, 3];
@@ -337,14 +334,14 @@ sum(1, 2);
 
     ```javascript
     let myObj = {
-      prop1: 'Hello',
-      prop2: 'World'
+        prop1: 'Hello',
+        prop2: 'World'
     };
     
     let newObj = {
-      name: 'George',
-      prop1: myObj.prop1,
-      prop2: myObj.prop2
+        name: 'George',
+        prop1: myObj.prop1,
+        prop2: myObj.prop2
     };
     
     console.log(newObj.prop1); // Hello
@@ -354,8 +351,8 @@ sum(1, 2);
 
     ```javascript
     let newObj = {
-      name: 'George',
-      ...myObj
+        name: 'George',
+        ...myObj
     };
     
     console.log(newObj.prop1); // Hello
@@ -368,26 +365,26 @@ sum(1, 2);
   ```javascript
   // store.js
   new Vuex.Store({
-    state: {
-      prop1: ...,
-      prop2: ...,
-      prop3: ...
-    }
+      state: {
+          prop1: ...,
+          prop2: ...,
+          prop3: ...
+      }
   });
   ```
 
   ```javascript
   // app.js
   new Vue({
-    computed: {
-      prop1() {
-        return store.state.prop1;
-      },
-      prop2() {
-        return store.state.prop2;
+      computed: {
+          prop1() {
+              return store.state.prop1;
+          },
+          prop2() {
+              return store.state.prop2;
+          }
+          ...
       }
-      ...
-    }
   });
   ```
 
@@ -406,10 +403,10 @@ sum(1, 2);
   import { mapState } from 'vuex';
   
   new Vue({
-    computed: {
-      someLocalComputedProp() { ... },
-      ...mapState(['prop1', 'prop2', 'prop3'])
-    }
+      computed: {
+          someLocalComputedProp() { ... },
+          ...mapState(['prop1', 'prop2', 'prop3'])
+      }
   });
   ```
 
