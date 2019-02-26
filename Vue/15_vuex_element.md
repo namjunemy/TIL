@@ -41,5 +41,65 @@ npm install vuex --save
     });
     ```
 
-    
+
+## Vuex 기술 요소
+
+* state
+
+  * 여러 컴포넌트에 공유되는 데이터 `data`
+
+  ```javascript
+  // Vue
+  data: {
+    message: 'Hello Vue.js'
+  }
+  
+  // Vuex
+  state: {
+    message: 'Hello Vue.js'
+  }
+  ```
+
+  ```vue
+  <!-- Vue -->
+  <p>{{ message }}</p>
+  
+  <!-- Vuex -->
+  <p>{{ this.$store.state.message }}</p>
+  ```
+
+* getters
+
+  * 연산된 state 값을 접근하는 속성 `computed`
+  * 뒤에서 헬퍼함수를 통해 `this.$store.state.message`로 state를 접근하는 법을 간소화함
+
+  ```javascript
+  // store.js
+  state: {
+    num: 10
+  },
+  getters: {
+    getNumber(state) {
+      return state.num;
+    },
+    doubleNumber(state) {
+      return state.num * 2;    
+    }
+  }
+  ```
+
+  ```vue
+  <p>{{ this.$store.getters.getNumber }}</p>
+  <p>{{ this.$store.getters.doubleNumber }}</p>
+  ```
+
+* mutations
+
+  * state 값을 변경하는 이벤트 로직, 메서드 `methods`
+
+* actions
+
+  * 비동기 처리 로직을 선언하는 메서드 `async methods`
+
+
 
