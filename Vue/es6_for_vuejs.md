@@ -285,4 +285,135 @@ sum(1, 2);
     log(hi);
     ```
 
+
+## Object Spread Operator
+
+* Spread 구문(`...`)을 사용하면 배열이나 문자열과 같이 반복 가능한 문자를 0개 이상의 인수(함수 호출할 경우) 또는 요소(배열 리터럴의 경우)로 확장하여, 0개 이상의 key-value 쌍의 객체로 확장시킬 수 있다.
+
+* **함수 호출에서의 Spread**
+
+  * 일반적으로 배열의 엘리먼트를 함수의 인수로 사용하고자 할 때 `Function.prototype.apply`를 사용했다.
+
+  * 하지만, Spread 문법을 사용해서 대체할 수 있다.
+
+    ```javascript
+    function sum(x, y, z) {
+      return x + y + z;
+    }
     
+    const numbers = [1, 2, 3];
+    
+    console.log(sum(...numbers));
+    // expected output: 6
+    
+    console.log(sum.apply(null, numbers));
+    // expected output: 6
+    ```
+
+  * 인수 목록의 모든 인수는 Spread 문법을 사용할 수 있으며, 여러번 사용될 수도 있다.
+
+    ```javascript
+    function myFunction(v, w, x, y, z) { }
+    var args = [0, 1];
+    myFunction(0, ...args, ...args);           // 2
+    ```
+
+* **객체 리터럴에서의 Spread**
+
+  * Object 리터럴에 Spread를 추가하면, 객체가 소유한 열거형 프로퍼티를 새로운 객체로 복사한다.
+
+    ```javascript
+    var obj1 = { foo: 'bar', x: 42 };
+    var obj2 = { foo: 'baz', y: 13 };
+    
+    var clonedObj = { ...obj1 };
+    // Object { foo: "bar", x: 42 }
+    
+    var mergedObj = { ...obj1, ...obj2 };
+    // Object { foo: "baz", x: 42, y: 13 }
+    ```
+
+  * ES5에서 객체의 특정 값들을 다른 객체로 복사할 때
+
+    ```javascript
+    let myObj = {
+      prop1: 'Hello',
+      prop2: 'World'
+    };
+    
+    let newObj = {
+      name: 'George',
+      prop1: myObj.prop1,
+      prop2: myObj.prop2
+    };
+    
+    console.log(newObj.prop1); // Hello
+    ```
+
+  * ES6의 Spread 연산자를 적용한 후
+
+    ```javascript
+    let newObj = {
+      name: 'George',
+      ...myObj
+    };
+    
+    console.log(newObj.prop1); // Hello
+    ```
+
+### 뷰엑스에서 Object Spread Operator 적용예시
+
+* 기존 자바스크립트 방식에서 state 속성 선언하는 부분
+
+  ```javascript
+  // store.js
+  new Vuex.Store({
+    state: {
+      prop1: ...,
+      prop2: ...,
+      prop3: ...
+    }
+  });
+  ```
+
+  ```javascript
+  // app.js
+  new Vue({
+    computed: {
+      prop1() {
+        return store.state.prop1;
+      },
+      prop2() {
+        return store.state.prop2;
+      }
+      ...
+    }
+  });
+  ```
+
+* 뷰엑스에서 제공하는 mapState함수를 이용하면 위 코드처럼 `state`에 일일이 접근하지 않아도 된다.
+
+  ```javascript
+  import { mapState } from 'vuex';
+  
+  var state = mapState(['prop1', 'prop2', 'prop3']);
+  ```
+
+* mapState에 `...`연산자를 붙여 computed 속성에서 쉽게 뷰엑스의 `state`에 접근할 수 있다.
+
+  ```javascript
+  // app.js
+  import { mapState } from 'vuex';
+  
+  new Vue({
+    computed: {
+      someLocalComputedProp() { ... },
+      ...mapState(['prop1', 'prop2', 'prop3'])
+    }
+  });
+  ```
+
+## Reference
+
+* https://joshua1988.github.io/web-development/translation/essential-es6-features-for-vuejs/#%EA%B5%AC%EC%A1%B0-%EB%B6%84%ED%95%B4%EC%99%80-%ED%99%95%EC%9E%A5-%EB%AC%B8%EB%B2%95
+* https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/Spread_syntax
