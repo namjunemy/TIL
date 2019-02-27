@@ -159,6 +159,7 @@
 * [Vue.js를 위한 ES6](https://github.com/namjunemy/TIL/blob/master/Vue/es6_for_vuejs.md)
 * [Vuex 개요](https://github.com/namjunemy/TIL/blob/master/Vue/14_vuex_intro.md)
 * [Vuex의 기술 요소](https://github.com/namjunemy/TIL/blob/master/Vue/15_vuex_element.md)
+* [Vuex Helper](https://github.com/namjunemy/TIL/blob/master/Vue/16_vuex_helper.md)
 
 ### Git
 
