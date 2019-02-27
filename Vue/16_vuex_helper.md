@@ -100,3 +100,92 @@ export default {
 * 거기에 Vuex store에 정의된 getters를 사용해야하는 상황이 있을 것이다.
 * 이때, `...` 연산자를 통해 mapGetters를 연결해줘야 컴포넌트에서 computed 속성과 Vuex의 store에 등록된 getters를 함께 사용할 수 있다.
 
+## mapMutations, mapActions
+
+* mapMutations
+
+  * Vuex에 선언한 mutations 속성을 뷰 컴포넌트에 더 쉽게 연결해주는 헬퍼
+
+    * 컴포넌트에서 버튼 클릭시 컴포넌트의 methods에 clickBtn이 정의 되어있는 것 처럼 동작한다.
+
+    * 하지만 실제로는 ...mapMutations를 통해서 Vuex Store에 등록된 함수를 쓴다.
+
+    * 따라서, Vuex에 정의된 state.msg가 alert로 뜨게 될 것이다.
+
+      ```javascript
+      // App.vue
+      import { mapMutations } from 'vuex';
+      
+      methods: {
+        ...mapMutations(['clickBtn']),
+        authLogin() {},
+        displayTable() {}
+      }
+      
+      // store.js
+      mutations: {
+        clickBtn(state) {
+          alert(state.msg);
+        }
+      }
+      ```
+
+      ```vue
+      <button @click="clickBtn">popup message</button>
+      ```
+
+* mapActions
+
+  * Vuex에 선언한 actions 속성을 뷰 컴포넌트에 더 쉽게 연결해주는 헬퍼
+
+    * 마찬가지로 컴포넌트에서 버튼 클릭으로 methods에 등록된 delayClickBtn을 호출한다.
+
+    * methods에는 Spread Operator로 store의 actions에 정의된 delayClickBtn을 등록한다.
+
+      ```javascript
+      // App.vue
+      import { mapActions } from 'vuex';
+      
+      methods: {
+        ...mapActions(['delayClickBtn'])
+      }
+      
+      // store.js
+      actions: {
+        delayclickBtn(context) {
+          setTimeout(() => context.commit('clickBtn'), 2000);
+        }
+      }
+      ```
+
+      ```vue
+      <button @click="delayClickBtn">delay popup message</button>
+      ```
+
+## Helper의 유연한 문법
+
+* Vuex의 선언한 속성을 그대로 컴포넌트에 연결하는 문법
+
+  * addNumber(인자)의 경우 배열리터럴로 넘기는 string에 선언을 안해도 알아서 넘겨준다!
+
+  ```javascript
+  // 배열 리터럴
+  ...mapMutations([
+    'clickBtn',    //'clickBtn': clickBtn
+    'addNumber'    //addNumber(인자)
+  ])
+  ```
+
+* Vuex에 선언한 속성을 컴포넌트의 특정 메서드에다가 연결하는 문법
+
+  * 컴포넌트에서 사용하는 메서드와 Store의 Mutation 명이 다를 경우 객체 리터럴을 사용해서 등록할 수 있다.
+
+  ```javascript
+  // 객체 리터럴
+  ...mapMutations({
+    popupMsg: 'clickBtn'    // 컴포넌트 메서드 명 : Store의 Mutation 명
+  })
+  ```
+
+  
+
