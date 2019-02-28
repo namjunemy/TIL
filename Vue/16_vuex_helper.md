@@ -268,5 +268,145 @@ export default {
     </script>
     ```
 
-    
+## Vuex 프로젝트 구조화 및 모듈화
 
+* 프로젝트 구조화와 모듈화 방법 1
+
+  * 속성별 파일로 구조화
+
+  * store 디렉토리 구조
+
+    * store
+      * getters.js
+      * mutations.js
+      * store.js
+
+  * getters.js
+
+    ```javascript
+    export const storedTodoItems = (state) => {
+      return state.todoItems;
+    }
+    ```
+
+  * mutations.js
+
+    ```javascript
+    const addOneItem = (state, todoItem) => {
+      const obj = {completed: false, item: todoItem};
+      sessionStorage.setItem(todoItem, JSON.stringify(obj));
+      state.todoItems.push(obj);
+    }
+    
+    const removeOneItem = (state, payload) => {
+      sessionStorage.removeItem(payload.todoItem.item);
+      state.todoItems.splice(payload.index, 1);
+    }
+    
+    const toggleOneItem = (state, payload) => {
+      state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+      sessionStorage.removeItem(payload.todoItem.item);
+      sessionStorage.setItem(payload.todoItem.item,
+                             JSON.stringify(payload.todoItem));
+    }
+    
+    const clearAll = (state) => {
+      state.todoItems = [];
+      sessionStorage.clear();
+    }
+    
+    export { addOneItem, removeOneItem, toggleOneItem, clearAll }
+    ```
+
+  * store.js
+
+    ```javascript
+    import Vue from 'vue';
+    import Vuex from 'vuex';
+    import * as getters from './getters';
+    import * as mutations from './mutations'
+    
+    Vue.use(Vuex);
+    
+    export const store = new Vuex.Store({
+      state: {
+        todoItems: storage.fetch()
+      },
+      getters,
+      mutations
+    })
+    ```
+
+* **방법 2 - 앱이 비대해져서 1개의 store로는 관리가 힘들 때 `modules` 속성 사용**
+
+  * 모듈별로 필요한 store 속성들을 모아서 관리한다.
+
+  * store.js
+
+    ```javascript
+    import Vue from 'vue';
+    import Vuex from 'vuex';
+    import todoApp from './modules/todoApp';
+    
+    Vue.use(Vuex);
+    
+    export const store = new Vuex.Store({
+      modules: {
+        todoApp
+      }
+    });
+    ```
+
+  * store/modules/todoApp.js
+
+    ```javascript
+    const storage = {
+      fetch() {
+        const arr = [];
+        if (sessionStorage.length > 0) {
+          for (let i = 0; i < sessionStorage.length; i++) {
+            if (sessionStorage.key(i) !== 'loglevel:webpack-dev-server') {
+              arr.push(JSON.parse(sessionStorage.getItem(sessionStorage.key(i))));
+            }
+          }
+        }
+        return arr;
+      },
+    };
+    
+    const state = {
+      todoItems: storage.fetch(),
+    }
+    
+    const getters = {
+      storedTodoItems(state) {
+        return state.todoItems;
+      }
+    }
+    
+    const mutations = {
+      addOneItem(state, todoItem) {
+        const obj = {completed: false, item: todoItem};
+        sessionStorage.setItem(todoItem, JSON.stringify(obj));
+        state.todoItems.push(obj);
+      },
+      removeOneItem(state, payload) {
+        sessionStorage.removeItem(payload.todoItem.item);
+        state.todoItems.splice(payload.index, 1);
+      },
+      toggleOneItem(state, payload) {
+        state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+        sessionStorage.removeItem(payload.todoItem.item);
+        sessionStorage.setItem(payload.todoItem.item,
+                               JSON.stringify(payload.todoItem));
+      },
+      clearAll(state) {
+        state.todoItems = [];
+        sessionStorage.clear();
+      }
+    }
+    
+    export default { state, gettets, mutations }
+    ```
+
+    
