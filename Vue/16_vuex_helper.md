@@ -187,5 +187,86 @@ export default {
   })
   ```
 
+
+## Helper 함수가 주는  간편함
+
+* demoStore.js
+
+  ```javascript
+  import Vue from 'vue';
+  import Vuex from 'vuex';
   
+  Vue.use(Vuex);
+  
+  export const store = new Vuex.store({
+    state: {
+      price: 100
+    },
+    getters: {
+      originalPrice(state) {
+        return state.price;
+      },
+      doublePrice(state) {
+        return state.price * 2;
+      },
+      triplePrice(state) {
+        return state.price * 3;
+      }
+    }
+  })
+  ```
+
+* 헬퍼를 사용하지 않고 Vuex를 적용한 컴포넌트 - Demo.vue
+
+  * template영역에 this.$store로 스토어에 바로 접근해도 되지만, Vue는 template 영역에 표현식을 줄이는 것을 권고한다. 따라서 스크립트 영역에서 this.$store로 값을 받아온다. 
+
+  ```vue
+  <template>
+    <div id="root">
+      <p>{{ originalPrice }}</p>  //100
+      <p>{{ doublePrice }}</p>    //200
+      <p>{{ triplePrice }}</p>    //300
+    </div>
+  </template>
+  
+  <script>
+    export default {
+      computed: {
+        originalPrice() {
+          return this.$store.getters.originalPrice;
+        },
+        doublePrice() {
+          return this.$store.getters.doublePrice;
+        },
+        triplePrice() {
+          return this.$store.getters.triplePrice;
+        },
+      },
+    };
+  </script>
+  ```
+
+  * Vuex 의 헬퍼함수를 사용하면 반복 코드를 줄이고 편하게 Vuex store에 접근할 수 있다.
+
+    ```vue
+    <template>
+      <div id="root">
+        <p>{{ originalPrice }}</p>
+        <p>{{ doublePrice }}</p>
+        <p>{{ triplePrice }}</p>
+      </div>
+    </template>
+    
+    <script>
+      import {mapGetters} from 'vuex';
+    
+      export default {
+        computed: {
+          ...mapGetters(['originalPrice', 'doublePrice', 'triplePrice']),
+        },
+      };
+    </script>
+    ```
+
+    
 
