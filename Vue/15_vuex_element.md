@@ -20,7 +20,7 @@ npm install vuex --save
     
     Vue.use(Vuex);
     export const store = new Vuex.Store({
-      //
+        //
     });
     ```
 
@@ -35,9 +35,9 @@ npm install vuex --save
     import { store } from './store/store'
     
     new Vue({
-      el: '#app',
-      store,	              // store: store,
-      render: h => h(App),
+        el: '#app',
+        store,	              // store: store,
+        render: h => h(App),
     });
     ```
 
@@ -51,12 +51,12 @@ npm install vuex --save
 ```javascript
 // Vue
 data: {
-  message: 'Hello Vue.js'
+    message: 'Hello Vue.js'
 }
 
 // Vuex
 state: {
-  message: 'Hello Vue.js'
+    message: 'Hello Vue.js'
 }
 ```
 
@@ -76,15 +76,15 @@ state: {
 ```javascript
 // store.js
 state: {
-  num: 10
+    num: 10
 },
 getters: {
-  getNumber(state) {
-    return state.num;
-  },
-  doubleNumber(state) {
-    return state.num * 2;    
-  }
+    getNumber(state) {
+        return state.num;
+    },
+    doubleNumber(state) {
+        return state.num * 2;    
+    }
 }
 ```
 
@@ -105,12 +105,12 @@ getters: {
   // store.js
   state: { num: 10 },
   mutations: {
-    printNumbers(state) {
-      return state.num
-    },
-    sumNumbers(state, anotherNum) {
-      return state.num + anotherNum;
-    }
+      printNumbers(state) {
+          return state.num;
+      },
+      sumNumbers(state, anotherNum) {
+          return state.num + anotherNum;
+      }
   }
   
   // App.vue
@@ -125,19 +125,19 @@ getters: {
     ```javascript
     // store.js
     state: {
-      storeNum:10
+        storeNum:10
     },
     mutations: {
-      modifyState(state, payload) {
-        console.log(payload.str);
-        return state.storeNum += payload.num;
-      }
+        modifyState(state, payload) {
+            console.log(payload.str);
+            return state.storeNum += payload.num;
+        }
     }
     
     // App.vue
     this.$store.commit('modifyState', {
-      str: 'passed from payload',
-      num: 20
+        str: 'passed from payload',
+        num: 20
     });
     ```
 
@@ -147,7 +147,7 @@ getters: {
 
     ```javascript
     methods: {
-      increaseCounter() { this.$store.state.counter++; }
+        increaseCounter() { this.$store.state.counter++; }
     }
     ```
 
@@ -166,17 +166,17 @@ getters: {
   ```javascript
   // store.js
   state: {
-    num: 10
+      num: 10
   },
   mutations: {
-    doubleNumber(state) {
-      state.num * 2;
-    }
+      doubleNumber(state) {
+          state.num * 2;
+      }
   },
   actions: {
-    delayDoubleNumber(context) {     //context로 store의 메서드와 속성 접근
-      context.commit('doubleNumber');
-    }
+      delayDoubleNumber(context) {     //context로 store의 메서드와 속성 접근
+          context.commit('doubleNumber');
+      }
   }
   
   // App.vue
@@ -190,21 +190,21 @@ getters: {
   ```javascript
   // store.js
   mutations: {
-    addCounter(state) {
-      state++;
-    }
+     addCounter(state) {
+          state++;
+      }
   },
   actions: {
-    delayedAddCounter(context) {     //context로 store의 메서드와 속성 접근
-      setTimeout(() => context.commit('addCounter'), 2000);
-    }
+      delayedAddCounter(context) {     //context로 store의 메서드와 속성 접근
+          setTimeout(() => context.commit('addCounter'), 2000);
+      }
   }
   
   // App.vue
   methods: {
-    incrementCounter() {
-      this.$store.dispatch('delayedAddCounter');
-    }
+      incrementCounter() {
+          this.$store.dispatch('delayedAddCounter');
+      }
   }
   ```
 
@@ -213,22 +213,22 @@ getters: {
   ```javascript
   // store.js
   mutations: {
-    setData(state, fetchedData) {
-      state.product = fetchedData;
-    }
+      setData(state, fetchedData) {
+          state.product = fetchedData;
+      }
   },
   actions: {
-    fetchedProductData(context) {
-      return axios.get('http://domain.com/products/1')
-                  .then(response => context.commit('setData', response));
-    }
+      fetchedProductData(context) {
+          return axios.get('http://domain.com/products/1')
+              .then(response => context.commit('setData', response));
+      }
   }
   
   // App.vue
   methods: {
-    getProduct() {
-      this.$store.dispatch('fetchedProductData');
-    }
+      getProduct() {
+          this.$store.dispatch('fetchedProductData');
+      }
   }
   ```
 

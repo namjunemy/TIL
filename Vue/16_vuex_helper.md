@@ -22,14 +22,14 @@ import { mapMutations } from 'vuex';
 import { mapActions } from 'vuex';
 
 export default {
-  computed() {
-    ...mapState(['num']),
-    ...mapGetters(['countedNum'])
-  },
-  methods: {
-    ...mapMutations(['clickBtn']),
-    ...mapActions(['asyncClickBtn'])
-  }
+    computed() {
+        ...mapState(['num']),
+            ...mapGetters(['countedNum'])
+    },
+    methods: {
+        ...mapMutations(['clickBtn']),
+        ...mapActions(['asyncClickBtn'])
+    }
 }
 ```
 
@@ -50,13 +50,13 @@ export default {
     import { mapState } from 'vuex';
     
     computed() {
-      ...mapState(['num'])
-      // num() { return this.$store.state.num; } 를 대체함
+        ...mapState(['num'])
+        // num() { return this.$store.state.num; } 를 대체함
     }
     
     // store.js
     state: {
-      num: 10
+        num: 10
     }
     ```
 
@@ -78,14 +78,14 @@ export default {
     import { mapGetters } from 'vuex';
     
     computed: {
-      ...mapGetters(['reverseMessage'])
+        ...mapGetters(['reverseMessage'])
     }
     
     // store.js
     getters: {
-      reverseMessage(state) {
-        return state.msg.split('').reverse().join('');
-      }
+        reverseMessage(state) {
+            return state.msg.split('').reverse().join('');
+        }
     }
     ```
 
@@ -117,16 +117,16 @@ export default {
       import { mapMutations } from 'vuex';
       
       methods: {
-        ...mapMutations(['clickBtn']),
-        authLogin() {},
-        displayTable() {}
+          ...mapMutations(['clickBtn']),
+          authLogin() {},
+          displayTable() {}
       }
       
       // store.js
       mutations: {
-        clickBtn(state) {
-          alert(state.msg);
-        }
+          clickBtn(state) {
+              alert(state.msg);
+          }
       }
       ```
 
@@ -147,14 +147,14 @@ export default {
       import { mapActions } from 'vuex';
       
       methods: {
-        ...mapActions(['delayClickBtn'])
+          ...mapActions(['delayClickBtn'])
       }
       
       // store.js
       actions: {
-        delayclickBtn(context) {
-          setTimeout(() => context.commit('clickBtn'), 2000);
-        }
+          delayclickBtn(context) {
+              setTimeout(() => context.commit('clickBtn'), 2000);
+          }
       }
       ```
 
@@ -171,8 +171,8 @@ export default {
   ```javascript
   // 배열 리터럴
   ...mapMutations([
-    'clickBtn',    //'clickBtn': clickBtn
-    'addNumber'    //addNumber(인자)
+      'clickBtn',    //'clickBtn': clickBtn
+      'addNumber'    //addNumber(인자)
   ])
   ```
 
@@ -183,7 +183,7 @@ export default {
   ```javascript
   // 객체 리터럴
   ...mapMutations({
-    popupMsg: 'clickBtn'    // 컴포넌트 메서드 명 : Store의 Mutation 명
+      popupMsg: 'clickBtn'    // 컴포넌트 메서드 명 : Store의 Mutation 명
   })
   ```
 
@@ -199,20 +199,20 @@ export default {
   Vue.use(Vuex);
   
   export const store = new Vuex.store({
-    state: {
-      price: 100
-    },
-    getters: {
-      originalPrice(state) {
-        return state.price;
+      state: {
+          price: 100
       },
-      doublePrice(state) {
-        return state.price * 2;
-      },
-      triplePrice(state) {
-        return state.price * 3;
+      getters: {
+          originalPrice(state) {
+              return state.price;
+          },
+          doublePrice(state) {
+              return state.price * 2;
+          },
+          triplePrice(state) {
+              return state.price * 3;
+          }
       }
-    }
   })
   ```
 
@@ -222,26 +222,26 @@ export default {
 
   ```vue
   <template>
-    <div id="root">
-      <p>{{ originalPrice }}</p>  //100
-      <p>{{ doublePrice }}</p>    //200
-      <p>{{ triplePrice }}</p>    //300
-    </div>
+      <div id="root">
+          <p>{{ originalPrice }}</p>  //100
+          <p>{{ doublePrice }}</p>    //200
+          <p>{{ triplePrice }}</p>    //300
+      </div>
   </template>
   
   <script>
     export default {
-      computed: {
-        originalPrice() {
-          return this.$store.getters.originalPrice;
+        computed: {
+            originalPrice() {
+                return this.$store.getters.originalPrice;
+            },
+            doublePrice() {
+                return this.$store.getters.doublePrice;
+            },
+            triplePrice() {
+                return this.$store.getters.triplePrice;
+            },
         },
-        doublePrice() {
-          return this.$store.getters.doublePrice;
-        },
-        triplePrice() {
-          return this.$store.getters.triplePrice;
-        },
-      },
     };
   </script>
   ```
@@ -250,20 +250,20 @@ export default {
 
     ```vue
     <template>
-      <div id="root">
-        <p>{{ originalPrice }}</p>
-        <p>{{ doublePrice }}</p>
-        <p>{{ triplePrice }}</p>
-      </div>
+        <div id="root">
+          <p>{{ originalPrice }}</p>
+          <p>{{ doublePrice }}</p>
+          <p>{{ triplePrice }}</p>
+        </div>
     </template>
     
     <script>
       import {mapGetters} from 'vuex';
     
       export default {
-        computed: {
-          ...mapGetters(['originalPrice', 'doublePrice', 'triplePrice']),
-        },
+          computed: {
+              ...mapGetters(['originalPrice', 'doublePrice', 'triplePrice']),
+          },
       };
     </script>
     ```
@@ -361,49 +361,49 @@ export default {
 
     ```javascript
     const storage = {
-      fetch() {
-        const arr = [];
-        if (sessionStorage.length > 0) {
-          for (let i = 0; i < sessionStorage.length; i++) {
-            if (sessionStorage.key(i) !== 'loglevel:webpack-dev-server') {
-              arr.push(JSON.parse(sessionStorage.getItem(sessionStorage.key(i))));
+        fetch() {
+            const arr = [];
+            if (sessionStorage.length > 0) {
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    if (sessionStorage.key(i) !== 'loglevel:webpack-dev-server') {
+                        arr.push(JSON.parse(sessionStorage.getItem(sessionStorage.key(i))));
+                    }
+                }
             }
-          }
-        }
-        return arr;
-      },
+            return arr;
+        },
     };
     
     const state = {
-      todoItems: storage.fetch(),
+        todoItems: storage.fetch(),
     }
     
     const getters = {
-      storedTodoItems(state) {
-        return state.todoItems;
-      }
+        storedTodoItems(state) {
+            return state.todoItems;
+        }
     }
     
     const mutations = {
-      addOneItem(state, todoItem) {
-        const obj = {completed: false, item: todoItem};
-        sessionStorage.setItem(todoItem, JSON.stringify(obj));
-        state.todoItems.push(obj);
-      },
-      removeOneItem(state, payload) {
-        sessionStorage.removeItem(payload.todoItem.item);
-        state.todoItems.splice(payload.index, 1);
-      },
-      toggleOneItem(state, payload) {
-        state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
-        sessionStorage.removeItem(payload.todoItem.item);
-        sessionStorage.setItem(payload.todoItem.item,
-                               JSON.stringify(payload.todoItem));
-      },
-      clearAll(state) {
-        state.todoItems = [];
-        sessionStorage.clear();
-      }
+        addOneItem(state, todoItem) {
+            const obj = {completed: false, item: todoItem};
+            sessionStorage.setItem(todoItem, JSON.stringify(obj));
+            state.todoItems.push(obj);
+        },
+        removeOneItem(state, payload) {
+            sessionStorage.removeItem(payload.todoItem.item);
+            state.todoItems.splice(payload.index, 1);
+        },
+        toggleOneItem(state, payload) {
+            state.todoItems[payload.index].completed = !state.todoItems[payload.index].completed;
+            sessionStorage.removeItem(payload.todoItem.item);
+            sessionStorage.setItem(payload.todoItem.item,
+                                   JSON.stringify(payload.todoItem));
+        },
+        clearAll(state) {
+            state.todoItems = [];
+            sessionStorage.clear();
+        }
     }
     
     export default { state, gettets, mutations }
