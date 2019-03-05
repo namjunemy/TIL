@@ -151,7 +151,7 @@ class memberService {
      }
      ```
 
-     * 테이블에 저장할 때에는 `member.getTeam().getId()`로 Id를 조회해서 넣었다.
+     * 테이블에 저장할 때에는 `member.getTeam().getId()`로 Id를 조회해서 넣었다.
 
         ```sql
         INSERT INTO MEMBER(MEMBER_ID, TEAM_ID, USERNAME) VALUES ...
