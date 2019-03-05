@@ -110,32 +110,78 @@ class memberService {
 
     * 테이블의 외래키에는 **방향성이 없다**. 멤버랑 팀 조인가능, 팀과 멤버 조인가능.
 
-    * 이 때, 위의 **테이블 설계에 맞추어 객체를 모델링**하게 되면 아래와 같이 FK를 그대로 필드로 포함하게 된다. 하지만, Member클래스에 Team 객체가 존재하는 것이 더 객체지향적이다 라고 할 수 있다. FK의 값을 넣는것 보단.
+  * 이 때, 위의 **테이블 설계에 맞추어 객체를 모델링**하게 되면 아래와 같이 FK를 그대로 필드로 포함하게 된다. 하지만, Member클래스에 Team 객체가 존재하는 것이 더 객체지향적이다 라고 할 수 있다. FK의 값을 넣는것 보단.
 
-      ```java
-      class Member {
-        String id;        //MEMBER_ID 컬럼
-        Long teamId;      //TEAM_ID FK 컬럼
-        String username;  //USERNAME 컬럼
-      }
-      ```
+    ```java
+    class Member {
+      String id;        //MEMBER_ID 컬럼
+      Long teamId;      //TEAM_ID FK 컬럼
+      String username;  //USERNAME 컬럼
+    }
+    ```
 
-      ```java
-      class Team {
-        Long id;
-        String name;
-      }
-      ```
+    ```java
+    class Team {
+      Long id;
+      String name;
+    }
+    ```
 
     * 이렇게 설계된 객체를 테이블에 저장 한다.
 
       * 테이블 설계에 맞추어 객체를 모델링해서 INSERT 쿼리를 짠다.
 
-      ```sql
-      INSERT INTO MEMBER(MEMBER_ID, TEAM_ID, USERNAME) VALUES ...
-      ```
+        ```sql
+        INSERT INTO MEMBER(MEMBER_ID, TEAM_ID, USERNAME) VALUES ...
+        ```
 
-    * 
+  * 그러나, **객체다운 모델링**에서는 아래와 같이 Team이라는 객체 자체를 포함하고 있어서 Member객체에서 Team을 바로 접근할 수 있다.
+     ```java
+     class Member {
+       String id;
+       Team team;        //참조로 연관관계를 맺는다
+       String username;
+     }
+     ```
+
+     ```java
+     class Team {
+       Long id;        // TEAM_ID PK 사용
+       String name;    // NAME 컬럼 사용
+     }
+     ```
+
+     * 테이블에 저장할 때에는 `member.getTeam().getId()`로 Id를 조회해서 넣었다.
+
+        ```sql
+        INSERT INTO MEMBER(MEMBER_ID, TEAM_ID, USERNAME) VALUES ...
+        ```
+
+     * 그러나, 조회를 하려고 하면…. 헬게이트 오픈이다. 먼저 멤버와 팀을 조인해 놓고 팀을 조회할 준비를 한다.
+
+        ```sql
+        SELECT M.*, T.*
+          FROM MEMBER M
+          JOIN TEAM T ON M.TEAM_ID = T.TEAM_ID
+        ```
+
+     * DB에서 조회해서 객체에 넣으려면..
+
+        ```java
+        public Member find(Strubg memberId) {
+          // SQL 실행하고
+          Member member = new Member();
+          // DB에서 조회한 회원 관련 정보를 모두 입력하고
+          Team team = new Team();
+          // DB에서 조회한 팀 관련 정보를 모두 넣고,
+          
+          // 회원과 팀 관계 설정
+          member.setTeam(team);
+          return member;
+        }
+        ```
+
+     * 하지만…. 선배들은 member와 team의 정보를 모두 가지고 있는 member_team DTO를 가지고,  위와같이 복잡하게 연관관계 매핑을 하지않고 한방 쿼리를 날리면서 작업을 한다...
 
 * 데이터 타입
 
