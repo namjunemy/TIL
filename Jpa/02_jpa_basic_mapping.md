@@ -69,7 +69,7 @@ JPA에서는 크게 중요한게 두가지가 있다. 첫번째는 객체와 관
   * MySQL : org.hibernate.dialect.MySQL5InnoDBDialect
 * 하이버네이트는 45가지 방언을 지원
 
-![](https://github.com/namjunemy/TIL/blob/5ab5553422b235a6b06e6dd9e4eedc5b6f14fe21/Jpa/img/04_jpa_dialect.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/04_jpa_dialect.PNG?raw=true)
 
 ## 애플리케이션 개발
 
@@ -77,7 +77,7 @@ JPA에서는 크게 중요한게 두가지가 있다. 첫번째는 객체와 관
   * Persistence를 통해서 xml설정을 읽고, EntityManagerFactory를 만들어야 한다.
   * 트랜잭션 단위로 기능을 만들때 항상 엔티티 매니저를 새로 만들어야 한다. EntityManagerFactory를 통해서 만든다.
 
-![](https://github.com/namjunemy/TIL/blob/5ab5553422b235a6b06e6dd9e4eedc5b6f14fe21/Jpa/img/05_jpa_entity_manager.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/05_jpa_entity_manager.PNG?raw=true)
 
 * 엔티티 매니저 설정
 * 트랜잭션
