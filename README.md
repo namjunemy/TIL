@@ -27,6 +27,7 @@
 * [[2018.03.29] okky 미니 세미나 - 유명 IT 기업 입사 도전 성공기](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180329_okky_mini_seminar_kakao_leekyoungil_feedback_ok.md)
 * [[2018.04.18] 2018 aws summit seoul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180418_aws_summit_seoul.md)
 * [[2018.09.11] 사내 세미나 - 협업의 육하원칙](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180911_agile_seminar.md)
+* [[2019.04.18] 2019 aws summit seoul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20190418_aws_summit_2019.md)
 
 ### Java
 
