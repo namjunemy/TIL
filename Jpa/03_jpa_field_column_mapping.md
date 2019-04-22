@@ -123,3 +123,7 @@ public class Member {
   * AUTO_INCREMENT로 숫자로 PK를 사용하면, int쓰면 안된다. 생각보다 금방 끝난다..
   * Long 타입으로.
 
+## Reference
+
+- 자바 ORM 표준 JPA 프로그래밍
+- 저자 직강 - <https://www.youtube.com/watch?v=WfrSN9Z7MiA&list=PL9mhQYIlKEhfpMVndI23RwWTL9-VL-B7U>
