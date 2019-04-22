@@ -41,6 +41,13 @@
 * [Java Logging Framework, LOGBack](https://github.com/namjunemy/TIL/blob/master/Java/logging_framework.md)
 * [Ehcache Configuration](https://github.com/namjunemy/TIL/blob/master/Java/ehcache_config.md)
 
+### JPA
+
+* [01. SQL 중심적인 개발의 문제점과 JPA 소개](<https://github.com/namjunemy/TIL/blob/master/Jpa/01_jpa_basic_intro.md>)
+* [02. JPA 기초와 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/02_jpa_basic_mapping.md>)
+* [03. JPA 필드와 컬럼 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/03_jpa_field_column_mapping.md>)
+* [04. JPA 연관관계 매핑 이론 - 단방향 매핑, 양방향 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/04_jpa_relational_mapping.md>)
+
 ### JavaScript
 
 * [[INSIDE JavaScript] 01. 자바스크립트 기본 개요](https://github.com/namjunemy/TIL/blob/master/JavaScript/01_js_core_concepts.md)
