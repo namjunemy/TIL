@@ -295,6 +295,7 @@ JPA를 공부할 때 가장 중요한게 **객체와 관계형 데이터베이�
     * LAZY 로딩 설정을 하면, 애플리케이션 로딩 시점에 Member의 Team에는 NPE가 나면 안되므로 프록시 객체(가짜 객체)가 들어간다.
     * 그리고 나서 멤버가 팀을 가져와서, **실제 사용하는 순간**에 팀의 값을 채운다. 쿼리 날려서 가져온다.
     
+  
   ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/14_lazy_proxy.PNG?raw=true)
   
 * 위에서 언급했지만 스프링을 사용하면서 트랜잭션의 범위 밖 준영속 상태에서 조회를 하려고하면 LazyInitializationException을 마주치게 된다. 주의하자.

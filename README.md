@@ -47,6 +47,7 @@
 * [02. JPA 기초와 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/02_jpa_basic_mapping.md>)
 * [03. JPA 필드와 컬럼 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/03_jpa_field_column_mapping.md>)
 * [04. JPA 연관관계 매핑 이론 - 단방향 매핑, 양방향 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/04_jpa_relational_mapping.md>)
+* [05. JPA 영속성 컨텍스트, 프록시와 Lazy Loding](<https://github.com/namjunemy/TIL/blob/master/Jpa/05_jpa_persistence_context.md>)
 
 ### JavaScript
 
