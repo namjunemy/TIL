@@ -272,14 +272,13 @@ JPA를 공부할 때 가장 중요한게 **객체와 관계형 데이터베이�
 * Member를 조회할 때 Team도 함께 조회해야 할까?
 
   * 단순히 member 정보만 사용하는 비즈니스 로직에서는 굳이 팀을 미리 조회할 필요가 없다.
-
     ```java
-  @Entity
+    @Entity
     public class Member {
       @Id
       @GeneratedValue
-    private Long id;
-      
+      private Long id;
+    
       @Column(name = "USERNAME")
       private String name;
     
