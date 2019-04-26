@@ -407,3 +407,8 @@ from Member m
 
   * XML이 항상 우선권을 가진다.
   * 애플리케이션 운영 환경에 따라 다른 XML을 배포할 수 있다.
+
+## Reference
+
+- 자바 ORM 표준 JPA 프로그래밍
+- 저자 직강 - <https://www.youtube.com/watch?v=WfrSN9Z7MiA&list=PL9mhQYIlKEhfpMVndI23RwWTL9-VL-B7U>
