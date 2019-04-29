@@ -448,3 +448,8 @@ List<Member> list =
 * Spring Data JPA
 * QueryDSL
 * Junit, Spock(Test)
+
+## Reference
+
+- 자바 ORM 표준 JPA 프로그래밍
+- 저자 직강 - <https://www.youtube.com/watch?v=WfrSN9Z7MiA&list=PL9mhQYIlKEhfpMVndI23RwWTL9-VL-B7U>
