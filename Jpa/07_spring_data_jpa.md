@@ -59,7 +59,7 @@
 
 * 스프링 로딩 시점에 MemberRepository와 ItemRepository의 구현체를 만든다.
 
-    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/15_jpa_repo.PNG?raw=true)
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/15_jpa_repo_diagram.png?raw=true)
 
 ### 공통 인터페이스 기능
 
@@ -71,7 +71,7 @@
 
 * 스프링 데이터 프로젝트에 공통적인 기능을 가지고 있고, JPA 특화된 기능을 스프링 데이터 JPA 프로젝트에서 가지고 있다.
 
-    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/16_jpa_common_interface.PNG?raw=true)
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/16_jpa_common_interface.png?raw=true)
 
 ### 쿼리 메서드 기능
 
@@ -448,4 +448,3 @@ List<Member> list =
 * Spring Data JPA
 * QueryDSL
 * Junit, Spock(Test)
-
