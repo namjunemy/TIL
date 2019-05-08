@@ -6,3 +6,16 @@
 
 * project structure 상단 바에서 설정 아이콘 -> Autoscroll from Source
 
+### custom Copyright
+
+go settings/preferences
+
+* Copyright Profiles
+
+* +
+
+* Copyright text
+
+  * ```
+    Created by njkim $today.year.$today.month.$today.day.
+    ```
