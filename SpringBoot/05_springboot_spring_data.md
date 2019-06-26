@@ -268,7 +268,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 }
 ```
 
-### 스프링 데이터 Repository 테스트 만들기
+## 6. 스프링 데이터 Repository 테스트 만들기
 
 * H2 DB를 테스트 scope 의존성에 추가하기
 
@@ -348,7 +348,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
       }
   ```
 
-### 데이터베이스 초기화
+## 7. 데이터베이스 초기화
 
 * JPA를 사용한 데이터베이스 초기화
 
@@ -382,3 +382,29 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     * schema.sql 또는 schema-${platform}.sql
     * data.sql 또는 data-${platform}.sql
     * ${platform} 값은 spring.datasource.platform 으로 설정 가능
+
+## 8. 데이터베이스 마이그레이션
+
+스프링 부트가 지원하는 DB 마이그레이션 툴은 Flyway와 Liquibase가 대표적이다. Flyway로 학습을 진행한다.
+
+DB 스키마 변경이나 데이터 변경을 버전관리 하듯 관리할 수 있다.
+
+* 공식 문서
+  * [Spring docs - Execute Flyway Database Migrations on Startup](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/#howto-execute-flyway-database-migrations-on-startup)	
+* 의존성 추가
+  * `compile group: 'org.flywaydb', name: 'flyway-core'`
+* db.migration 디렉토리 생성
+  * db/migration 또는 db/migration/{vendor}
+  * spring.flyway.locations로 변경 가능함
+  * `src/main/resources/db/migration`
+* 파일생성
+  * V숫자__이름.sql
+  * V는 꼭 대문자로.
+  * 숫자는 순차적으로 (타임스탬프 권장)
+  * 숫자와 이름 사이에 언더바 **두 개**.
+  * 이름은 가능한 서술적으로.
+* application.yml
+  * sping.jpa.hibernate.ddl-auto=validate로 변경하고
+    * hibernate.ddl-auto=validate 는 실제 DB와 @Entity 매핑이 서로 일을 할 수 있나 확인만 하는 설정.
+* 기존의 schema.sql은 제거~!
+* https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/ed31b16cfdd5f38c18941ada48f6c24907db25f6
