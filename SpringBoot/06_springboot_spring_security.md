@@ -49,29 +49,28 @@
       ```java
       ...
         
-      public DefaultAuthenticationEventPublisher(
-      			ApplicationEventPublisher applicationEventPublisher) {
-      		this.applicationEventPublisher = applicationEventPublisher;
+      public DefaultAuthenticationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
       
-      		addMapping(BadCredentialsException.class.getName(),
-      				AuthenticationFailureBadCredentialsEvent.class);
-      		addMapping(UsernameNotFoundException.class.getName(),
-      				AuthenticationFailureBadCredentialsEvent.class);
-      		addMapping(AccountExpiredException.class.getName(),
-      				AuthenticationFailureExpiredEvent.class);
-      		addMapping(ProviderNotFoundException.class.getName(),
-      				AuthenticationFailureProviderNotFoundEvent.class);
-      		addMapping(DisabledException.class.getName(),
-      				AuthenticationFailureDisabledEvent.class);
-      		addMapping(LockedException.class.getName(),
-      				AuthenticationFailureLockedEvent.class);
-      		addMapping(AuthenticationServiceException.class.getName(),
-      				AuthenticationFailureServiceExceptionEvent.class);
-      		addMapping(CredentialsExpiredException.class.getName(),
-      				AuthenticationFailureCredentialsExpiredEvent.class);
-      		addMapping(
-      				"org.springframework.security.authentication.cas.ProxyUntrustedException",
-      				AuthenticationFailureProxyUntrustedEvent.class);
+        addMapping(BadCredentialsException.class.getName(),
+                   AuthenticationFailureBadCredentialsEvent.class);
+        addMapping(UsernameNotFoundException.class.getName(),
+                   AuthenticationFailureBadCredentialsEvent.class);
+        addMapping(AccountExpiredException.class.getName(),
+                   AuthenticationFailureExpiredEvent.class);
+        addMapping(ProviderNotFoundException.class.getName(),
+                   AuthenticationFailureProviderNotFoundEvent.class);
+        addMapping(DisabledException.class.getName(),
+                   AuthenticationFailureDisabledEvent.class);
+        addMapping(LockedException.class.getName(),
+                   AuthenticationFailureLockedEvent.class);
+        addMapping(AuthenticationServiceException.class.getName(),
+                   AuthenticationFailureServiceExceptionEvent.class);
+        addMapping(CredentialsExpiredException.class.getName(),
+                   AuthenticationFailureCredentialsExpiredEvent.class);
+        addMapping(
+          "org.springframework.security.authentication.cas.ProxyUntrustedException",
+          AuthenticationFailureProxyUntrustedEvent.class);
       }
       
       ...
@@ -110,8 +109,8 @@
   * 스프링 시큐리티가 제공하는 **기본설정을 그대로 쓴다**는 의미가 된다.
 
     * @ConditionalOnMissingBean(WebSecurityConfigurerAdapter.class)가 의미하는 것은
-    * 만약, WebSecurityConfigurerAdapter.class 를 상속받은 빈을 만들면
-    * 커스텀하게 우리의 시큐리티 설정을 가져갈 수 있다는 이야기가 된다. 
+    * **만약, WebSecurityConfigurerAdapter.class 를 상속받은 빈을 만들면**
+    * **커스텀하게 우리의 시큐리티 설정을 가져갈 수 있다는 이야기가 된다.** 
 
   * WebSecurityConfigurerAdapter.class 안에서 특히 configure() 메서드를 보면, 
 
@@ -199,19 +198,103 @@
     }
     ```
 
+* [commit log](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/83ab8f4ff7095a94390ec3684edafae93dabea5f)
 
+## 6.2 시큐리티 설정 커스터마이징
 
+* 1 - 웹 시큐리티 설정
 
+  * 6.1에서 설명했던것 처럼 SpringBootWebSecurityConfiguration는 WebSecurityConfigurerAdapter가 빈으로 등록되어 있지 않을 경우에 등록된다. 
+  * 따라서, 아래와 같이 WebSecurityConfigurerAdapter를 상속받은 커스텀 설정을 빈으로 등록하면 스프링 부트의 기본 시큐리티 설정은 사용하지 않게 된다.
+    * "/", "/hello"는 모든 사용자에게 허용하고, 
+    * 그 외의 요청은 인증이 필요하도록 설정하는 코드이다.
 
+  ```java
+  @Configuration
+  public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+  
+      @Override
+      protected void configure(HttpSecurity http) throws Exception {
+          http.authorizeRequests()
+              .antMatchers("/", "/hello").permitAll()
+              .anyRequest().authenticated()
+              .and()
+              .formLogin()
+              .and()
+              .httpBasic();
+      }
+  }
+  ```
 
+* 2 - UserDetailsService 구현
 
+  * https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#jc-authentication-userdetailsservice
 
+  * 스프링 시큐리티가 랜덤생성해주는 유저 말고, 우리가 원하는 유저로 인증
 
+  * 보통 Account를 관리하는 서비스 계층에서 UserDetailsService를 implements 한다.
 
+  * UserDetailsService 타입의 빈이 등록이 되어있어야지 부트가 기본으로 생성해주는 유저가 더 이상 등록되지 않는다.
 
+  * password 검증을 위해서 passwordEncoder가 꼭 필요하다.
 
+    * 스프링 시큐리티에서 권장하는 인코더를 시큐리티 설정에 빈으로 등록해주면 된다.
 
+    * https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#core-services-password-encodin
 
+      ```java
+      @Configuration
+      public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+      
+          @Override
+          protected void configure(HttpSecurity http) throws Exception {
+              http.authorizeRequests()
+                  .antMatchers("/", "/hello").permitAll()
+                  .anyRequest().authenticated()
+                  .and()
+                  .formLogin()
+                  .and()
+                  .httpBasic();
+          }
+      
+          @Bean
+          public PasswordEncoder passwordEncoder() {
+              return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+          }
+      }
+      
+      ```
 
+  * AccountService.class
 
+    ```java
+    @Service
+    @RequiredArgsConstructor
+    public class AccountService implements UserDetailsService {
+    
+        private final AccountRepository accountRepository;
+        private final PasswordEncoder passwordEncoder;
+    
+        public Account createAccount(String username, String password) {
+            Account account = new Account();
+            account.setUsername(username);
+            account.setPassword(passwordEncoder.encode(password));
+            return accountRepository.save(account);
+        }
+    
+        @Override
+        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+            Account account = accountRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+    
+            return new User(account.getUsername(), account.getPassword(), authorities());
+        }
+    
+        private Collection<? extends GrantedAuthority> authorities() {
+            return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+    }
+    ```
+
+* [commit log](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/1330e36e5d2ed20523e5f5c17b80844855b8c610)
 
