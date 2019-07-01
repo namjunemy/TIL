@@ -203,3 +203,83 @@ REST 클라이언트를 사용하는데에 두가지 선택사항이 있다. 차
             ```
 
     * https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#webflux-client
+
+## 7-2. REST 클라이언트 커스터마이징
+
+* **RestTemplate**
+
+  * 기본으로 java.net.HttpURLConnection 사용
+
+  * 커스터마이징
+
+    * 로컬 커스터마이징
+
+      * 로컬에서 정의 후 안에서만 사용
+
+    * 글로벌 커스터마이징
+
+      * RestTemplate이 기본적으로 사용하는 java.net.HttpURLConnection를 HttpClient로 사용해야 하는 상황이 있을 수 있다.
+
+      * 먼저 HttpClient를 빈으로 만들기 위해서 의존성에 추가한다.
+
+      * 그리고 RestTemplateCustomizer를 빈으로 등록해서 전역 사용한다.
+
+      * 커스터마이저 안에서 restTemplate.setRequestFactory()로 맞는 구현체를 등록한다.(이것 역시 Spring의 PSA(Portable Service Abstraction)가 잘 적용 되어있다.)
+
+      * 이렇게 되면 더이상 기본 커넥션이 아닌, apache에서 제공하는 org.apache.http.client.HttpClient를 RestTemplate이 사용하게 된다.
+
+        ```java
+        @Bean
+        public RestTemplateCustomizer restTemplateCustomizer() {
+          return new RestTemplateCustomizer() {
+            @Override
+            public void customize(RestTemplate restTemplate) {
+              restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+            }
+          };
+        }
+        ```
+
+      * 빈 재정의
+
+* **WebClient**
+
+  * 기본으로 Reactor Netty의 HTTP 클라이언트 사용
+
+  * 커스터마이징
+
+    * 로컬 커스터마이징
+
+      ```java
+      WebClient webClient = builder
+      	.baseUrl("http://localhost:8080")
+        .build();
+      
+      ...
+        
+      Mono<String> hiMono = webClient.get().uri("/hi")
+        .retrieve()
+        .bodyToMono(String.class);
+      
+      ...
+      
+      Mono<String> byeMono = webClient.get().uri("/bye")
+        .retrieve()
+        .bodyToMono(String.class);
+              
+      ```
+
+    * 글로벌 커스터마이징
+
+      * WebClientCustomizer를 빈으로 등록해서 전역 사용
+
+        * 빈으로 등록해 놓고, 사용하는 쪽에서는 build()만 해서 사용
+
+          ```java
+          @Bean
+          public WebClientCustomizer webClientCustomizer() {
+            return webClientBuilder -> webClientBuilder.baseUrl("http://localhost:8080");
+          }
+          ```
+
+      * 또는 빈 재정의 해서 사용해도 됨.
