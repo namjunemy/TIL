@@ -298,3 +298,7 @@
 
 * [commit log](https://github.com/namjunemy/spring-boot-concept-and-utilization/commit/1330e36e5d2ed20523e5f5c17b80844855b8c610)
 
+## Reference
+
+* https://spring.io/projects/spring-security
+* [백기선 - 스프링 부트 개념과 활용](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8/)

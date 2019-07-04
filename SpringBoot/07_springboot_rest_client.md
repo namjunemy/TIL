@@ -283,3 +283,8 @@ REST 클라이언트를 사용하는데에 두가지 선택사항이 있다. 차
           ```
 
       * 또는 빈 재정의 해서 사용해도 됨.
+
+## Reference
+
+- https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/client/RestTemplate.html
+- [백기선 - 스프링 부트 개념과 활용](https://www.inflearn.com/course/%EC%8A%A4%ED%94%84%EB%A7%81%EB%B6%80%ED%8A%B8/)
