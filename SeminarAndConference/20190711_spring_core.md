@@ -6,9 +6,13 @@
 
 ## 1
 
+* https://nhnent.dooray.com/share/posts/YhZXrT4MRL6TFHMalXX5LQ 
+
 - Spring container == ApplicationContext 로 보자
 
 ## 2
+
+* https://nhnent.dooray.com/share/posts/XIU5FMn1RHOMFHxOWyztvQ
 
 - Bean의 멤버변수 선언할 때, singleton은 JVM 안에서 singleton이 아니다. ApplicationContext 안에서의 singleton이다.
 - 그리고, @Bean이 Singleton 인데. 멤버변수가 HashMap이다. 망했다.
@@ -16,10 +20,14 @@
 
 ## 3
 
+* https://nhnent.dooray.com/share/posts/s7RaqXy9RsixVyLlIbt59w
+
 * @Configuration, @Profile("default")는 디폴트 프로파일로 설정
 * PSA
 
 ## 4
+
+* https://nhnent.dooray.com/share/posts/vOmcp29ZTKqBwPlm7McPtQ 
 
 * Spring AOP
     * **weaving의 대상이 반드시 Spring Container에 의해서 관리되는 Spring Bean이어야 한다.**
