@@ -136,6 +136,106 @@
         }
         ```
 
+### 3. @Autowired
+
+* 필요한 의존 객체의 "타입"에 해당하는 빈을 찾아 주입한다.
+
+* **@Autowired**
+
+  * required: 기본값은 true(따라서 못 찾으면 애플리케이션 구동 실패)
+
+* **사용할 수 있는 위치**
+
+  * 생성자(스프링 4.3 부터는 생략 가능)
+  * 세터
+  * 필드
+
+* **경우의 수**
+
+  * 해당 타입의 빈이 없는 경우
+  * 해당 타입의 빈이 한 개인 경우
+  * 해당 타입의 빈이 여러 개인 경우
+    * 빈 이름으로 시도
+      * 같은 이름의 빈을 찾으면 해당 빈 사용
+      * 같은 이름 못찾으면 실패
+
+* **같은 타입의 빈이 여러개 일 때**
+
+  * **@Primary**
+    * 같은 타입의 빈이 여러개일 때, 필드의 이름을 변경해서 주입 받는 것 보다 @Primary를 이용하는 것을 권장함.
+  * 해당 타입의 빈 모두 주입 받기
+    * List 형태로 해당 타입의 빈을 모두 주입 받을 수 있음
+  * @Qualifier(빈 이름으로 주입)
+
+* **@Autowired의 동작 원리**
+
+  * 빈 Initialization 라이프 사이클(@PostConstruct 등) 이전 또는 이후에 부가적인 작업을 할 수 있는 **BeanPostProcessor라는 라이프 사이클 콜백**이 존재한다.
+    * 아래 document의 11번, 14번 순서
+      * BeanPostProcessor의 postProcessBeforeInitialization() 메서드
+      * BeanPostProcessor의 postProcessAfterInitialization() 메서드
+    *  Initialization 라이프 사이클인 @PostConstruct는 12번 InitializingBean's 에서 이루어짐
+  * **BeanPostProcessor**
+    * 새로 만든 빈 인스턴스를 수정할 수 있는 라이프 사이클 인터페이스
+  * AutowiredAnnotationBeanPostProcessor extends BeanPostProcessor
+    * **@Autowired 동작 시점**
+      * **결국 빈이 Initialization 하기 전에(postProcessBeforeInitialization()) BeanPostProcessor를 상속받은 AutowiredAnnotationBeanPostProcessor에 의해서 @Autowired를 처리한다.**
+      * 아래 spring document의 표준 빈 라이프 사이클 메서드 중 11번째에 해당
+    * 스프링이 제공하는 @Autowired와 @Value 애노테이션 그리고 JSR-330의 @Inject 어노테이션을 지원하는 어노테이션 처리기
+
+* **그러면 BeanPostProcessor는 어떻게 동작하나?**
+
+  * BeanFactory(이것은 결국 스프링이 제공하는 ApplicationContext)가 BeanPostProcessor 타입의 빈들을 찾는다.
+
+  * 그중에 AutowiredAnnotationBeanPostProcessor 빈이 등록되어 있을 것이고,
+
+  * 일반적인 빈들에게 AutowiredAnnotationBeanPostProcessor에 있는 어노테이션을 적용하는 로직을 수행하게 된다.
+
+  * 궁금하면 한번 찾아보자!
+
+    ```java
+    @Component
+    public class MyRunner implements ApplicationRunner {
+      
+      @Autowired
+      ApplicationContext applicationContext;
+      
+      @Override
+      public void run(ApplicationArguments args) throws Exception {
+        AutowiredAnnotationBeanPostProcessor bean =
+          applicationContext.getBean(AutowiredAnnotationBeanPostProcessor.class)
+          System.out.println(bean);
+      }
+    }
+    ```
+
+* **spring.io에서 제공하는 document - 표준 빈 라이프 사이클 초기화 메서드 순서**
+
+  ```
+  Bean factory implementations should support the standard bean lifecycle interfaces as far as possible. The full set of initialization methods and their standard order is:
+  
+  1. BeanNameAware's setBeanName
+  2. BeanClassLoaderAware's setBeanClassLoader
+  3. BeanFactoryAware's setBeanFactory
+  4. EnvironmentAware's setEnvironment
+  5. EmbeddedValueResolverAware's setEmbeddedValueResolver
+  6. ResourceLoaderAware's setResourceLoader (only applicable when running in an application context)
+  7. ApplicationEventPublisherAware's setApplicationEventPublisher (only applicable when running in 8. an application context)
+  9. MessageSourceAware's setMessageSource (only applicable when running in an application context)
+  ApplicationContextAware's setApplicationContext (only applicable when running in an application context)
+  10. ServletContextAware's setServletContext (only applicable when running in a web application context)
+  11. postProcessBeforeInitialization methods of BeanPostProcessors
+  12. InitializingBean's afterPropertiesSet
+  13. a custom init-method definition
+  14. postProcessAfterInitialization methods of BeanPostProcessors
+  
+  On shutdown of a bean factory, the following lifecycle methods apply:
+  
+  1. ostProcessBeforeDestruction methods of DestructionAwareBeanPostProcessors
+  2. DisposableBean's destroy
+  3. a custom destroy-method definition
+  ```
+
 ## Reference
 
+* https://spring.io/projects/spring-framework
 * 스프링 프레임워크 핵심 기술 - 백기선
