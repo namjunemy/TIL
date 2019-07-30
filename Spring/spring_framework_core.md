@@ -235,6 +235,49 @@
   3. a custom destroy-method definition
   ```
 
+### 4. @Component와 컴포넌트 스캔
+
+* 컴포넌트 스캔의 주요 기능
+
+  * 스캔할 위치를 선정한다.
+  * 필터 : 어떤 애노테이션을 스캔 할지 또는 제외 할지.
+
+* 컴포넌트 스캔의 대상들
+
+  * @Component
+    * 컴포넌트를 확장한 어노테이션들
+    * @Repository
+    * @Service
+    * @Controller
+    * @Configuration
+    * 등
+
+* 컴포넌트 스캔의 동작 원리
+
+  * @ComponentScan은 스캔할 패키지(basePackages)와 애노테이션에 대한 정보를 가지고 있다.
+  * **실제 스캐닝**은 BeanFactoryPostProcessor를 확장한 **ConfigurationClassPostProcessor**에 의해서 처리되는데, 이 시점은 3. @Autowired 에서 설명한 **표준 빈 라이프사이클 초기화 메서드 단계 이전이다.**
+  * 다른 모든 빈들이 만들어지기 이전에 동작한다. 다른 빈이라는 것은 @Bean으로 **직접** 등록하거나, Application을 run 하면서 **직접** functional하게 컴포넌트 스캔 해당 패키지 바깥에 있는 빈등을 말한다. 핵심은 직접!
+  * 직접 만드는 빈들이 만들어 지기 이전에 컴포넌트 스캔으로 빈들을 등록해준다.
+
+* Functional 하게 빈 등록하는 방법
+
+  * 스프링 5부터는 application initialize 시점에 컴포넌트 스캔 패키지 외부의 빈을 직접 등록할 수 있다.
+
+  * 이 방법은 리플렉션과 프록시를 사용하지 않기 때문에, 초기 구동시 모든 빈이 등록할 때 드는 비용(성능)상의 이점을 가져갈 수 있다.
+
+  * 하지만, 이것 때문에 컴포넌트 스캔 대신 Functional 하게 모든 빈을 일일히 등록하는 건 좀 불편하지 않을까..
+
+    ```java
+    public static void main(String[] args) {
+      new SpringApplicationBuilder(Application.class)
+        .sources(Application.class)
+        .initializers((ApplicationContextInitializer<GenericApplicationContext>) ctx -> {
+          ctx.registerBean(MyBean.class);
+        })
+        .run(args);
+    }
+    ```
+
 ## Reference
 
 * https://spring.io/projects/spring-framework
