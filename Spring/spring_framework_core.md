@@ -49,6 +49,7 @@
         * HierarchicalBeanFactory
     * EnvironmentCapable
         * spring-core 모듈
+        * 프로파일과 프로퍼티를 다루는 인터페이스
     * MessageSource
         * spring-context 모듈
         * 메세지 소스 처리 기능(i18n)
@@ -334,6 +335,171 @@
   * 필드가 공유된다.
   * 멀티스레드 환경에서 빈의 필드를 변경하려고 하기때문에 스레드 세이프한 코딩이 필수적이다.
   * 모든 싱글톤 빈들은 ApplicationContext 초기 구동시 인스턴스가 생성된다.
+
+### 6. Environment 1부. 프로파일
+
+* ApplicationContext는 BeanFactory 기능 외에도, 여러가지 기능을 가지고 있다. 그중 하나가 프로파일과 프로퍼티를 다루는 것인데 ApplicationContext가 EnvironmentCapable 인터페이스를 상속 받았기 때문에 그 기능을 사용할 수 있다.
+
+* 프로파일
+
+  * 빈들의 그룹
+
+  * **Environment**의 역할은 활성화 할 프로파일 확인 및 설정하는 것이다.
+
+    ```java
+    @Autowired
+    ApplicationContext ctx;
+    
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+      Environment environment = ctx.getEnvironment();
+      System.out.println(Arrays.toString(environment.getActiveProfiles()));  // 기본은 비어있음
+      System.out.println(Arrays.toString(environment.getDefaultProfiles()));  // [default]
+    }
+    ```
+
+* 프로파일 유스케이스
+
+  * 테스트 환경에서는 A라는 빈을, 배포환경에서는 B라는 빈을 쓰고 싶다.
+  * 이 빈은 모니터링 용도니까 테스트할 때는 필요없고, 배포할 때만 등록이 되면 좋겠다.
+
+* 프로파일 정의하기
+
+  * 아래의 설정 파일은 테스트라는 프로파일에서만 사용되는 빈설정 파일이다.
+
+  * 클래스에 정의
+
+    ```java
+    @Configuration
+    @Profiles("test")
+    public class TestConfiguration {
+      
+      @Bean
+      public BookRepository bookRepository() {
+        return new TestBookRepository();
+      }
+    }
+    ```
+
+    ```java
+    @Repository
+    @Profiles("test")
+    public class TestBookRepository implements BookRepository {
+    }
+    ```
+
+  * 메소드에 정의
+
+    ```java
+    @Configuration
+    public class TestConfiguration {
+      
+      @Bean
+      @Profiles("test")
+      public BookRepository bookRepository() {
+        return new TestBookRepository();
+      }
+    }
+    ```
+
+* 프로파일 설정하기
+
+  * 인텔리제이에서는 Active Profiles에 추가 또는, VM options에 `-Dspring.profiles.active="test"`를 추가하면 된다.
+  * 또는 jar파일 실행시 VM 옵션을 주면 된다. `$ java -Dspring.profiles.active="test" -jar [파일이름].jar`
+  * 테스트 할 경우에는 
+    * 테스트 코드 실행시 특정 환경을 맞춰야 한다면 **@ActiveProfiles** 를 사용하면 된다.
+
+* 프로파일 표현식
+
+  * ! (not)
+
+  * & (and)
+
+  * | (or)
+
+  * 사용 예
+
+    * prod환경이 아닌 경우에만 빈을 등록
+
+      ```java
+      @Repository
+      @Profiles("!prod")
+      public class TestBookRepository implements BookRepository {
+      }
+      ```
+
+### 7. Environment 2부. 프로퍼티
+
+* 프로퍼티
+
+  * 어플리케이션에 등록되어 있는 여러가지 키-밸류 쌍으로 정의되어 있는 정보
+  * 다양한 방법으로 정의할 수 있는 설정값
+  * 여기서 Environment의 역할은 프로퍼티 소스 설정 및 프로퍼티 값 가져오기
+
+* 만약 어플리케이션 실행시 VM options 으로 `-Dapp.name=spring5` 를 줬다면, 어플리케이션에서는 아래와 같이 접근이 가능하다.
+
+  ```java
+  @Autowired
+  ApplicationContext ctx;
+  
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    Environment environment = ctx.getEnvironment();
+    environment.getProperty("app.name"); // 프로퍼티 키 값으로 접근
+  }
+  ```
+
+* 프로퍼티 파일을 만들고, 그 파일을 참조해서 프로퍼티 값을 참조하는 것도 가능하다.
+
+  * resources/app.properties
+
+    ```java
+    app.about=test
+    ```
+
+  * Application.java
+
+    * **@PropertySource 활용**
+
+      ```java
+      @SpringBootApplication
+      @PropertySource("classpath:/app.properties")
+      public class Application {
+        public static void main(String[] args) {
+          
+        }
+      }
+      ```
+
+  * AppRunner.java
+
+    * Environment를 통해서 프로퍼티 값 가져오기
+
+      ```java
+      @Autowired
+      ApplicationContext ctx;
+      
+      @Override
+      public void run(ApplicationArguments args) throws Exception {
+        Environment environment = ctx.getEnvironment();
+        environment.getProperty("app.about"); // 프로퍼티 키 값으로 접근 test 출력
+      }
+      ```
+
+* **프로퍼티에는 우선 순위가 있다.** 계층형(hierarchical)으로 접근한다는 말이 우선순위에 따라서 값이 결정 된다는 이야기이다.
+  * 같은 옵션을 JVM 시스템 프로퍼티로 줄 때와 프로퍼티 소스(.properties 파일)로 넣은게 높을까?
+    * JVM 옵션으로 줄때가 높다.
+  * **StandardServletEnvironment의 우선순위**
+    * ServletConfig 매개변수
+    * ServletContext 매개변수
+    * JNDI (java:comp/env/)
+    * JVM 시스템 프로퍼티 (-Dkey="value")
+    * JVM 시스템 환경 변수(운영 체제 환경 변수)
+* 스프링 부트의 외부 설정 참고
+  * 스프링 부트에서는 프로퍼티를 더 쉽게 쓸 수 있게 지원해 준다.
+  * 프로파일 까지 고려한 계층형 프로퍼티 우선 순위를 제공한다.
+  * **스프링 부트의 외부 설정과 프로퍼티에 관한 내용 정리**
+    * [https://github.com/namjunemy/TIL/blob/master/SpringBoot/03_springboot_utilization.md#3-1-%EC%99%B8%EB%B6%80%EC%84%A4%EC%A0%95-1%EB%B6%80](https://github.com/namjunemy/TIL/blob/master/SpringBoot/03_springboot_utilization.md#3-1-외부설정-1부)
 
 ## Reference
 
