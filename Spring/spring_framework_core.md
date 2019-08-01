@@ -24,7 +24,7 @@
 * **Inversion of Control**
     * 의존 관계 주입(Dependency Injection)이라고도 하며, 어떤 객체가 사용하는 의존 객체를 직접 만들어 사용하는게 아니라, 주입 받아 사용하는 방법을 말함.
 * **스프링 IoC 컨테이너**
-    * BeanFactory
+    * **BeanFactory**
         * 스프링 프레임워크의 중요한 인터페이스
     * 애플리케이션 컴포넌트의 중앙 저장소
     * 빈 설정 소스로부터 빈 정의를 읽어들이고, 빈을 구성하고 제공한다.
@@ -44,22 +44,22 @@
             * @PostConstruct 등
 * **ApplicationContext**
     * ApplicationContext는 spring-context 모듈 안에 위치함
-    * spring-beans 모듈의 BeanFactory를 상속받고, 그외 다양한 기능을 가지는 인터페이스도 추가로 상속받은 인터페이스
-        * ListableBeanFactory
-        * HierarchicalBeanFactory
-    * EnvironmentCapable
-        * spring-core 모듈
-        * 프로파일과 프로퍼티를 다루는 인터페이스
-    * MessageSource
-        * spring-context 모듈
-        * 메세지 소스 처리 기능(i18n)
-    * ApplicationEventPublisher
-        * spring-context 모듈
-        * 이벤트 발행 기능
-    * ResourcePatternResolver
-        * spring-core 모듈
-        * ResourceLoader
-        * 리소스 로딩 기능 등
+    * spring-beans 모듈의 **BeanFactory**(스프링 IoC 컨테이너)를 상속받고, 그외 다양한 기능을 가지는 인터페이스도 추가로 상속받은 인터페이스
+        * **ListableBeanFactory**
+        * **HierarchicalBeanFactory**
+        * **EnvironmentCapable**
+            * spring-core 모듈
+            * 프로파일과 프로퍼티를 다루는 인터페이스
+        * **MessageSource**
+            * spring-context 모듈
+            * 메세지 소스 처리 기능(i18n)
+        * **ApplicationEventPublisher**
+            * spring-context 모듈
+            * 이벤트 발행 기능
+        * **ResourcePatternResolver**
+            * spring-core 모듈
+            * **ResourceLoader**
+            * 리소스 로딩 기능 등
 
 ### 2. ApplicationContext와 다양한 빈 설정 방법
 
@@ -73,7 +73,7 @@
 
     * 특정 패키지 하위에 있는 빈이 될 클래스들을 모두 스캔해서 빈으로 등록하는 방법이다.
     * 빈 스캐닝시 기본적으로 @Component 어노테이션을 사용해서 빈으로 등록할 수 있고,
-    * @Component를 확장받은 @Controller, @Service, @Repository 모두 컴포넌트 스캔의 대상이 된다.
+    * @Component를 확장한 @Controller, @Service, @Repository 모두 컴포넌트 스캔의 대상이 된다.
 
 * **Java Config**로 직접 빈 설정도 사용할 수 있다.
 
