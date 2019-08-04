@@ -277,7 +277,7 @@ create table Member (
     * JPA 입장에서는 코드를 짤 때, 테이블을 보지 않는다.
     * Member 객체를 대상으로 쿼리를 만든다고 보면 된다.
     * 멤버 **객체** 를 모두 가져오라는 쿼리이다.
-    * **JPQL에서 작성하는 쿼리의 대상이 테이블이 아니고 객체(엔티티)**다.
+    * **JPQL에서 작성하는 쿼리의 대상이 테이블이 아니고 객체(엔티티)** 다.
 
     ```java
     EntityManager em = emf.createEntityManager();
