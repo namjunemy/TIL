@@ -44,7 +44,7 @@
 ### JPA
 
 * 자바 ORM 표준 JPA 프로그래밍 - 기본편
-    * [01.]()
+    * [01. SQL 중심적인 개발의 문제점](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/01_sql_centric_problem.md)
 
 * T아카데미 토크온 세미나
     * [01. SQL 중심적인 개발의 문제점과 JPA 소개](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/01_jpa_basic_intro.md>)
