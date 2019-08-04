@@ -313,3 +313,7 @@ class memberService {
 * 결론적으로 객체답게 모델링 할수록 매핑 작업만 늘어나게 된다.
 * 객체를 자바 컬렉션에 저장하듯이 DB에 저장할 수는 없을까?
 * 자바진영에서는 그 고민의 결과가 **JPA**다.
+
+### Reference
+
+* [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
