@@ -43,13 +43,17 @@
 
 ### JPA
 
-* [01. SQL 중심적인 개발의 문제점과 JPA 소개](<https://github.com/namjunemy/TIL/blob/master/Jpa/01_jpa_basic_intro.md>)
-* [02. JPA 기초와 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/02_jpa_basic_mapping.md>)
-* [03. JPA 필드와 컬럼 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/03_jpa_field_column_mapping.md>)
-* [04. JPA 연관관계 매핑 이론 - 단방향 매핑, 양방향 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/04_jpa_relational_mapping.md>)
-* [05. JPA 영속성 컨텍스트, 프록시와 Lazy Loding](<https://github.com/namjunemy/TIL/blob/master/Jpa/05_jpa_persistence_context.md>)
-* [06. JPA 객체지향 쿼리, JPQL](<https://github.com/namjunemy/TIL/blob/master/Jpa/06_jpa_query.md>)
-* [07. Spring Data JPA와 QueryDSL 이해, 실무 경험 공유](https://github.com/namjunemy/TIL/blob/master/Jpa/07_spring_data_jpa.md)
+* 자바 ORM 표준 JPA 프로그래밍 - 기본편
+    * [01.]()
+
+* T아카데미 토크온 세미나
+    * [01. SQL 중심적인 개발의 문제점과 JPA 소개](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/01_jpa_basic_intro.md>)
+    * [02. JPA 기초와 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/02_jpa_basic_mapping.md>)
+    * [03. JPA 필드와 컬럼 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/03_jpa_field_column_mapping.md>)
+    * [04. JPA 연관관계 매핑 이론 - 단방향 매핑, 양방향 매핑](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/04_jpa_relational_mapping.md>)
+    * [05. JPA 영속성 컨텍스트, 프록시와 Lazy Loding](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/05_jpa_persistence_context.md>)
+    * [06. JPA 객체지향 쿼리, JPQL](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/06_jpa_query.md>)
+    * [07. Spring Data JPA와 QueryDSL 이해, 실무 경험 공유](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/07_spring_data_jpa.md)
 
 ### JavaScript
 

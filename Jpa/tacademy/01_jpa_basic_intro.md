@@ -279,7 +279,7 @@ class memberService {
 
 * JPA는 애플리케이션과 JDBC 사이에서 동작한다. JDBC API 와 DB 사이에 있기 때문에 가운데서 대신 무언가를 해준다.
 
-  ![](https://github.com/namjunemy/TIL/blob/5ab5553422b235a6b06e6dd9e4eedc5b6f14fe21/Jpa/img/01_extends.PNG?raw=true)
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/01_extends.PNG?raw=true)
 
 * **저장**
 
@@ -298,7 +298,7 @@ class memberService {
 
   * 예)
 
-    ![](https://github.com/namjunemy/TIL/blob/5ab5553422b235a6b06e6dd9e4eedc5b6f14fe21/Jpa/img/02_jpa_save.PNG?raw=true)
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/02_jpa_save.PNG?raw=true)
 
 * **조회**
 
@@ -306,7 +306,7 @@ class memberService {
 
   * 예)
 
-    ![](https://github.com/namjunemy/TIL/blob/5ab5553422b235a6b06e6dd9e4eedc5b6f14fe21/Jpa/img/03_jpa_find.PNG?raw=true)
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/03_jpa_find.PNG?raw=true)
 
 ### JPA 소개
 

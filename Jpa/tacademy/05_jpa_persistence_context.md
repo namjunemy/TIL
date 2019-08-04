@@ -11,7 +11,7 @@ JPA를 공부할 때 가장 중요한게 **객체와 관계형 데이터베이�
 * JPA는 스레드가 하나 생성될 때 마다(매 요청마다) EntityManagerFactory에서 EntityManager를 생성한다.
 * EntityManager는 내부적으로 DB 커넥션 풀을 사용해서 DB에 붙는다.
 
-![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/10_jpa_em.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/10_jpa_em.PNG?raw=true)
 
 ## 영속성 컨텍스트
 
@@ -27,13 +27,13 @@ JPA를 공부할 때 가장 중요한게 **객체와 관계형 데이터베이�
   * 눈에 보이지 않는다.
   * 엔티티 매니저를 통해서 영속성 컨텍스트에 접근한다.
 
-  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/11_jpa_em.PNG?raw=true)
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/11_jpa_em.PNG?raw=true)
 
   * 스프링에서 EntityManager를 주입 받아서 쓰면, 같은 트랜잭션의 범위에 있는 EntityManager는 동일 영속성 컨텍스트에 접근한다.
 
 ## 엔티티의 생명주기
 
-![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/12_entity_lifecycle.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/12_entity_lifecycle.PNG?raw=true)
 
 * 비영속(new/transient)
 
@@ -204,7 +204,7 @@ JPA를 공부할 때 가장 중요한게 **객체와 관계형 데이터베이�
 
   * 그러고나서 commit()또는 flush()가 일어날 때 **엔티티와 스냅샷을 비교**해서, 변경사항이있으면 UPDATE SQL을 알아서 만들어서 DB에 저장한다.
 
-    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/13_dirty_checking.PNG?raw=true)
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/13_dirty_checking.PNG?raw=true)
 
   * update() 만들면 되지 왜 이렇게 복잡한 방법으로 처리하나...
 
@@ -295,7 +295,7 @@ JPA를 공부할 때 가장 중요한게 **객체와 관계형 데이터베이�
     * 그리고 나서 멤버가 팀을 가져와서, **실제 사용하는 순간**에 팀의 값을 채운다. 쿼리 날려서 가져온다.
     
   
-  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/14_lazy_proxy.PNG?raw=true)
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/14_lazy_proxy.PNG?raw=true)
   
 * 위에서 언급했지만 스프링을 사용하면서 트랜잭션의 범위 밖 준영속 상태에서 조회를 하려고하면 LazyInitializationException을 마주치게 된다. 주의하자.
 

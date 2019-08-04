@@ -86,7 +86,7 @@
 * 객체지향 모델링
   * 객체 연관관계 사용
 
-  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/06_jpa_relational.PNG?raw=true)
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/06_jpa_relational.PNG?raw=true)
 
 * 객체의 참조와 테이블의 외래 키를 매핑한다.
 
@@ -196,7 +196,7 @@
 * DB를 보자. DB는 바뀌는게 없다. 왜냐. 둘을 join 하면 된다. DB는 방향이 없다!
 * 이 두가지가 큰 차이다.
 
-![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/07_jpa_relational2.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/07_jpa_relational2.PNG?raw=true)
 
 * Member 엔티티는 단방향과 동일
 
@@ -312,7 +312,7 @@
   * 두 객체에 따로따로 두번 넣을 때, DB에는 두번 업데이트 해야할 까?
   * 이게 가장 큰 패러다임 의 문제이다.
 
-![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/08_jpa_fk.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/08_jpa_fk.PNG?raw=true)
 
 * **연관관계의 주인(Owner)**
   * 이 문제를 해결하기 위해 만들어진 개념이다.
@@ -339,7 +339,7 @@
 
     * 이미, 단방향 매핑만으로 ORM 매핑이 다 끝났다. 양방향은 단순히 조회를 편하게 하기 위해 부가 기능이 조금더 들어가는 거라고 보면 된다. 어차피 조회할 수 있는 기능만 있다.
 
-    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/img/09_jpa_fk2.PNG?raw=true)
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/09_jpa_fk2.PNG?raw=true)
 
 * **양방향 매핑시 가장 많이 하는 실수**
 
