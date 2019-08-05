@@ -20,7 +20,7 @@
 
 * 개발자는 직접 JDBC API를 쓰지 않고, JPA를 통해서 사용한다.
 
-  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/02_jpa_working_point.PNG?raw=true)
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/02_jpa_working_point.png?raw=true)
 
 ### 저장
 
@@ -205,18 +205,18 @@
       transction.commit();
     ```
   
-* **지연 로딩(Lazy Loading)**
-  
-    * 지연로딩 : **객체가 실제 사용될 때** 로딩
-  
+* 지연 로딩(Lazy Loading)
+
+    - 지연로딩 : **객체가 실제 사용될 때** 로딩
+
       ```java
       Member member = memberDAO.find(memberId);  // SELECT * FROM MEMBER
-    Team team = member.getTeam();
+      Team team = member.getTeam();
       String teamName = team.getName();  //SELECT * FROM TEAM
-    ```
-  
-    * 즉시로딩: JOIN SQL로 한번에 연관된 객체까지 미리 조회
-  
+      ```
+
+    - 즉시로딩: JOIN SQL로 한번에 연관된 객체까지 미리 조회
+
       ```java
       Member member = memberDAO.find(memberId);  // SELECT ... FROM MEMBER JOIN TEAM ...
       Team team = member.getTeam();

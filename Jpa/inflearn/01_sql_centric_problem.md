@@ -208,17 +208,21 @@ class memberService {
 
 * **(객체지향 적인)객체 모델링을 자바 컬렉션에 관리**한다고 생각하면, 객체지향 적인 설계가 괜찮은 설계가 된다.
 * 리스트에 멤버를 저장하면, 팀도 같이 저장된다.
+    
     * `list.add(member);`
 * 멤버가 필요하면?
+    
     * `Member member = list.get(memberId);`
 * 멤버의 팀을 조회하고 싶으면?
+    
     * `Team team = member.getTeam();`
 * 이걸 RDB에 저장하고 조회하면 생산성이 안나오기 시작한다.
+  
   * 그래서 슈퍼 DTO 만들어서 객체 하나로 반환해서 사용했다. 그게 생산성 측면에서 더 좋았다.
 
 ### 객체 그래프 탐색
 
-![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/01_graph_navigation.PNG?raw=true)
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/01_graph_navigation.png?raw=true)
 
 * 객체는 자유롭게 객체 그래프를 탐색할 수 있어야 한다.
 
