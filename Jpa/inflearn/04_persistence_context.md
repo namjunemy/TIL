@@ -274,7 +274,7 @@ em.remove(memberA); // 엔티티 삭제
   
   System.out.println("플러시 직접 호출하면 쿼리가 커밋 전 플러시 호출 시점에 나감");
   
-  em.commit();
+  transaction.commit();
   ```
 
 * **트랜잭션 커밋**시 플러시 자동 호출
@@ -320,5 +320,73 @@ em.remove(memberA); // 엔티티 삭제
   * 어쨋든 트랜잭션이 시작되고 커밋되는 시점에만 동기화 해주면 되기 때문에, 그 사이에서 플러시 매커니즘의 동작이 가능한 것이다.
 * JPA는 기본적으로 데이터를 맞추거나 동시성에 관련된 것들은 데이터베이스 트랜잭션에 위임한다. 참고로 알아두자.
 
+## 준영속 상태
 
+- 영속 상태
+
+  - **영속성 컨텍스트의 1차 캐시에 올라간 상태가 영속 상태이다.** 엔티티 매니저가 관리하는 상태.
+
+  - em.persist()로 영속성 컨텍스트에 저장한 상태도 영속 상태이지만,
+
+  - **em.find()로 조회를 할 때, 영속성 컨텍스트 1차 캐시에 없어서 DB에서 조회해와서 1차 캐시에 저장한 상태도 영속 상태다.**
+
+  - 코드로 보면
+
+    - em.find()가 일어 날때, 1차 캐시에 없으므로 DB에서 조회한 엔티티를 1차 캐시에 넣는다. 영속상태가 됐다.
+    - setName으로 이름을 바꾸고 커밋 하려니까, Dirty Checking이 일어나서 1차 캐시의 엔티티와 스냅샷이 다른 것을 감지하고 Update 쿼리를 날리게 된다.
+
+    ```java
+    Member member = em.find(Member.class, 150L);
+    
+    member.setName("AAAAA");
+    transaction.commit();
+    ```
+
+- 준영속 상태 - 영속 상태의 엔티티가 영속성 컨텍스트에서 분리된 상태(detached)
+
+  - `em.detach(member);` 로 멤버를 영속성 컨텍스트에서 분리하고
+
+  - 트랜잭션을 커밋하면, 아무 일도 일어나지 않는다. JPA가 관리 하지 않는 객체가 된다.
+
+  - 실제로 아래에선 UPDATE 쿼리가 나가지 않는다.
+
+    ```java
+    Member member = em.find(Member.class, 150L);
+    member.setName("AAAAA");
+    
+    em.detach(member);
+    
+    transaction.commit();
+    ```
+
+- 영속성 컨텍스트가 제공하는 기능을 사용하지 못함. 쿼리 안나감.
+
+- **준영속 상태로 만드는 방법**
+
+  - em.detach(entity) - 특정 엔티티만 준영속 상태로 전환
+
+  - em.clear() - 영속성 컨텍스트를 완전히 초기화
+
+    - 아래 코드의 경우 첫번째 find에서 멤버를 SELECT 해서 영속성 컨텍스트에 저장하고
+    - 영속성 컨텍스트를 초기화 했다.
+    - 그러고나서 같은 아이디를 가지는 멤버를 다시 조회했을때는 SELECT 쿼리가 다시 나간다.
+    - 총 2번의 SELECT 쿼리가 발생한다.
+    - clear는 테스트 케이스 작성시에 도움이 된다.
+
+    ```java
+    Member member = em.find(Member.class, 150L);
+    member.setName("AAAAA");
+    
+    em.clear();
+    
+    Member member1 = em.find(Member.class, 150L);
+    
+    transaction.commit();
+    ```
+
+  - em.close() - 영속성 컨텍스트를 종료
+
+### Reference
+
+- [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
 
