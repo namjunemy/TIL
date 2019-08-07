@@ -47,6 +47,7 @@
     * [01. SQL 중심적인 개발의 문제점](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/01_sql_centric_problem.md)
     * [02. JPA 소개](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/02_jpa_intro.md)
     * [03. JPA 시작하기(프로젝트 생성, 애플리케이션 개발), JPQL 소개](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/03_jpa_start_hello_application.md)
+    * [04. 영속성 컨텍스트](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/04_persistence_context.md)
     
 * T아카데미 토크온 세미나
     * [01. SQL 중심적인 개발의 문제점과 JPA 소개](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/01_jpa_basic_intro.md>)
