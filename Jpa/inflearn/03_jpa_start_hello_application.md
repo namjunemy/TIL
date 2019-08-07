@@ -51,9 +51,7 @@
 </persistence>
 ```
 
-* dialect는 데이터베이스 방언이라는 뜻인데,
-
-### 데이터베이스 방언
+### 데이터베이스 방언(Dialect)
 
 * JPA는 특정 데이터베이스에 종속적이지 않은 기술
 * 각각의 데이터베이스가 제공하는 SQL 문법과 함수는 조금씩 다르다
@@ -88,7 +86,7 @@
 - @Id
     - DB PK와 매핑할 필드
 
-```
+```java
 @Entity
  public class Member {
  @Id
@@ -96,6 +94,8 @@
  private String name;
 //Getter, Setter ...
 }
+
+//SQL
 create table Member (
  id bigint not null,
  name varchar(255),

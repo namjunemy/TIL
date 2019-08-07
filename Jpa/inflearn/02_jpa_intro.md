@@ -33,7 +33,7 @@
   * INSERT INTO ITEM ...
   * INSERT INTO ALBUM ...
 
-* JPA persistant 객체에 Album 객체 저장하면. 알아서 INSERT 쿼리 두개 만들어서 넣는다.
+* JPA persistent 객체에 Album 객체 저장하면. 알아서 INSERT 쿼리 두개 만들어서 넣는다.
 
 * 단순하게 INSERT 쿼리 두벌 만들어서 DB에 넣는게 아니라 **패러다임의 불일치 자체를 해결**한다.
 
