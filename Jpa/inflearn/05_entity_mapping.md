@@ -66,7 +66,7 @@ JPA를 공부할 때 가장 중요한게
     | ----------- | ------------------------------------------------------------ |
     | create      | 기존 테이블 삭제 후 다시 생성(DROP + CREATE)                 |
     | create-drop | create와 같으나 종료시점에 테이블 DROP(테스트에서 사용하면 도움됨) |
-    | update      | 변경분만 반영(운영DB에는 사용하면 안됨). **추가하는 변경분만 반영, DELETE X** |
+    | update      | 변경분만 반영(운영DB에는 사용하면 안됨). **추가하는 변경분만 반영, DROP X** |
     | validate    | 엔티티와 테이블이 정상 매핑되었는지만 확인                   |
     | none        | 사용하지 않음                                                |
 
@@ -91,6 +91,102 @@ JPA를 공부할 때 가장 중요한게
     * @Column(unique = true)
 * 위와 같이 DDL을 생성할 때 우리가 사용하는 어노테이션들(**DDL 생성 기능**)은 JPA의 실행 매커니즘에 영향을 주지 않는다. DB에만 영향을 준다.
     * 매핑테이블 지정 @Table(name = "another")은 런타임에 영향을 준다.
+
+## 필드와 컬럼 매핑
+
+* 이해를 돕기위한 요구사항
+    * 회원은 일반 회원과 관리자로 구분해야 한다.
+    * 회원 가입일과 수정일이 있어야 한다.
+    * 회원을 설명할 수 있는 필드가 있어야 한다. 이 필드는 길이 제한이 없다.
+
+```java
+@Entity
+public class Member {
+
+    @Id
+    private Long id;
+
+    @Column(name = "name")
+    private String username;
+
+    private Integer age;
+
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastModifiedDate;
+
+    @Lob
+    private String description;
+}
+```
+
+### 필드-컬럼 매핑 어노테이션 정리
+
+#### @Column
+
+- @Column(name = "USERNAME")
+- name
+    - 필드와 매핑할 테이블의 컬럼 이름
+    - default = 객체의 필드이름
+- insertable, updatable
+    - TRUE/FALSE 설정. 읽기 전용
+    - default = true
+- nullable(DDL)
+    - null 허용여부 결정, DDL 생성시 사용(not null 제약 조건이 추가됨)
+- unique(DDL)
+    - 유니크 제약 조건, DDL 생성시 사용
+    - 실제로는 필드에 조건을 주면 alter문으로 constraint 추가할 때 컬럼명이 랜덤으로 생성된다.
+    - **@Table의 uniqueConstrains 옵션에 이름까지 줄 수 있고, 복수로 설정 가능하다.**
+    - https://stackoverflow.com/questions/3126769/uniqueconstraint-annotation-in-java
+- columnDefinition(DDL)
+    - DB 컬럼 정의를 직접 할 수 있다.
+    - 정의한 문구가 DDL에 그대로 들어간다.
+    - default는 자바 필드 타입과 DB 방언 정보를 사용해서 만듦
+    - ex)
+        - varchar(100) default 'EMPTY'
+- length(DDL)
+    - 문의 길이 제약조건, String 타입에만 사용
+    - default = 255
+- precision, scale(DDL)
+    - 큰 숫자를 표현하는 자료형 BigDecimal 타입(BigInteger도)에서 사용한다.
+    - precision은 소수점을 포함한 전체 자릿수를 지정하는 옵션이고,
+    - scale은 소수점 자리수를 지정하는 옵션이다.
+    - Double, float 타입에는 적용되지 않는다. 
+
+#### @Temporal
+
+- @Temporal(TemporalType.TIMESTAMP)
+- 날짜 타입. 시간과 관련된 매핑
+- Date 뿐만아니라 자바8에서 지원하는 LocalDatetime도 지원한다.
+- **LocalDate, LocalDateTime을 사용할 때는 어노테이션 생략 가능**하다.(최신 하이버네이트 지원)
+    - LocalDate -> date 타입(ex : 2018-01-01)
+    - LocalDateTime -> timestamp 타입 (ex : 2018-01-01 11:11:11)
+
+#### @Enumerates
+
+- @Enumerated(EnumType.STRING)
+- 자바의 Enum 타입 매핑을 지원한다.
+- 현**업에서는 EnumType을 무조건 STRING으로 지정** 해야한다.
+- 기본 값인 ORDINAL로 설정하면 **Enum 순서로 숫자가 매핑되는데, Enum 중간에 필드가 하나 추가 되면 다 꼬이게 된다.**
+
+#### @Lob
+
+- 컨텐츠의 길이가 너무 길 경우(varchar를 넘는) 바이너리 파일로 DB에 바로 밀어 넣어야 하는데, 보통 이런 경우에 사용한다.
+- 공통적으로 @Lob으로 사용하면 된다.
+- CLOB, BLOB 매핑은 지정할 수 있는 속성이 없다. 아래의 기준으로 자동 매핑 된다.
+    - CLOB : String, char[], java.sql.CLOB
+    - BLOB : byte[], java.sql.BLOB
+
+#### @Transient
+
+- 이 필드는 매핑하지 않는다.
+- 애플리케이션에서 DB에 저장하지 않는 필드
+- 주로 메모리상에서만 임시로 관리하고 싶을 경우 사용
 
 ### Reference
 
