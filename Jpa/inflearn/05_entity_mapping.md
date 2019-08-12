@@ -188,6 +188,98 @@ public class Member {
 - 애플리케이션에서 DB에 저장하지 않는 필드
 - 주로 메모리상에서만 임시로 관리하고 싶을 경우 사용
 
+## 기본 키 매핑
+
+### 기본 키 매핑 어노테이션
+
+- @Id
+
+    * @Id만 사용하면 직접 매핑, 직접 Id를 세팅함
+
+- @GeneratedValue(strategy = GenerationType.[**타입**])
+
+    - @Id + @GeneratedValue(strategy = GenerationType.[**타입**]) -> ID 자동 할당
+
+    - **IDENTITY**
+
+        - 기본 키 생성을 데이터베이스에 위임한다.
+        - DDL 조건에 설정되어서 들어간다.
+        - MYSQL, PostgreSQL, SQL Server, DB2에서 사용
+        - Ex)
+            - MYSQL의 AUTO_INCREMENT 
+        - **IDENTITY 전략의 특징**
+            - JPA는 보통 트랜잭션 커밋 시점에 INSERT SQL을 실행한다.
+            - 하지만 AUTO_INCREMENT는 DB INSERT SQL 실행 후에 ID값을 알 수 있다.
+            - 그러면 영속성 컨텍스트 1차 캐시에 @Id값이 저장 못하나?
+            - 이 경우를 위해서 IDENTITY 전략은 예외적으로 em.persist() 시점에 즉시  INSERT SQL을 실행한다.
+            - 그리고 JDBC가 INSERT문을 실행하고 리턴하는 ID값을 리턴해서 사용한다.(ID값을 SELECT문으로 찾진 않음)
+            - 결과적으로 쓰기지연(버퍼링)을 사용할 수 없다. 하지만, 1차 캐시는 한 트랜잭션의 범위 안에서만 사용하는 굉장히 짧은 캐시 레이어이기 때문에 성능의 차이가 극단적으로 나진 않는다. 
+
+    - **SEQUENCE**
+
+        - 데이터베이스 시퀀스는 유일한 값을 순서대로 생성하는 특별한 DB 오브젝트(ORACLE 시퀀스)
+
+        - ORACLE, PostgreSQL, DB2, H2 DB에서 사용
+
+        - 기본적으로 하이버네이트가 만드는 기본 시퀀스 오브젝트를 쓰는데, 테이블마다 시퀀스를 따로 관리하고 싶을때는 @SequenceGenerator를 사용하면 된다. Auto DDL 기능으로 시퀀스가 생성된다.
+
+        - **SEQUENCE 전략의 특징**
+
+            - SEQUENCE 전략도 **DB에서 만드는 시퀀스 오브젝트를 참조해야 한다.**
+            - em.persist()시에(영속성 컨텍스트에 저장할 때) DB 시퀀스 오브젝트에서 next value를 호출해서 가져온 다음에
+            - 트랜잭션 커밋시에 INSERT문의 Id 값에 세팅해서 사용. 쓰기지연 사용 가능
+            - allocationSize는 시퀀스 한 번 호출에 증가하는 수를 설정하는 옵션이다.
+                - **기본값이 50으로 설정 되어 있는데**, 성능 최적화에 사용된다.
+                    - INSERT문 수행시에 매번 시퀀스 테이블을 참조해서 next value를 가져오지 않고, allocationSize인 50만큼을 미리 어플리케이션 메모리에 올려놓고 사용한다.
+                    - 쭉 사용하다가 시퀀스 값이 51일 때, 다시 한번 호출해서 메모리에 올린다.
+                    - 여러대 서버의 요청에 대해서 동시성을 보장한다.
+                - **데이터베이스에서 시퀀스 값이 하나씩 증가하도록 설정되어 있으면 이 값을 반드시 1로 설정해야 된다.**
+
+            ```java
+            @Entity
+            @SequenceGenerator(
+                name = "MEMBER_SEQ_GENERATOR",
+                sequesceName = "MEMBER_SEQ",  // 매핑할 데이터베이스 시퀀스 이름
+                initialValue = 1, allocationSize = 1)
+            public class Member {
+                @Id
+                @GenerateValue(strategy = GenerationType.SEQUESCE, 
+                               generator = "MEMBER_SEQ_GENERATOR")
+                private Long id;
+            }
+            ```
+
+    - **TABLE**
+
+        - 키 생성용 테이블을 생성해서, 데이터베이스 시퀀스를 흉내낸다.
+        - 모든 DB에서 사용 가능하지만, 최적화가 되어있지 않은 테이블을 직접 사용하니까 성능상의 이슈가 있다.
+        - @SequenceGenerator와 유사하게 사용. 테이블 마다 @TableGenerator 필요
+        - **TABLE 전략의 특징**
+            - **SEQUENCE 전략의 특징** 참조
+
+    - **AUTO**
+
+        - 방언에 따라 자동 지정, 기본값
+
+### 권장하는 식별자 전략
+
+* 기본 키 제약 조건
+    * null이 아니고
+    * 유일해야 하며
+    * **변하면 안된다.**
+
+* 미래까지 이 조건을 만족하는 자연키는 찾기 어렵다. 대리키(대체키)를 사용하자.
+    * 자연키 - 비즈니스 적으로 의미가 있는 키(전화번호, 주민등록번호 등)
+
+* 예를 들어, 주민등록번호도 기본 키로 적절하지 않다.
+    * 주민번호를 PK로 설정하고 다른 테이블과 FK 참조시 그대로 주민번호가 넘어간다. 갑자기 나라에서 개인정보 목적으로 "DB에 주민번호 저장하지 마라"라고 한다. 마이그레이션 헬..오픈
+
+* 권장
+    * **Long + 대체키 + 키 생성전략 사용**
+    * 대체키는 전혀 비즈니스랑 관계없는 키.
+    * AUTO_INCREMENT로 숫자로 PK를 사용하면, int쓰면 안된다. 생각보다 금방 끝난다..
+    * Long 타입으로.
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
