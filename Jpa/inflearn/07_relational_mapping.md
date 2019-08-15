@@ -394,3 +394,148 @@ member.setTeam(teamB);
 
     ![img](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/img/09_jpa_fk2.PNG?raw=true)
 
+### 양방향 매핑시 가장 많이 하는 실수
+
+* **연관관계의 주인**에 값을 입력하지 않음
+
+* 연관관계의 주인을 Member.team으로 잡아놓고, Team의 members에만 연관관계를 설정한다.
+
+* 주인이 아닌 mappdBy가 설정 되어있는 Team의 members는 조회 권한만 가지고 있고, DB에 영향을 주지 못한다.
+
+* 따라서, **DB에 Member를 조회해보면, TEAM_ID 가 NULL인 상황이 발생한다.**
+
+* 양방향 매핑에 대해서 잘 이해하고 있으면, DB 모델링에 따라서 객체 모델링은, ORM 모델링은 이렇게 엮어 가면 되겠구나 라고 생각하는데 많은 도움이 된다.
+
+    ```java
+    Team team = new Team();
+    team.setName("TeamA");
+    em.persist(team);
+    
+    Member member = new Member();
+    member.setName("member1");
+    em.persist(member);
+    
+    //이 작업을 하지 않고,
+    //member.setTeam(team);
+    
+    //역방향(주인이 아닌 방향)만 연관관계 설정
+    team.getMembers().add(member);
+    
+    tx.commit();
+    ```
+
+### 양방향 매핑시 주의할점 
+
+* 양방향 매핑시 연관관계의 주인에 값을 입력해야 한다.
+
+* JPA 입장에서만 보면, 연관관계의 주인인 멤버에다가 팀을 세팅해주면 끝난다. DB에 FK값 세팅 되고 문제가 없다.
+* 굳이 team의 members 컬렉션에 멤버를 새로 넣어주지 않아도, 지연 로딩을 통해서 해당 멤버를 조회해올 수 있기 때문에 (아래의 코드에서는)아무 문제가 없다.
+    * 아래의 코드에서는 em.flush(), clear() 하는 순간에 DB에 FK 세팅 된다. 그래서 지연 로딩을 해도 FK로 조인해서 가져올 수 있다.
+    * 하지만, em.flush(), clear()가 일어나지 않으면 DB에 쿼리가 안날라가고, FK도 없이 MEMBER가 1차 캐시에만 영속화 되어있는 상태이다. members 조회해봤자 size 0이다.
+* 결론은 진짜 객체 지향적으로 고려하면 항상 **양쪽다 값을 넣어 주는 것이 맞다.**
+    * 추가적으로 JPA 없이 순수 자바 Object로 테스트 케이스가 동작하게끔 테스트 코드를 짤때도 NPE 발생한다. 양쪽다 넣어주자.
+
+```java
+Team team = new Team();
+team.setName("TeamA");
+em.persist(team);
+
+Member member = new Member();
+member.setName("member1");
+em.persist(member);
+
+// 연관관계의 주인에 값 설정
+member.setTeam(team);
+
+// 역방향 연관관계를 설정하지 않아도, 지연 로딩을 통해서 아래에서 Member에 접근할 수 있다.
+//team.getMembers().add(member);
+
+// 이 동작이 수행되지 않으면 FK가 설정되어 있지 않은 1차캐시에만 영속화 된 상태이다. SELECT 쿼리로 조회해봤자 list 사이즈 0이다.
+em.flush();
+em.clear();
+
+Team findTeam = em.find(Team.class, team.getId());
+List<Member> findMembers = findTeam.getMembers();
+
+for (Member m : findMembers) {
+    // flush, clear가 일어난 후에는 팀의 Members에 넣어주지 않았지만, 조회를 할 수 있음. 이것이 지연로딩
+    System.out.println(m.getUsername());
+}
+
+tx.commit();
+```
+
+- **순수 객체 상태를 고려해서** 항상 양쪽에 값을 설정하자.
+
+- 연관관계를 설정하다 보면 휴먼에러가 생길 여지가 많다. **연관관계 편의 메소드를 생성하는 것을 권장**한다.
+
+    - 편의 메소드에서는 주인쪽에서 연관관계의 값을 설정할때, 역방향 값도 함께 설정해준다. 메소드를 원자적으로 사용해서 세트로 움직이면 실수할 일이 없어진다.
+    - 혹시 편의 메소드 안에 비즈니스 로직이 들어가는 복잡한 경우. 책을 참조해보자.
+
+    ```java
+    class Member {
+        ...
+            
+        public void changeTeam(Team team) {
+            this.team = team;
+            team.getMembers().add(this);
+        }
+    }
+    ```
+
+- **양방향 매핑시에 무한 루프를 주의**하자
+
+    - **lombok이 자동으로 만드는 toString()을 사용하지 말자.**
+
+        - Member의 toString()
+
+            ```java
+            @Override
+                public String toString() {
+                    return "Member{" +
+                        "id=" + id +
+                        ", username='" + username + '\'' +
+                        ", team=" + team +
+                        '}';
+                }
+            ```
+
+        - Team의 toString()
+
+            ```java
+            @Override
+                public String toString() {
+                    return "Team{" +
+                        "id=" + id +
+                        ", name='" + name + '\'' +
+                        ", members=" + members +
+                        '}';
+                }
+            ```
+
+        - Member의 toString()을 호출하는 순간 Team의 toString()의 members가 호출하는 각 member의 toString()때문에 무한루프 생성. 스택오버플로우 발생
+
+    - **JSON 생성 라이브러리**
+
+        - 양방향 관계의 엔티티를 JSON으로 시리얼라이즈 하는순간 무한루프에 빠져버린다.
+        - **컨트롤러에서는 엔티티를 절대 직접 반환하지 말자.**
+            - 1 - 엔티티 -> JSON 시 무한루프 걸린다.
+            - 2 - 엔티티는 충분히 변경의 여지가 있는데, 엔티티 변경시 API 스펙 자체가 변경된다.
+                - 실무에서 웬만하면 DTO로 변환해서 반환하자. 그렇게 하면 JSON 생성 라이브러리 때문에 생기는 문제는 없다.
+
+### 양방향 매핑 정리
+
+* **단방향 매핑만으로도 이미 연관관계 매핑은 끝**이다.
+    * 실무에서 JPA 모델링 할 때, 단방향 매핑으로 처음에 설계를 끝내야 한다(객체와 테이블을 매핑하는 것). 일대다에서 다쪽에 단방향 매핑으로 쭉 설계하면 이미 테이블 FK 설정은 끝났다. 거기서 필요할때 양방향 매핑을 추가해서 역방향 조회 기능을 쓰면 된다. 테이블 영향없이 자바 코드에 컬렉션만 추가하면 된다.
+* 양방향 매핑은 반대 방향으로 조회(객체 그래프 탐색) 기능이 추가된 것 뿐이다.
+* JPQL에서 역방향으로 탐색할 일이 많다. 현업에서 많이 쓴다.
+* **단방향 매핑을 잘 하고, 테이블이 굳어진 뒤에 양방향 매핑은 필요할 때 추가해도 된다**. 테이블에 영향주지 않는다.
+    * 그동안 학습한 것을 보면, 단방향 매핑에서 양방향 매핑으로 넘어가면서 추가된 것은 팀 객체(엔티티)에 members 컬렉션이 들어간것 뿐이다. 테이블은 똑같다.
+* 연관관계의 주인을 정하는 기준은
+    * 비즈니스 로직을 기준으로 주인을 선택하면 안된다.
+    * **연관관계 주인은 외래 키의 위치를 기준**으로 정해야 한다.
+
+### Reference
+
+- [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
+
