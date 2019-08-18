@@ -501,7 +501,76 @@
   * **스프링 부트의 외부 설정과 프로퍼티에 관한 내용 정리**
     * [https://github.com/namjunemy/TIL/blob/master/SpringBoot/03_springboot_utilization.md#3-1-%EC%99%B8%EB%B6%80%EC%84%A4%EC%A0%95-1%EB%B6%80](https://github.com/namjunemy/TIL/blob/master/SpringBoot/03_springboot_utilization.md#3-1-외부설정-1부)
 
-## Reference
+### 8. MessageSource
+
+* 국제화(i18n) 기능을 제공하는 인터페이스가 ApplicationContext에 들어 있다.
+
+* 메세지를 다국화 하는 방법
+
+* ApplicationContext를 타고 들어가 보면, MessageSource를 구현하고 있다. 따라서, @Autowired로 ApplicationContext를 주입받을 수 있다면. MessageSource를 직접 주입 받을수도 있다.
+
+* MessageSource가 제공하는 인터페이스를 직접 사용할 수 있다.
+
+* 스프링 부트를 사용한다면, 별다른 설정을 하지 않아도messages로 시작하는 프로퍼티 파일들을 메세지 소스로 다 읽어준다.
+
+    * 아래에서 찍어보면 알겠지만, 부트에 등록되어있는 ResourceBundleMessageSource빈이 리소스 번들을 다 읽어서 등록해준다.
+
+    * `messages.properties`
+
+        ```properties
+        greeting = hello, {0}
+        ```
+
+    * `messages_ko_KR.properties`
+
+        ```properties
+        greeting = 안녕, {0}
+        ```
+
+    * AppRunner.java
+
+        ```java
+        @Component
+        public class AppRunner implements ApplicationRunner {
+            
+            @Autowired
+            MessageSource messageSource;
+            
+            @Override
+            public void run(ApplicationArguments args) throws Exception {
+                System.out.println(messageSource.getClass());        
+                System.out.println(messageSource.getMessage("greeting", new String[]{"NJKIM"}, Locale.getDefault()));
+                System.out.println(messageSource.getMessage("greeting", new String[]{"NJKIM"}, Locale.KOREA));
+            }
+        }
+        ```
+
+        ```text
+        class.org.springframework.context.support.ResourceBundleMessageSource
+        안녕, NJKIM
+        hello, NJKIM
+        ```
+
+* 리로딩 기능이 있는 메세지 소스를 사용할 수도 있다.
+
+    * 언제나 우리는 스프링부트가 제공하는 기능을 커스텀해서 쓸 수 있다.
+
+    * 메세지 소스의 캐시타임을 3초로 주면, 3초 주기로 리로드 하게된다.
+
+    * 빌드된 소스를 읽어서 동작하기 때문에, ide에서 빌드를 해줘야 확인가능하다.
+
+        ```java
+        @Bean
+        public MessageSource messageSource() {
+            ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+            messageSource.setBasename("classpath:/messages");
+            messageSource.setDefaultEncofing("UTF-8");
+            messageSource.setCacheSeconds(3);
+            return messageSource;
+        }
+        ```
+
+### Reference
 
 * https://spring.io/projects/spring-framework
 * 스프링 프레임워크 핵심 기술 - 백기선
