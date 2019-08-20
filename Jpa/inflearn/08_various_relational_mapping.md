@@ -98,7 +98,216 @@
     }
     ```
 
+* 실제 발생한 쿼리 확인.
+
+  * Main.java
+  
+    ```java
+    Team team = new Team();
+    team.setName("A");
+    em.persist(team);
+    System.out.println("-----팀 저장");
+    
+    Member member = new Member();
+    member.setUsername("NJ");
+    member.changeTeam(team);
+    em.persist(member);
+    System.out.println("-----멤버 저장");
+    
+    tx.commit();
+    ```
+    
+  * 실제 발생한 쿼리
+  
+    ```sql
+    Hibernate: 
+        /* insert hello.jpa.Team
+            */ 
+            insert 
+            into
+                Team
+                (id, name) 
+            values
+                (null, ?)
+    -----팀 저장
+    Hibernate: 
+        /* insert hello.jpa.Member
+            */ 
+            insert 
+            into
+                Member
+                (id, age, createdDate, description, lastModifiedDate, roleType, TEAM_ID, name) 
+            values
+                (null, ?, ?, ?, ?, ?, ?, ?)
+    -----멤버 저장
+    ```
+  
 * 정리
 
   * 외래키가 있는 쪽이 연관관계의 주인이고,
   * 양쪽을 서로 참조하도록 개발하면 된다.
+
+## 일대다 [1:N]
+
+* 일대다 관계에서는 일이 연관관계의 주인이다.
+
+* 일 쪽에서 외래키를 관리하겠다는 의미가 된다.
+
+* 결론을 먼저 말하자면, 표준스펙에서 지원은 하지만 실무에서 이 모델은 권장하지 않는다.
+
+* **일대다 단방향** 매핑
+
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/12_one_to_many.PNG?raw=true)
+
+  * 팀과 멤버가 일대다 관계이다.
+  * Team이 Members를 가지는데, Member 입장에서는 Team을 참조하지 않아도 된다라는 설계가 나올 수 있다. 객체 입장에서 생각하면 충분히 나올 수 있는 설계이다.
+  * 그러나 DB 테이블 입장에서 보면, 무조건 일대다의 다쪽에 외래키가 들어간다.
+  * Team에서 members가 바뀌면, DB의 Member 테이블에 업데이트 쿼리가 나가는 상황이다.
+
+* JPA **@OneToMany와 @JoinColumn()을 이용해서 일대다 단방향 매핑** 코드로 이해하기
+
+  * Member는 코드상 연관관계 매핑 없고, 팀에서만 일대다 단방향 매핑 설정.
+
+    ```java
+    @Entity
+    public class Team {
+        ...
+        
+        @OneToMany
+        @JoinColumn(name = "TEAM_ID")
+        private List<Member> members = new ArrayList<>();
+        
+        ...
+    }
+    ```
+
+  * Main.java
+
+    ```java
+    ...
+    Member member = new Member();
+    member.setUsername("NJ");
+    em.persist(member);
+    
+    System.out.println("-----멤버 저장");
+    
+    Team team = new Team();
+    team.setName("A");
+    team.getMembers().add(member);
+    em.persist(team);
+    
+    System.out.println("-----팀 저장");
+    
+    tx.commit();
+    ```
+
+  * 실제 발생한 쿼리
+
+    * log에서 확인해보면 **트랜잭션 커밋 시점**에 create one-to-many row로 시작되는 주석과 함께 Member 테이블을 업데이트 하는 **쿼리가 나간다.**
+
+    ```sql
+    Hibernate: 
+        /* insert hello.jpa.Member
+            */ 
+            insert 
+            into
+                Member
+                (id, age, createdDate, description, lastModifiedDate, roleType, name) 
+            values
+                (null, ?, ?, ?, ?, ?, ?)
+    -----멤버 저장
+    Hibernate: 
+        /* insert hello.jpa.Team
+            */
+            insert 
+            into
+                Team
+                (id, name) 
+            values
+                (null, ?)
+    -----팀 저장
+    Hibernate: 
+        /* create one-to-many row hello.jpa.Team.members */ 
+        update
+            Member 
+        set
+            TEAM_ID=? 
+        where
+            id=?
+    ```
+
+### 일대다 단방향 정리 - 문제점과 실무적인 해결 방안
+
+* 일대다 단방향은 일대다(1:N)의 일(1)이 연관관계의 주인이다.
+
+* 테이블 일대다 관계는 항상 다(N) 쪽에 외래키가 있다.
+
+* 객체와 테이블의 패러다임 차이 때문에 객체의 반대편 테이블의 외래키를 관리하는 특이한 구조이다.
+
+* @JoinColumn을 꼭 사용해야 한다. 그렇지 않으면 조인 테이블 방식을 사용한다.(중간에 테이블을 하나 추가한다.)
+
+  - 실제로 TEAM_MEMBER라는 테이블이 하나 생성되고, INSERT 쿼리가 나간다.
+
+    ```sql
+    Hibernate: 
+        
+        create table Team_Member (
+           Team_id bigint not null,
+            members_id bigint not null
+        )
+        
+    ...(생략)
+    
+    -----팀 저장 이후에
+    Hibernate: 
+        /* insert collection
+            row hello.jpa.Team.members */ 
+            insert 
+            into
+                Team_Member
+                (Team_id, members_id) 
+            values
+                (?, ?)
+    ```
+
+* **문제점**
+
+  * 일단 업데이트 쿼리가 나간다. 성능상 좋지않다.
+  * Main.java 파일을 보자. 코드를 보면서 쿼리를 추적할 때,
+  * 팀 엔티티를 수정했는데 멤버 테이블에 업데이트 쿼리가 나가는 상황이 나오게되고,
+  * 실무에서는 테이블이 수십개가 엮여서 돌아가는 상황에서 위와 같은 상황은 운영을 힘들게 한다.
+
+* 답은 위에서 먼저 학습한 다대일 단방향 관계로 매핑하고, 필요할 경우 양방향 매핑을 통해서 해결한다.
+
+* 객체 입장에서보면, 반대방향으로 참조할 필요가 없는데 관계를 하나 만드는 것이지만, DB의 입장으로 설계의 방향을 조금 더 맞춰서 운영상 유지보수하기 쉬운 쪽으로 선택할 수 있다.
+
+### 일대다 양방향 매핑
+
+* 이런 매핑은 공식적으로는 존재하지 않는다.
+
+* @JoinColumn(name = "team_id", insertable = false, updatable = false)
+
+* @ManyToOne과 @JoinColumn을 사용해서 연관관계를 매핑하면, 다대일 단방향 매핑이 되어버린다. 근데 반대쪽 Team에서 이미 일대다 단방향 매핑이 설정되어있다. 이런 상황에서는 두 엔티티에서 모두 테이블의 FK 키를 관리 하게 되는 상황이 벌어진다.
+
+* 그걸 막기 위해서 insert, update를 FALSE로 설정하고 읽기 전용 필드로 사용해서 양방향 매핑처럼 사용하는 방법이다.
+
+* 읽기 전용으로 사용할 경우도 있을 수 있으니, 알아두자.
+
+* **그러나, 결론은 다대일 양방향을 사용하자.**
+
+  * 테이블이 수십개 있는데, 매핑이나 설계는 단순해야 팀원 누구나 사용할 수 있다.
+
+  ```java
+  @Entity
+  public class Member {
+    ...
+      
+    @ManyToOne
+    @JoinColumn(name = "team_id", insertable = false, updatable = false)
+    private Team team;
+    
+    ...
+  }
+  ```
+
+  
