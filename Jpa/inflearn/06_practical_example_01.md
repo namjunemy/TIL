@@ -1,4 +1,4 @@
-# 실전 예제 1 - 요구사항 분석과 기본 매핑
+## 실전 예제 1 - 요구사항 분석과 기본 매핑
 
 ### 요구사항 분석
 
@@ -15,7 +15,7 @@
 - 주문
     - 상품주문, 주문내역조회, 주문취소
 
-## 도메인 모델 분석
+### 도메인 모델 분석
 
 ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/05_domain_model.png?raw=true)
 
@@ -26,11 +26,11 @@
     * 반대로 같은 **상품**도 여러 번 **주문**될 수 있다.
     * **주문상품 이라는 모델**을 만들어서 다대다 관계를 일대다, 다대일 관계로 풀어낼 수 있다.
 
-## 테이블 설계
+### 테이블 설계
 
 ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/06_table.png?raw=true)
 
-## 엔티티 설계와 매핑
+### 엔티티 설계와 매핑
 
 * 테이블 설계에 맞춰서 아래와 같이 엔티티를 설계하고 매핑 한다.
 * 이렇게 해보고, 실제로 문제점이 뭔지 파악하자
@@ -236,4 +236,203 @@
             ```
 
 * 단방향 매핑을 쭉 하고나서, 양방향 매핑을 필요할 때 해주면 된다. 하지만, 실전에서 경험을 해보면 조회시 JPQL 쿼리를 많이 짜게 되는데, 그래서 양방향 연관관계를 많이 걸게 된다.
+
+## 실전 예제 3 - 다양한 연관관계 매핑
+
+### 엔티티 - 배송, 카테고리 추가
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/19_add_entity.png?raw=true)
+
+* 주문과 배송은 1:1(@OneToOne)
+* 상품과 카테고리는 N:M(@ManyToMany)
+
+### ERD - 배송, 카테고리 추가
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/20_add_erd.png?raw=true)
+
+### 추가된 엔티티 상세
+
+* 실습에서는 JPA가 지원하는 다대다 매핑을 경험해보자.
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/20_add_erd.png?raw=true)
+
+### 구현 코드
+
+* Order와 Delivery 일대일 @OneToOne 매핑
+
+    * Order - 연관관계의 주인
+
+        ```java
+        @Entity
+        @Table(name = "orders")
+        public class Order {
+        
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            @Column(name = "order_id")
+            private Long id;
+        
+            @ManyToOne
+            @JoinColumn(name = "member_id")
+            private Member member;
+        
+            // Delivery와 1:1 매핑. 연관관계의 주인은 Order.
+            @OneToOne
+            @JoinColumn(name = "delivery_id")
+            private Delivery delivery;
+        
+            @OneToMany(mappedBy = "order")
+            private List<OrderItem> orderItems = new ArrayList<>();
+        
+            public void addOrderItem(OrderItem orderItem) {
+                this.orderItems.add(orderItem);
+                orderItem.setOrder(this);
+            }
+        
+            private LocalDateTime orderDateTime;
+        
+            @Enumerated(EnumType.STRING)
+            private OrderStatus status;
+        }
+        ```
+
+    * Delivery - mappedBy 설정
+
+        ```java
+        @Entity
+        public class Delivery {
+        
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long id;
+        
+            private String city;
+        
+            private String street;
+        
+            private String zipcode;
+        
+            private DeliveryStatus status;
+        
+            @OneToOne(mappedBy = "delivery")
+            private Order order;
+        }
+        ```
+
+* Category와 Item 다대다 @ManyToMany 매핑
+
+    * Category
+
+        * 상위, 하위 카테고리 구현시 엔티티 셀프 참조로 연관관계 매핑이 가능하다.
+        * joinColumns과 inverseJoinColumns 명시
+
+        ```java
+        @Entity
+        public class Category {
+        
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long id;
+        
+            private String name;
+        
+            // 상위 카테고리를 엔티티 셀프로 매핑할 수 있다.
+            @ManyToOne
+            @JoinColumn(name = "parent_id")
+            private Category parent;
+        
+            // 하위 카테고리 매핑
+            @OneToMany(mappedBy = "parent")
+            private List<Category> child = new ArrayList<>();
+        
+            // 다대다 관계 매핑, joinColumns과 inverseJoinColumns 명시
+            @ManyToMany
+            @JoinTable(
+                name = "category_item",
+                joinColumns = @JoinColumn(name = "category_id"),
+                inverseJoinColumns = @JoinColumn(name = "item_id")
+            )
+            private List<Item> items = new ArrayList<>();
+        }
+        ```
+
+    * Item - mappedBy 설정
+
+        ```java
+        @Entity
+        public class Item {
+        
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            @Column(name = "item_id")
+            private Long id;
+        
+            private String name;
+        
+            private int price;
+        
+            private int stockQuantity;
+        
+            @ManyToMany(mappedBy = "items")
+            private List<Category> categories = new ArrayList<>();
+        }
+        ```
+
+    * 실제 발생한 조인테이블 생성 SQL
+
+        ```sql
+        ...
+        
+        Hibernate: 
+            
+            create table category_item (
+               category_id bigint not null,
+                item_id bigint not null
+            )
+            
+        ...
+        ```
+
+### 다대다 관계는 1:N, N:1로
+
+* 실습에서는 ManyToMany를 경험했지만, 실전에서는 조인 테이블을 이용해서 1:N, N:1로 풀어내자.
+* 실전에서는 중간 테이블이 단순하지 않다.
+* @ManyToMany의 제약은
+    * 중간 테이블에 필드를 추가하지 못한다는 것
+    * 엔티티와 테이블이 불일치하는 문제가 생긴다는 것
+* 실전에서는 @ManyToMany는 사용하지 말자
+
+### @JoinColumn
+
+* 외래 키를 매핑할 때 사용한다.
+
+| 속성                                                         | 설명                                                         | 기본값                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | --------------------------------------------- |
+| name                                                         | 매핑할 외래 키 이름                                          | 필드명 + _ + 참조하는 테이블의 기본 키 컬럼명 |
+| referencedColumnName                                         | 외래 키가 참조하는 대상 테이블의 컬럼명                      | 참조하는 테이블의 기본키 컬럼명               |
+| foreignKey(DDL)                                              | 외래 키 제약조건을 직접 지정할 수 있다. 이 속성은 테이블을 생성할 때만 사용한다. |                                               |
+| unuque<br />nullable<br />insertable<br />updatable<br />columnDefinition<br />table | @Column의 속성과 같다.                                       |                                               |
+
+### @ManyToOne의 주요 속성
+
+* 다대일 관계 매핑
+
+| 속성         | 설명                                                         | 기본값                                                    |
+| ------------ | ------------------------------------------------------------ | --------------------------------------------------------- |
+| optional     | false로 설정하면 연관된 엔티티가 항상 있어야 한다.           | TRUE                                                      |
+| fetch        | 글로벌 페치 전략을 설정한다.                                 | @ManyToOne=FetchType.EAGER<br />@OneToMany=FetchType.LAZY |
+| cascade      | 영속성 전이 기능을 사용한다.                                 |                                                           |
+| targetEntity | 연관된 엔티티의 타입 정보를 설정한다. 이 기능은 거의 사용하지 않는다. 컬렉션을 사용해도 제네릭으로 타입 정보를 알 수 있다. |                                                           |
+
+### @OneToMany의 주요 속성
+
+* 일대다 관계 매핑
+* **일대다는 mappedBy가 존재하는데, 다대일관계에서는 없다. 그 말은 다대일을 사용하면 연관관계의 주인이 되어야 한다는 것이다.**
+
+| 속성         | 설명                                                         | 기본값                                                    |
+| ------------ | ------------------------------------------------------------ | --------------------------------------------------------- |
+| mappedBy     | 연관관계의 주인 필드를 선택한다.                             |                                                           |
+| fetch        | 글로벌 페치 전략을 설정한다.                                 | @ManyToOne=FetchType.EAGER<br />@OneToMany=FetchType.LAZY |
+| cascade      | 영속성 전이 기능을 사용한다.                                 |                                                           |
+| targetEntity | 연관된 엔티티의 타입 정보를 설정한다. 이 기능은 거의 사용하지 않는다. 컬렉션을 사용해도 제네릭으로 타입 정보를 알 수 있다. |                                                           |
 

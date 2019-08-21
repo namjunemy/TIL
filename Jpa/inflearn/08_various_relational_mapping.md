@@ -60,6 +60,8 @@
 
 * JPA **@ManyToOne으로 다대일 관계 단방향 매핑**
 
+  * @JoinColumn은 외래 키를 매핑할 때 사용한다. name은 매핑할 외래 키 이름이다.
+  
   ```java
   public class Member {
     ...
