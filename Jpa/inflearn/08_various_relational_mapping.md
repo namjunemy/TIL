@@ -85,7 +85,7 @@
 
   * 연관관계의 주인이 아니고, 어디에 매핑 됐는지에 관한 정보 **(mappedBy = "team")**을 꼭 넣어줘야 한다.
 
-  * 그러면 members 필드는 team에 의해 매핑 되어진 것이라는 의미 전달을 확실하게 할 수 있다.
+  * 그러면 members 필드는 Member 엔티티의 team 필드에 의해 매핑 되어진 것이라는 의미 전달을 확실하게 할 수 있다.
 
     ```java
     public class Team {
@@ -399,3 +399,180 @@
         * JPA가 제공하는 기본 프록시 기능의 한계로 **지연 로딩으로 설정해도 항상 즉시 로딩** 된다.(프록시는 뒤에서 학습)
             * JPA 입장에서 일대일 관계의 주 테이블에 외래 키를 저장하는 상황에서는, 멤버 객체를 로딩할 때, 멤버 테이블의 FK에 락커 ID가 있는지 없는지만 판단하면 된다. 있으면 프록시 객체를 넣어주고, 없으면 null을 넣으면 된다. 나중에 진짜 락커 필드에 엑세스 할 때, 그때 쿼리가 나간다.
             * 그런데, 대상 테이블에 외래 키를 저장한다면, JPA가 멤버의 락커를 조회하는 상황에서 DB의 멤버 테이블만 조회해서는 모른다. 어차피 락커 테이블을 찾아서 멤버가 있는지 확인 해야(쿼리를 날려 봐야) 알 수 있다. 어차피 쿼리가 나간단 이야기는 프록시를 만들 필요가 없다는 이야기이다. 그래서 하이버네이트 구현체 같은 경우는 지연 로딩으로 설정해도 항상 즉시 로딩 된다.
+
+## 다대다[N:M]
+
+* 실무에선 사용하지 않는 것을 추천한다. 사용하면 안되는 이유를 학습하자.
+
+* 관계형 데이터베이스는 정규화된 테이블 2개로 다대다 관계를 표현할 수 없다.
+
+* 연결 테이블(조인 테이블)을 추가해서 일대다, 다대일 관계로 풀어내야한다. 
+
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/15_many_to_many.png?raw=true)
+
+* **객체는 컬렉션을 사용해서 객체 2개로 다대다 관계가 가능하다.**
+
+    * ORM 입장에서는 테이블은 안되고, 객체는 안되는 것을 지원해줘야 한다.
+    * 따라서, 아래의 그림에서와 같이 객체의 다대다 관계(멤버와 프로덕트가 서로 리스트를 가짐)와
+    * 테이블에서 다대다 관계를 일대다 다대일 관계로 풀어낸 것 두개의 차이를 연결해준다. 
+
+    ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/16_many_to_many.png?raw=true)
+
+* JPA @ManyToMany 어노테이션을 사용하고
+
+* @JoinTable로 연결 테이블을 지정해줄 수 있다.
+
+### 다대다 단방향
+
+```java
+@Entity
+public class Member {
+    ...
+    
+    @ManyToMany
+    @JoinTable(name = "member_product")
+    private List<Product> products = new ArrayList<>();
+    
+    ...
+}
+```
+
+* 실행된 SQL
+
+    * 조인 테이블이 하나 생성되고, 외래 키 제약조건도 두가지가 설정 된다.
+
+    ```sql
+        ...
+       
+    Hibernate: 
+        
+        create table member_product (
+           Member_id bigint not null,
+            products_id bigint not null
+        )
+        
+        ...
+        
+    Hibernate: 
+        
+        alter table member_product 
+           add constraint FK17rh8i9jrsy7yqy2j6e9yijuw 
+           foreign key (products_id) 
+           references Product
+    Hibernate: 
+        
+        alter table member_product 
+           add constraint FK3cjijenmv5sgu1w04p4ofy6ik 
+           foreign key (Member_id) 
+           references Member
+    ```
+
+### 다대다 양방향
+
+* 똑같이 @ManyToMany 설정을 해주고, mappedBy 설정을 해줘야 한다.
+
+```java
+@Entity
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @ManyToMany(mappedBy = "products")
+    private List<Member> members = new ArrayList<>();
+}
+```
+
+### 다대다 매핑의 한계
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/17_many_to_many.png?raw=true)
+
+* 편리해 보이지만 실무에서 사용하면 안된다.
+* 개발하다 보면, 연결 테이블이 단순히 연결만 하고 끝나지 않는다. 조인 테이블 자체에 주문시간, 수량 같은 추가 데이터가 많이 들어갈 수 있다.
+* 하지만, 매핑 정보만 넣는 것이 가능하고, 추가 정보를 넣는 것 자체가 불가능하다.
+* 그리고 중간 테이블이 숨겨져 있기 때문에 예상하지 못하는 쿼리들이 나간다.
+* 이런 문제점들 때문에 실무에서는 안쓰는게 맞다고 본다.
+
+### 다대다 한계 극복
+
+* 어떻게 한계를 극복할까.
+* 연결 테이블용 엔티티를 추가한다. 사실상 연결 테이블을 엔티티로 승격시킨다.
+* 그리고 @ManyToMany를 각각 @OneToMany, @ManyToOne으로 관계를 맺어준다.
+    * 사실 개인적으로 이부분에 대해서는 @ManyToOne, 다대일 관계 두개로 풀어낸다는 표현이 맞는 것 같다.
+    * 앞서 일대다 관계를 학습할 때, 결론적으로 다대일 양방향 매핑을 사용하자는 결론을 냇기도 했고,
+    * 실제로 아래의 코드상으로 봐도 @ManyToOne 양방향 매핑 2개로 이어져있다.
+    * 그냥 테이블의 배치 순서상(Member -> MemberProduct(Order) -> Product) 표현을 @OneToMany, @ManyToOne으로 표현했던 것이라면 이해는 간다.
+* JPA가 만들어주는 숨겨진 매핑테이블의 존재를 바깥으로 꺼내는 것이다.
+* 위에 다대다 매핑의 한계 첨부 그림에서는 MemberProduct의 MEMBER_ID, PRODUCT_ID를 묶어서 PK로 썻지만, 실제로는 아래 처럼 **독립적으로 generated되는 id를 사용하는 것을 권장**한다. ID가 두개의 테이블에 종속되지 않고 더 유연하게 개발 할 수 있다. 시스템을 운영하면서 점점 커지는데 만약 비즈니스적인 제약 조건이 커지면 PK를 운영중에 업데이트 하는 상황이 발생할 수도 있다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/18_many_to_many.png?raw=true)
+
+* 코드로 이해하기
+
+    * Member
+
+        * 멤버 엔티티에서 @OneToMany 관계로 변경한다.
+
+            ```java
+            @Entity
+            public class Member {
+                ...
+                    
+                @OneToMany(mappedBy = "member")
+                private List<MemberProduct> memberProducts = new ArrayList<>();
+            
+                ...
+            }
+            ```
+
+    * Product
+
+        * 마찬가지로 @OneToMany 관계로 변경한다.
+
+            ```java
+            @Entity
+            public class Product {
+            
+                ...
+            
+                @OneToMany(mappedBy = "product")
+                private List<MemberProduct> members = new ArrayList<>();
+                
+                ...
+            }
+            
+            ```
+
+    * MemberProduct
+
+        * 연결 테이블을 엔티티로 승격시킨다. 그리고 @ManyToOne 매핑을 두개 한다.
+
+        * 여기서 추가 데이터가 들어간다면 아예 의미있는 엔티티 이름(Order)으로 변경 될 것이다.
+
+            ```java
+            @Entity
+            @Getter
+            @Setter
+            public class MemberProduct {
+            
+                @Id
+                @GeneratedValue(strategy = GenerationType.IDENTITY)
+                private Long id;
+            
+                @ManyToOne
+                @JoinColumn(name = "member_id")
+                private Member member;
+            
+                @ManyToOne
+                @JoinColumn(name = "product_id")
+                private Product product;
+            }
+            ```
+
+### Reference
+
+- [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
+
