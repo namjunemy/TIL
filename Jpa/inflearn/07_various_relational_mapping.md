@@ -58,21 +58,23 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/09_modeling.png?raw=true)
 
-* JPA **@ManyToOne으로 다대일 관계 단방향 매핑**
+###  다대일 관계 단방향 매핑
 
-  * @JoinColumn은 외래 키를 매핑할 때 사용한다. name은 매핑할 외래 키 이름이다.
+* JPA @ManyToOne 어노테이션을 사용해서 다대일 관계를 매핑한다.
+
+* @JoinColumn은 외래 키를 매핑할 때 사용한다. name은 매핑할 외래 키 이름이다.
+
+```java
+public class Member {
+  ...
   
-  ```java
-  public class Member {
-    ...
-    
-      @ManyToOne
-      @JoinColumn(name = "TEAM_ID")
-      private Team team;
-    
-    ...
-  }
-  ```
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
+  
+  ...
+}
+```
 
 ### 다대일 양방향 매핑
 
@@ -165,6 +167,9 @@
   * Team이 Members를 가지는데, Member 입장에서는 Team을 참조하지 않아도 된다라는 설계가 나올 수 있다. 객체 입장에서 생각하면 충분히 나올 수 있는 설계이다.
   * 그러나 DB 테이블 입장에서 보면, 무조건 일대다의 다쪽에 외래키가 들어간다.
   * Team에서 members가 바뀌면, DB의 Member 테이블에 업데이트 쿼리가 나가는 상황이다.
+
+
+### 일대다 단방향 매핑
 
 * JPA **@OneToMany와 @JoinColumn()을 이용해서 일대다 단방향 매핑** 코드로 이해하기
 
@@ -287,11 +292,11 @@
 
 * 이런 매핑은 공식적으로는 존재하지 않는다.
 
-* @JoinColumn(name = "team_id", insertable = false, updatable = false)
+* @JoinColumn(name = "team_id", insertable = false, updatable = false) 사용.
 
 * @ManyToOne과 @JoinColumn을 사용해서 연관관계를 매핑하면, 다대일 단방향 매핑이 되어버린다. 근데 반대쪽 Team에서 이미 일대다 단방향 매핑이 설정되어있다. 이런 상황에서는 두 엔티티에서 모두 테이블의 FK 키를 관리 하게 되는 상황이 벌어진다.
 
-* 그걸 막기 위해서 insert, update를 FALSE로 설정하고 읽기 전용 필드로 사용해서 양방향 매핑처럼 사용하는 방법이다.
+* 그걸 막기 위해서 insertable, updatable 설정을 FALSE로 설정하고 읽기 전용 필드로 사용해서 양방향 매핑처럼 사용하는 방법이다.
 
 * 읽기 전용으로 사용할 경우도 있을 수 있으니, 알아두자.
 
@@ -312,10 +317,9 @@
   }
   ```
 
-
 ## 일대일 [1:1]
 
-* 일대일 관게는 그 반대도 일대일이다.
+* 일대일 관계는 그 반대도 일대일이다.
 * 일대일 관계는 특이하게 주 테이블이나 대상 테이블 중에 외래 키를 넣을 테이블을 선택 가능하다.
     * 주 테이블에 외래 키 저장
     * 대상 테이블에 외래 키 저장
@@ -325,7 +329,7 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/13_one_to_one.png?raw=true)
 
-* 회원이 딱 하나의 락커를 가지고 있는 상황이다. 반대로 락커도 회원 한명만 할당 받을 수 있는 비즈니스 적인 룰이 있고, 둘의 관계는 일대일 관계이다.
+* 회원이 딱 하나의 락커를 가지고 있는 상황이다. 반대로 락커도 회원 한명만 할당 받을 수 있는 비즈니스 적인 룰이 있고, 이때, 둘의 관계는 일대일 관계이다.
 * 이 경우 멤버를 주 테이블로 보고 주 테이블 또는 대상 테이블에 외래 키를 저장할 수 있다. 단, 유니크 제약조건을 추가한 상태에서만.
 * **다대일[N:1] 단방향 관계 매핑과 JPA 어노테이션만 달라지고, 거의 유사하다.**
 
@@ -501,12 +505,12 @@ public class Product {
 ### 다대다 한계 극복
 
 * 어떻게 한계를 극복할까.
-* 연결 테이블용 엔티티를 추가한다. 사실상 연결 테이블을 엔티티로 승격시킨다.
-* 그리고 @ManyToMany를 각각 @OneToMany, @ManyToOne으로 관계를 맺어준다.
+* 연결 테이블용 엔티티를 추가한다. **사실상 연결 테이블을 엔티티로 승격**시킨다.
+* 그리고 @ManyToMany를 각각 일대다, 다대일로 관계를 맺어준다.
     * 사실 개인적으로 이부분에 대해서는 @ManyToOne, 다대일 관계 두개로 풀어낸다는 표현이 맞는 것 같다.
-    * 앞서 일대다 관계를 학습할 때, 결론적으로 다대일 양방향 매핑을 사용하자는 결론을 냇기도 했고,
-    * 실제로 아래의 코드상으로 봐도 @ManyToOne 양방향 매핑 2개로 이어져있다.
-    * 그냥 테이블의 배치 순서상(Member -> MemberProduct(Order) -> Product) 표현을 @OneToMany, @ManyToOne으로 표현했던 것이라면 이해는 간다.
+    * 앞서 일대다 관계를 학습할 때, 결론적으로 다대일 양방향 매핑을 사용하자는 결론을 내기도 했고,
+    * 실제로 아래의 코드상으로 봐도 FK 2개를 중간테이블에서 관리하고, @ManyToOne 양방향 매핑 2개로 이어져있다.
+    * 테이블의 배치 순서상(Member -> MemberProduct(Order) -> Product) 표현을 @OneToMany, @ManyToOne으로 표현했던 것이라면 이해가 간다.
 * JPA가 만들어주는 숨겨진 매핑테이블의 존재를 바깥으로 꺼내는 것이다.
 * 위에 다대다 매핑의 한계 첨부 그림에서는 MemberProduct의 MEMBER_ID, PRODUCT_ID를 묶어서 PK로 썻지만, 실제로는 아래 처럼 **독립적으로 generated되는 id를 사용하는 것을 권장**한다. ID가 두개의 테이블에 종속되지 않고 더 유연하게 개발 할 수 있다. 시스템을 운영하면서 점점 커지는데 만약 비즈니스적인 제약 조건이 커지면 PK를 운영중에 업데이트 하는 상황이 발생할 수도 있다.
 
@@ -550,7 +554,7 @@ public class Product {
 
     * MemberProduct
 
-        * 연결 테이블을 엔티티로 승격시킨다. 그리고 @ManyToOne 매핑을 두개 한다.
+        * 연결 테이블을 엔티티로 승격시킨다. 그리고 @ManyToOne 매핑을 두개 한다.(연관관계의 주인)
 
         * 여기서 추가 데이터가 들어간다면 아예 의미있는 엔티티 이름(Order)으로 변경 될 것이다.
 
