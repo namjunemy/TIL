@@ -48,9 +48,10 @@
     * [02. JPA 소개](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/02_jpa_intro.md)
     * [03. JPA 시작하기(프로젝트 생성, 애플리케이션 개발), JPQL 소개](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/03_jpa_start_hello_application.md)
     * [04. 영속성 컨텍스트](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/04_persistence_context.md)
-    * [05. 엔티티 매핑](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/05_entity_mapping.md)
-    * [06. 연관관계 매핑 기초](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/06_relational_mapping.md)
-    * [07. 다양한 연관관계 매핑](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/07_various_relational_mapping.md)
+    * [05. 엔티티 매핑(객체와 테이블, 필드와 컬럼, 기본키 매핑)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/05_entity_mapping.md)
+    * [06. 연관관계 매핑 기초(단방향, 양방향 매핑 이론, 연관관계의 주인)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/06_relational_mapping.md)
+    * [07. 다양한 연관관계 매핑(@ManyToOne, @OneToMany, @OneToOne, @OneToMany)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/07_various_relational_mapping.md)
+    * [08. 고급 매핑(상속관계 매핑, @MappedSuperclass)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/08_advanced_mapping.md)
     * [99. 단계별 실전 예제](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/99_practical_example.md)
     
 * T아카데미 토크온 세미나
