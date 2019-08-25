@@ -28,7 +28,7 @@
 
   * **@Inheritance(strategy=InheritanceType.XXX)**의 stategy를 설정해주면 된다.
     * default 전략은 **SINGLE_TABLE**(단일 테이블 전략)이다.
-    * InheritanveType 종류
+    * InheritanceType 종류
       * JOINED
       * SINGLE_TABLE
       * TABLE_PER_CLASS
@@ -93,19 +93,19 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/22_super_sub.PNG?raw=true)
 
-* 가장 정규화 된 방식으로 구현하는 방식이다.
+* 가장 정규화 된 방법으로 구현하는 방식이다.
 
 * NAME, PRICE가 ITEM 테이블에만 저장되고, ALBUM, MOVIE, BOOK이 각자의 데이터만 저장한다.
 
 * Item 엔티티 - @Inheritance(strategy = InheritanceType.JOINED) 전략
 
   * **하이버네이트**의 조인 전략에서는 **@DiscriminatorColumn을 선언하지 않으면 DTYPE 컬럼이 생성되지 않는다.**
-  * 어차피 조인하면 앨범인지 무비인지 알 수 있다. DTYPE을 넣어주는 것이 명확하다. 넣어주자.
+  * 어차피 조인하면 앨범인지 무비인지 알 수 있다. 그래도, DTYPE을 넣어주는 것이 명확하다. 넣어주자.
 
   ```java
   @Entity
   @Inheritance(strategy = InheritanceType.JOINED)
-  //@DiscriminatorColumn // 하위 테이블의 구분 컬럼 생성(default = DTYPE)
+  @DiscriminatorColumn // 하위 테이블의 구분 컬럼 생성(default = DTYPE)
   public class Item {
   
       @Id
@@ -266,7 +266,7 @@
 
   * 단일 테이블 전략에서는 @DiscriminatorColumn을 선언해 주지 않아도, 기본으로 DTYPE 컬럼이 생성된다.
 
-  * 한 테이블에 모든 컬럼을 저장하기 때문에, DTYPE 없이는 테이블을 판단할 수 없다.
+  * 한 테이블에 모든 컬럼을 저장하기 때문에, **DTYPE 없이는 테이블을 판단할 수 없다.**
 
     ```java
     @Entity
@@ -303,7 +303,7 @@
         )
     ```
 
-  * 조인 전략의 Movie 저장, 조회 예제를 그대로 돌려보면?
+  * 조인 전략에서 실습했던 Movie 저장, 조회 예제를 그대로 돌려보면?
 
     * Item 테이블을 그냥 조회한다. 조인하지 않고, DTYPE을 검색 조건으로 추가해서 Movie를 조회
 
@@ -326,7 +326,7 @@
 
 ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/24_super_sub.PNG?raw=true)
 
-* 조인 전략과 유사하지만, 슈퍼 타입의 컬럼들을 서브 타입으로 내린다. NAME, PRICE 컬럼들을 중복되도록 허용하는 전략이다.
+* 조인 전략과 유사하지만, 슈퍼 타입의 컬럼들을 서브 타입으로 내린다. NAME, PRICE 컬럼들이 중복되도록 허용하는 전략이다.
 
 * 구현 클래스마다 테이블 생성 전략 적용
 
@@ -337,7 +337,7 @@
     * 하지만, @Id 생성 전략 GenerationType.IDENTITY를 사용하는 경우 문제가 있다.
     * @Inheritance의 **TABLE_PER_CLASS**와 @Id의 GenerationType을 **IDETITY**를 같이 사용할 경우 에러 발생
       * `Cannot use identity column key generation with <union-subclass> mapping for`
-      * @Id의 GenerationType을 TABLE 타입으로 변경 적용해서 해결. 그러나, 시퀀스 테이블이 생성되므로 이것에 대한 매핑까지 추가해줘야 완벽히 해결이 된다.
+      * @Id의 GenerationType을 **TABLE 타입**으로 변경 적용해서 해결. 그러나, 시퀀스 테이블이 생성되므로 이것에 대한 매핑까지 추가해줘야 완벽히 해결이 된다.
       * https://stackoverflow.com/questions/916169/cannot-use-identity-column-key-generation-with-union-subclass-table-per-clas
 
   * Item 엔티티 설정
@@ -439,7 +439,7 @@
 
     * 실행된 SQL
 
-      * union all로 전체 테이블을 다 찾는다.
+      * union all로 전체 하위 테이블을 다 찾는다.
       * INSERT 까진 심플했으나, 조회가 시작되면 굉장히 비효율적으로 동작한다.
 
       ```sql
@@ -498,8 +498,144 @@
           item0_.id=?
       ```
 
-    
+### 상속관계 매핑 정리
 
-    
+* 조인 전략
+    * 장점
+        * 테이블이 정규화가 되어있고, 
+        * 외래 키 참조 무결성 제약조건 활용 가능
+            * ITEM의 PK가 ALBUM, MOVIE, BOOK의 PK이자 FK이다. 그래서 다른 테이블에서 아이템 테이블만 바라보도록 설계하는 것이 가능 하다
+        *  저장공간 효율화
+            * 테이블 정규화로 저장공간이 딱 필요한 만큼 소비된다.
+    * 단점
+        * 조회시 조인을 많이 사용한다. 단일 테이블 전략에 비하면 성능이 안나온다. 조인하니까.
+        * 그래서 조회 쿼리가 복잡하다
+        * 데이터 저장시에 INSERT 쿼리가 상위, 하위 테이블 두번 발생한다.
+    * 정리
+        * 성능 저하라고 되어있지만, 실제로는 영향이 크지 않다.
+        * 오히려 저장공간이 효율화 되기 때문에 장점이 크다.
+        * **기본적으로는 조인 정략이 정석**이라고 보면 된다. 객체랑도 잘 맞고, 정규화도 되고, 그래서 설계가 깔끔하게 나온다.
+* 단일 테이블 전략
+    * 장점
+        * 조인이 필요 없으므로 일반적인 조회 성능이 빠르다.
+        * 조회 쿼리가 단순핟.
+    * 단점
+        * 자식 엔티티가 매핑한 컬럼은 모두 NULL을 허용해야 한다.
+        * 단일 테이블에 모든 것을 저장하므로 테이블이 커질 수 있다.
+        * 상황에 따라서 조인 전략보다 성능이 오히려 느려질 수 있다.
+            * 보통 이 상황에 해당하는 임계점을 넘을 일은 많지 않다.
+* 구현 클래스마다 테이블 전략
+    * 결론은
+        * 이 전략은 쓰지말자.
+        *  ORM을 하다보면 데이터 쪽과 객체 쪽에서 trade off를 할 때가 있는데, 이 전략은 둘 다 추천하지 않는다.
+    * 장점
+        * 서브 타입을 명확하게 구분해서 처리할 때 효과적이다
+        * NOT NULL 제약조건을 사용할 수 있다.
+    * 단점
+        * 여러 자식 테이블을 함께 조회할 때 성능이 느리다(UNION SQL)
+        * 자식 테이블을 통합해서 쿼리하기 어렵다.
+        * 변경이라는 관점으로 접근할 때 굉장히 좋지 않다.
+            * 예를 들어, ITEM들을 모두 정산하는 코드가 있다고 가정할 때, ITEM 하위 클래스가 추가되면 정산 코드가 변경된다. 추가된 하위 클래스의 정산 결과를 추가하거나 해야 한다.
 
+* 상속관계 매핑 정리
+    * 기본적으로는 조인 전략을 가져가자.
+    * 그리고 조인 전략과 단일 테이블 전략의 trade off를 생각해서 전략을 선택하자.
+    * 굉장히 심플하고 확장의 가능성도 적으면 단일 테이블 전략을 가져가자. 그러나 비즈니스 적으로 중요하고, 복잡하고, 확장될 확률이 높으면 조인 전략을 가져가자.
+
+## @MappedSuperclass
+
+* **객체의 입장에서** 공통 매핑 정보가 필요할 때 사용한다.
+* id, name은 객체의 입장에서 볼 때 계속 나온다.
+* 이렇게 공통 매핑 정보가 필요할 때, 부모 클래스에 선언하고 속성만 상속 받아서 사용하고 싶을 때 @MappedSuperclass를 사용한다.
+* DB 테이블과는 상관없다. 아래에 보면 DB는 매핑 정보 다 따로 쓰고 있다. 객체의 입장이다.
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/25_mapped_super_class.png?raw=true)
+
+### 코드로 이해하기
+
+* 생성자, 생성시간, 수정자, 수정시간을 모든 엔티티에 공통으로 가져가야 하는 상황에서
+
+* 아래와 같이 BaseEntity를 정의해서 활용할 수 있다.
+
+* BaseEntity.java
+
+    * 매핑정보만 상속받는 Superclass라는 의미의 @MappedSuperclass 어노테이션 선언
+
+    ```java
+    @Getter
+    @Setter
+    @MappedSuperclass
+    public abstract class BaseEntity {
     
+        private String createdBy;
+    
+        private LocalDateTime createdDate;
+    
+        private String lastModifiedBy;
+    
+        private LocalDateTime lastModifiedDate;
+    }
+    ```
+
+* Member.java, Team.java
+
+    * BaseEntity 상속
+
+        ```java
+        @Entity
+        public class Member extends BaseEntity {
+            ...
+        }
+        ```
+
+        ```java
+        @Entity
+        public class Team extends BaseEntity {
+            ...
+        }
+        ```
+
+* 실행된 DDL
+
+    * BaseEntity에 선언된 컬럼들이 생성 된다.
+
+        ```java
+        Hibernate: 
+            create table Member (
+               id bigint generated by default as identity,
+                createdBy varchar(255),
+                createdDate timestamp,
+                lastModifiedBy varchar(255),
+                lastModifiedDate timestamp,
+                age integer,
+                description clob,
+                roleType varchar(255),
+                name varchar(255),
+                locker_id bigint,
+                team_id bigint,
+                primary key (id)
+            )
+        Hibernate: 
+            create table Team (
+               id bigint generated by default as identity,
+                createdBy varchar(255),
+                createdDate timestamp,
+                lastModifiedBy varchar(255),
+                lastModifiedDate timestamp,
+                name varchar(255),
+                primary key (id)
+            )
+        ...
+        ```
+
+### 정리
+
+* 상속광계 매핑이 아니다.
+* @MappedSuperclass가 선언되어 있는 클래스는 엔티티가 아니다. 당연히 테이블과 매핑도 안된다.
+* 단순히 부모 클래스를 상속 받는 **자식 클래스에 매핑 정보만 제공**한다.
+* 조회, 검색이 불가하다. 부모 타입으로 조회하는 것이 불가능하다는 이야기.(em.find(BaseEntity) 불가능)
+* 직접 생성해서 사용할 일이 없으므로 **추상 클래스로 만드는 것을 권장**한다.
+* 테이블과 관계가 없고, 단순히 엔티티가 공통으로 사용하는 매핑 정보를 모으는 역할을 한다.
+* 주로 등록일, 수정일, 등록자, 수정자 같은 전체 엔티티에서 공통으로 적용하는 정보를 모을 때 사용한다.
+* **참고**
+    * **JPA에서 @Entity 클래스는 @Entity나 @MappedSuperclass로 지정한 클래스만 상속할 수 있다.**
