@@ -1,4 +1,4 @@
-# 프록시와 연관관계 관리
+프록시와 연관관계 관리
 
 > 목차
 >
@@ -783,6 +783,7 @@ member.getName();
     * 대부분 fetch join으로 해결 한다.
 
 * @ManyToOne, @OneToOne과 같이 @XXXToOne 어노테이션들은 기본이 즉시 로딩(EAGER) 이다.
+  
   * 꼭 LAZY로 명시적으로 설정해서 사용하자
 *  @OneToMany와 @ManyToMany는 기본이 지연 로딩(LAZY)이다.
 
@@ -797,6 +798,353 @@ member.getName();
 - 실무에서는 다 LAZY로 쓰자. 즉시 로딩 사용하지 말자.
 - JPQL fetch join이나, 엔티티 그래프 기능으로 해결하자.
 - 즉시 로딩은 상상하지 못한 쿼리가 나간다.
+
+## 영속성 전이: CASCADE
+
+* 영속성 전이는 즉시,지연 로딩이나 연관관계 설정과 전혀 관계가 없다.
+* 특정 엔티티를 영속 상태로 만들 때 연관된 엔티티도 함께 영속 상태로 만들고 싶을 때 사용한다.
+* 예를 들면,
+  * 부모 엔티티를 저장할 때 자식 엔티티도 함께 저장하고 싶은 상황에서.
+
+### 코드로 이해하기
+
+* 다대일 관계인 Child와 Parent를 만들고, 양방향 연관관계 매핑을 해준다.
+
+* Child
+
+  ```java
+  @Entity
+  @Getter
+  @Setter
+  public class Child {
+  
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
+  
+      private String name;
+  
+      @ManyToOne(fetch = FetchType.LAZY)
+      @JoinColumn(name = "parent_id")
+      private Parent parent;
+  }
+  ```
+
+* Parent
+
+  * 연관관계 편의 메소드 추가.
+
+    ```java
+    @Entity
+    @Getter
+    @Setter
+    public class Parent {
+    
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+    
+        private String name;
+    
+        @OneToMany(mappedBy = "parent")
+        private List<Child> children = new ArrayList<>();
+    
+        public void addChild(Child child) {
+            this.children.add(child);
+            child.setParent(this);
+        }
+    }
+    
+    ```
+
+* Main에서 저장할 때, em.persist로 3번 저장해야 한다. Parent와 Child 따로따로.
+
+  * 그런데, 개발 하다보면 Parent가 Child를 관리해줬으면 한다.
+
+  * 이런 상황에서 JPA의 CASCADE 기능을 사용할 수 있다.
+
+    ```java
+    Child child1 = new Child();
+    Child child2 = new Child();
+    
+    Parent parent = new Parent();
+    parent.addChild(child1);
+    parent.addChild(child2);
+    
+    em.persist(parent);
+    em.persist(child1);
+    em.persist(child2);
+    
+    tx.commit();
+    ```
+
+* Parent의 @OneToMany에서 cascade 옵션 추가하자
+
+  ```java
+  @Entity
+  @Getter
+  @Setter
+  public class Parent {
+  
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
+  
+      private String name;
+  
+      @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL) //cascade 추가
+      private List<Child> children = new ArrayList<>();
+  
+      public void addChild(Child child) {
+          this.children.add(child);
+          child.setParent(this);
+      }
+  }
+  ```
+
+* 그리고나서 Parent만 저장해보자. 결과는?
+
+  * 정상적으로 insert 쿼리 3개 나간다. Parent, Child * 2
+
+    ```java
+    Child child1 = new Child();
+    Child child2 = new Child();
+    
+    Parent parent = new Parent();
+    parent.addChild(child1);
+    parent.addChild(child2);
+    
+    em.persist(parent);
+    
+    tx.commit();
+    ```
+
+    ```sql
+    Hibernate: 
+        /* insert cascade.Parent
+            */ insert 
+            into
+                Parent
+                (id, name) 
+            values
+                (null, ?)
+    Hibernate: 
+        /* insert cascade.Child
+            */ insert 
+            into
+                Child
+                (id, name, parent_id) 
+            values
+                (null, ?, ?)
+    Hibernate: 
+        /* insert cascade.Child
+            */ insert 
+            into
+                Child
+                (id, name, parent_id) 
+            values
+                (null, ?, ?)
+    ```
+
+### 주의 사항
+
+* 영속성 전이는 연관관계를 매핑하는 것과 아무 관련이 없다.
+* 엔티티를 영속화할 때 연관된 엔티티도 함께 영속화하는 편리함을 제공할 뿐이다.
+* @OneToMany(mappedBy = ) 선언된 쪽에 다 걸어야 되나?
+  * 아니다.
+  * 단독 부모가 자식들을 관리할 때 의미가 있다.
+  * 게시판을 예로 들면, 하나의 게시글(부모)에서 첨부파일들의 경로(자식)을 관리 할 때 유용.
+  * 하지만, 해당 첨부파일들이 게시글 말고도 **다른 엔티티들과 연관 관계가 있으면 절대 사용하면 안된다.**
+  * 단일 엔티티에 완전히 종속적인 Child를 관리할 때 유용하게 쓰자. 둘의 라이프 사이클이 같기 때문에 가능하다.
+
+### CASCADE의 종류
+
+* **ALL - 모두 적용**
+  * 모든 라이프 사이클을 맞춰야 할 때, 삭제가 위험할 때
+* **PERSIST - 영속**
+  * 저장할 때만 사용
+* **REMOVE - 삭제**
+* MERGE
+* REFRESH
+* DETACH
+
+## 고아 객체
+
+* **부모 엔티티와 연관관계가 끊어진 자식 엔티티를 자동으로 삭제**한다.
+
+* 마찬가지로 @OneToManyChild 컬렉션쪽에 orpahnRemoval = true 옵션을 주고,
+
+  ```java
+  @Entity
+  @Getter
+  @Setter
+  public class Parent {
+  
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
+  
+      private String name;
+  
+      @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+      private List<Child> children = new ArrayList<>();
+  
+      public void addChild(Child child) {
+          this.children.add(child);
+          child.setParent(this);
+      }
+  }
+  ```
+
+* 자식 엔티티를 컬렉션에서 제거하면,
+
+  ```java
+  Child child1 = new Child();
+  Child child2 = new Child();
+  
+  Parent parent = new Parent();
+  parent.addChild(child1);
+  parent.addChild(child2);
+  
+  em.persist(parent);
+  
+  em.flush();
+  em.clear();
+  
+  Parent findParent = em.find(Parent.class, parent.getId());
+  findParent.getChildren().remove(0);
+  
+  tx.commit();
+  ```
+
+* DELETE 쿼리가 나간다!
+
+  ```sql
+  ...
+  
+  Hibernate: 
+      select
+          parent0_.id as id1_8_0_,
+          parent0_.name as name2_8_0_ 
+      from
+          Parent parent0_ 
+      where
+          parent0_.id=?
+          
+  Hibernate: 
+      select
+          children0_.parent_id as parent_i3_2_0_,
+          children0_.id as id1_2_0_,
+          children0_.id as id1_2_1_,
+          children0_.name as name2_2_1_,
+          children0_.parent_id as parent_i3_2_1_ 
+      from
+          Child children0_ 
+      where
+          children0_.parent_id=?
+          
+  Hibernate: 
+      /* delete cascade.Child */ 
+      delete 
+          from
+              Child 
+          where
+              id=?
+  ```
+
+### 고아 객체 사용 주의 사항
+
+* 참조가 제거된 엔티티는 다른 곳에서 참조하지 않는 고아 객체로 보고 삭제하는 기능이다.
+
+* 이것도 마찬가지로 참조하는 곳이 하나일 때 사용해야한다.
+
+* **특정 엔티티가 단독으로 소유할 때 사용 가능** 하다. 여러 엔티티와 관계가 물려있다면 절대 사용하지 말자.
+
+* @OneToOne, @OneToMany 에서만 사용 가능하다.
+
+* 참고
+
+  * 개념적으로 부모를 제거하면 자식은 고아가 된다.
+
+  * 따라서 **고아 객체 제거 기능을 활성화하면, 부모를 제거할 때 자식도 함께 제거 된다.**
+
+  * 이것은 cascade = CascadeType.ALL를 옵션에서 제거했지만, CascadeType.REMOVE 처럼 동작한다.
+
+  * 실제로 바로 위의 예제에서 0번째 Child 대신 Parent를 지워버리면, 
+
+    ```java
+    @Getter
+    @Setter
+    public class Parent {
+    
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+    
+        private String name;
+    
+        @OneToMany(mappedBy = "parent", orphanRemoval = true)
+        private List<Child> children = new ArrayList<>();
+    
+        public void addChild(Child child) {
+            this.children.add(child);
+            child.setParent(this);
+        }
+    }
+    ```
+
+    ```java
+    Child child1 = new Child();
+    Child child2 = new Child();
+    
+    Parent parent = new Parent();
+    parent.addChild(child1);
+    parent.addChild(child2);
+    
+    em.persist(parent);
+    
+    em.flush();
+    em.clear();
+    
+    Parent findParent = em.find(Parent.class, parent.getId());
+    em.remove(findParent);
+    
+    tx.commit();
+    ```
+
+  * DELETE 쿼리가 3방 나간다. Child 2개 지우고, Parent 지운다.
+
+    ```sql
+    ...
+    
+      Hibernate: 
+        /* delete cascade.Child */ delete 
+            from
+                Child 
+            where
+                id=?
+    Hibernate: 
+        /* delete cascade.Child */ delete 
+            from
+                Child 
+            where
+                id=?
+    Hibernate: 
+        /* delete cascade.Parent */ delete 
+            from
+                Parent 
+            where
+                id=?
+    ```
+
+## 영속성 전이 + 고아 객체, 생명주기
+
+* 그러면, CacadeType.ALL과 orphanRemoval = true를 같이 쓰면 어떻게 될까?
+* 스스로 생명주기를 관리하는 엔티티는
+  * em.persist()로 영속화하고
+  * em.remove()로 제거한다.
+* 두 옵션을 모두 활성화 하면 **부모 엔티티를 통해서 자식의 생명주기를 관리**할 수 있다.
+* 도메인 주도 설계(DDD)의 Aggregate Root 개념을 구현할 때 유용하다.
 
 ### Reference
 
