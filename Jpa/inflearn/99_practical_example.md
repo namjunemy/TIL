@@ -607,3 +607,60 @@
 * 실무에서 이렇게 쓸까?
 * 실무에서 도메인 모델의 상속관계를 가져가면서 따라오는 장단점을 잘 따져봐야 한다.
 * 사용자가 많고, 데이터가 많이 쌓일 수록 테이블을 단순하게 유지해야 한다. 초기에는 객지향적으로 설계해서 진행하다가, 시스템이 커지고 테이블을 단순하게 해야 할 필요성을 느끼는 시점에 변경하면 되겠다.(학습이 더 필요한 부분이라고 생각한다.)
+
+## 실전 예제 5 - 연관관계 관리
+
+### 글로벌 페치 전략 설정
+
+* **모든 연관관계를 지연 로딩으로 바꾸자**
+* @ManyToOne, @OneToOne은 기본이 즉시 로딩이므로 지연 로딩으로 변경하자.
+
+### 영속성 전이 설정
+
+![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/27_domain_model.png?raw=true)
+
+* **Order -> Delivery** 를 영속성 전이 ALL로 설정
+
+  * 주문을 생성할 때 배송을 같이 생성하겠다는 것이다. 주문과 배송의 라이프 사이클을 맞추는 작업.
+
+* **Order -> OrderItem** 을 영속성 전이 ALL로 설정
+
+  * 마찬가지로, 주문 생성시 OrderItem을 같이 생성한다.
+
+  ```java
+  @Entity
+  @Table(name = "orders")
+  @Getter
+  @Setter
+  public class Order extends BaseEntity {
+  
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      @Column(name = "order_id")
+      private Long id;
+  
+      @ManyToOne(fetch = FetchType.LAZY)
+      @JoinColumn(name = "member_id")
+      private Member member;
+  
+      @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+      @JoinColumn(name = "delivery_id")
+      private Delivery delivery;
+  
+      @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+      private List<OrderItem> orderItems = new ArrayList<>();
+  
+      public void addOrderItem(OrderItem orderItem) {
+          this.orderItems.add(orderItem);
+          orderItem.setOrder(this);
+      }
+  
+      private LocalDateTime orderDateTime;
+  
+      @Enumerated(EnumType.STRING)
+      private OrderStatus status;
+  }
+  ```
+
+  
+
