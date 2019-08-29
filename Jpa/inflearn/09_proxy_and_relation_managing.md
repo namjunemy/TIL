@@ -1,4 +1,4 @@
-프록시와 연관관계 관리
+# 프록시와 연관관계 관리
 
 > 목차
 >
@@ -24,9 +24,9 @@
 
 * JPA에서 em.find() 말고, em.getReference()라는 메서드도 제공 된다.
 
-* **em.find()**는 DB를 통해서 **실제 엔티티 객체를 조회**하는 메서드이고
+* **em.find()** 는 DB를 통해서 **실제 엔티티 객체를 조회**하는 메서드이고
 
-* **em.getReference()**는 DB의 조회를 미루는 **가짜(프록시) 엔티티 객체를 조회하는 메서드**이다.
+* **em.getReference()** 는 DB의 조회를 미루는 **가짜(프록시) 엔티티 객체를 조회하는 메서드**이다.
 
 * Member 엔티티
 
@@ -218,7 +218,7 @@ Member member = em.getReference(Member.class, member.getId());
 member.getName();
 ```
 
-1. em.getReference()로 프록시 객체를 가져온 다음에, **getName() 메서드를 호출 ** 하면
+1. em.getReference()로 프록시 객체를 가져온 다음에, **getName() 메서드를 호출** 하면
 2. MemberProxy 객체에 처음에 target 값이 존재하지 않는다. JPA가 영속성 컨텍스트에 초기화 요청을 한다.
 3. 영속성 컨텍스트가 DB에서 조회해서
 4. 실제 Entity를 생성해준다.
