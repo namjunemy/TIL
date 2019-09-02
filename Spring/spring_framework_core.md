@@ -570,6 +570,136 @@
         }
         ```
 
+### 9. ApplicationEventPublisher
+
+* 이어서 ApplicationContext가 상속 받고 있는 또하나의 인터페이스 ApplicationEventPublisher는 옵저버 패턴의 구현체로 이벤트 프로그래밍에 필요한 인터페이스를 제공한다.
+
+* 이벤트를 반드는 방법
+
+  * ApplicationEvent를 상속 받아서 구현**했었다**.
+
+    ```java
+    public class MyEvent extends ApplicationEvent {
+      
+      private int data;
+      
+      public MyEvent(Object source, int data) {
+        super(source);
+        this.data = data;
+      }
+      
+      public int getData() {
+        return data;
+      }
+    }
+    ```
+
+  * **스프링 4.2부터는 이 클래스를 상속 받지 않아도 이벤트로 사용할 수 있다.**
+
+    * 이것이 스프링 프레임워크가 추구하는 철학인 비침투성이다. POJO
+    * 코드에서 보면 spring 패키지에서 import가 하나도 없다.
+    * spring 소스 코드가 개발자의 소스코드에 들어가지 않는다. 노출되지 않는다.
+    * 이렇게 POJO기반의 프로그래밍을 할 때, 테스트 코드 작성이 더 쉬워지고, 유지보수 하기 쉬워진다.
+
+    ```java
+    public class MyEvent {
+      
+      private Object source;
+      private int data;
+      
+      public MyEvent(Object source, int data) {
+        this.object = object;
+        this.data = data;
+      }
+      
+      public Object getSource() {
+        return source;
+      }
+      
+      public int getData() {
+        return data;
+      }
+    }
+    ```
+
+* 이벤트를 발생 시키는 방법
+
+  * ApplicationContext가 ApplicationEventPublisher를 상속받고 있으므로 applicationContext에서 직접 publishEvent()를 호출 할 수도 있고.
+
+  * ApplicationEventPublisher를 Injection받아서
+
+  * ApplicationEbentPublisher.publishEvent()로 발생시킬 수 있다.
+
+    ```java
+    @Component
+    public class TestRunner implements ApplicationRunner {
+      
+      @AutoWired
+      ApplicationEventPublisher eventPublisher;
+      
+      @Override
+      public void run(ApplicationArguments args) throws Exception {
+        eventPublisher.publishEvent(new MyEvent(this, 100));
+      }
+    }
+    ```
+
+* 이벤트를 처리하는 방법
+
+  * ApplicationListener<이벤트> 구현한 클래스를 만들어서 **빈으로 등록** 해야 했었다.
+
+    ```java
+    @Component
+    public class MyEventHandler implements ApplicationListener<MyEvent> {
+      
+      @Override
+      publiv void onApplicationEvent(MyEvent event) {
+        System.out.println("이벤트 받음, 데이터는 " + event.getData());
+      }
+    }
+    ```
+
+  * **마찬가지로 스프링 4.2 부터는 리스터를 구현하지 않아도 된다.**
+
+    * 빈으로는 등록 되어야 한다. 그래야 스프링이 누구한테 전달해야 하는지 알 수 있다. 핸들러는 항상 빈으로.
+    * **@EventListener** 를 사용해서 빈의 메소드에 사용할 수 있다.
+
+    ```java
+    @Component
+    public class MyEventHandler {
+      
+      @EventListener
+      publiv void handleMyEvent(MyEvent event) {
+        System.out.println("이벤트 받음, 데이터는 " + event.getData());
+      }
+    }
+    ```
+
+  * 기본적으로 이벤트 처리는 동기. Syschronized 방식이다. 순서를 보장하지 않는다.
+
+  * 순서를 정하고 싶다면 @Order와 함께 사용하고,
+
+  * 비동기적으로 실행하고 싶다면 @Async와 함께 사용하면 된다.
+
+    * @Async를 사용하려면 @EnableAsync와 함께 사용해야 하고, 스레드풀 관련 설정을 해야 한다.
+
+* 그 어떠한 스프링 코드도 노출되어 있지 않는 POJO 기반의 프로그래밍으로 이벤트 기반 프로그래밍을 하자.
+
+* **스프링이 제공하는 기본 이벤트**
+
+  * 스프링 부트는 스프링의 이벤트를 확장해서 다양한 이벤트를 제공해준다.
+    *  https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-spring-application.html#boot-features-application-events-and-listeners
+  * ContextRefreshedEvent
+    * ApplicationContext를 초기화 했거나, 리프레시 했을 때 발생
+  * ContextStartedEvent
+    * ApplicationContext를 start()하여 라이프사이클 빈들이 시작 신호를 받은 시점에 발생
+  * ContextStoppedEvent
+    * ApplicationContext를 stop()하여 라이프사이클 빈들이 정지 신호를 받은 시점에 발생
+  * ContextClosedEvent
+    * ApplicationContext를 close()하여 싱글톤 빈 소멸되는 시점에 발생
+  * RequestHandledEvent
+    * HTTP 요청을 처리했을 때 발생
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
