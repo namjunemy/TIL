@@ -630,6 +630,8 @@
 
   * ApplicationEbentPublisher.publishEvent()로 발생시킬 수 있다.
 
+  * 가장 구체적인 인터페이스로 주입받아서 프로그래밍하는게 가장 직관적이다.
+
     ```java
     @Component
     public class TestRunner implements ApplicationRunner {
@@ -699,6 +701,75 @@
     * ApplicationContext를 close()하여 싱글톤 빈 소멸되는 시점에 발생
   * RequestHandledEvent
     * HTTP 요청을 처리했을 때 발생
+
+### 10. ResourceLoader
+
+* ApplicationContext가 상속받고 있는 ResourceLoader는 리소스를 읽어오는 기능을 제공하는 인터페이스이다.
+
+* 리소스 읽어오기
+
+  * resources 디렉토리 안에있는 것들이 빌드되면서 target 디렉토리 안으로 들어간다.
+  * 그래서 우리는 classpath: 라는 접두어로 리소스에 대해서 접근할 수 있다.
+
+  ```java
+  @Component
+  public class TestRunner implements ApplicationRunner {
+    
+    @Autowired
+    ResourceLoader resourceLoader;
+    
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+      Resource resource = resourceLoader.getResource("classpath:test.txt");
+      System.out.println(resource.exists()); // false
+    }
+  }
+  ```
+
+  * 파일 시스템에서 읽어오기
+  * 클래스패스에서 읽어오기
+  * URL로 읽어오기
+  * 상대/절대 경로로 읽어오기
+
+## Spring의 추상화
+
+### Resource 추상화
+
+* 특징
+  * 스프링에서 java.net.URL 클래스를 감싸서 org.springframework.core.io.Resource 라는 클래스로 제공한다.
+  * 실제 로우레벨에 있는 리소스를 접근하는 기능을 제공 한다.
+* 추상화 한 이유
+  * 클래스패스 기준으로 리소스를 읽어오는 기능의 부재
+  * ServletContext를 기준으로 상대 경로로 읽어오는 기능의 부재
+  * 새로운 핸들러를 등록하여 특별한 URL 접미사를 만들어 사용할 수는 있지만 구현이 복잡하고 편의성 메소드가 부족하다.
+* Resource 인터페이스 둘러보기
+  * 주요 메소드
+    * exists()
+    * isOpen()
+    * getDescription()
+
+* 구현체
+  * UrlResource
+    * java.net.URL참고
+    * 기본으로 지원하는 프로토콜 : http, https, ftp, file, jar
+  * ClassPathResource
+    * 지원하는 접두어 - classpath:
+  * FileSystemResource
+  * ServletContextResource
+    * 웹 어플리케이션 루트에서 상대 경로로 리소스를 찾는다.
+    * 가장 많이 사용한다. 읽어들이는 리소스 타입이 ApplicationContext와 관련있기 때문이다.
+    * resource.getResource("text.txt") 처럼 그냥 일반 문자열로 인자를 주면 사용하는 ApplicationContext 타입에 따라서 어디서 읽어올지 결정된다.
+    * URL 접두어를 명시해서 명확하게 접근하자.
+* 리소스 읽어오기
+  * Resource의 타입은 location 문자열과 **각 ApplicationContext의 타입에 따라 결정 된다.**
+    * ClassPathXmlApplicationContext -> ClassPathResource
+    * FileSystemXmlApplicationContext -> FileSystemResource
+    * WebApplicationContext -> ServletContextResource
+  * **ApplicationContext의 타입에 상관없이 리소스타입을 강제하려면 java.net.URL 접두어(+ classpath:)중 하나를 사용할 수 있다.**
+    * 예를 들면,
+    * **classpath:me/njkim/config.xml -> ClassPathResource**
+    * **file:///some/resource/config.xml -> FileSystemResource**
+  * 접두어를 사용하는 방법을 추천한다. 대부분의경우 WebApplicationContext를 사용하기 때문에 ServletContextResource를 사용하겠지만, 접두어가 있으면 훨씬 명시적으로 알 수 있다.
 
 ### Reference
 
