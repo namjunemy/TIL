@@ -771,6 +771,156 @@
     * **file:///some/resource/config.xml -> FileSystemResource**
   * 접두어를 사용하는 방법을 추천한다. 대부분의경우 WebApplicationContext를 사용하기 때문에 ServletContextResource를 사용하겠지만, 접두어가 있으면 훨씬 명시적으로 알 수 있다.
 
+### Validation 추상화
+
+* org.springframework.validation.Validator
+* 애플리케이션에서 사용하는 객체 검증용 인터페이스
+* 특징
+  * 주로 MVC에서 사용하긴 하지만, 웹 계층에서만 사용하는 전용 Validator는 아니다.
+  * 어떤 계층과도 관계가 없다 -> 모든 계층(웹, 서비스, 데이터)에서 사용해도 좋다.
+  * 구현체 중 하나로, JSR-303(Bran Validation 1.0)과 JSR-349(Bean Validation 1.1)을 지원한다.  최신 Bean Validation 2.0.1 까지 지원 (LocalValidatorFactoryBean)
+    * Bean Validation은 Java EE 표준 스펙중 하나로
+    * @NotEmpty, @NotNull 등 빈에 있는 내용을 검증할 수 있는 기능
+  * DataBinder에 들어가 바인딩 할 때 같이 사용되기도 한다.
+
+* 스프링이 제공하는 원시적으로 구현하려면, Validator는 두가지 메소드를 구현해야한다.
+
+  * supports(Class clazz)
+
+    * 넘어온 클래스가 Validator가 지원하는 클래스인지 확인
+
+  * validate(Object target, Errors errors)
+
+    * 실질적으로 검증작업이 이루어지는 곳
+
+    ```java
+    public class Event {
+      
+      Interger id;
+      
+      String title;
+    }
+    ```
+
+    ```java
+    public class EventValidator implements Validator {
+      
+      @Override
+      public boolean supports(Class clazz) {
+        return Event.class.equals(clazz);
+      }
+      
+      @Override
+      public void vaildate(Object target, Errors errors) {
+        //notempty은 errorCode로서 키값에 해당
+        ValicationUtils.rejectIfEmptyOrWhitespace(errors, "title", "notempty", "Empty title is not allowed");
+      }
+    }
+    ```
+
+  * 사용해보기
+
+    * Spring MVC를 사용하다보면 Errors를 많이 마주하지만, 구현체인 BeanPropertyBindingResult는 거의 볼 일이 없다. MVC에서 해준다.
+    * notempty 외에도 에러코드들을 만들어준다.
+
+    ```java
+    @Component
+    public class TestRunner implements ApplicationRunner {
+      
+      @Override
+      public void run(ApplicationArguments args) throws Exception {
+        Event event = new Event();
+        EventValidator eventValidator = new EventValidator();
+        Errors errors = new BeanPropertyBindingResult(event, "event");
+        
+        eventValidator.validate(event, errors);
+        
+        System.out.println(errors.hasErrors());
+        
+        errors.getAllErrors().forEach(e -> {
+          System.out.println("===== error code : ");
+          Arrays.stream(e.getCodes()).forEach(System.our::println);
+          System.out.println(e.getDefaultMessage());
+        })
+      }
+    }
+    ```
+
+    ```shell
+    true
+    ===== error code : 
+    notempty.event.title
+    notempty.title
+    notempty.java.lang.String
+    notempty
+    Empty totle is not allowed
+    ```
+
+* 최근에는 이렇게 원시적으로 구현해서 쓰지 않는다.
+
+* Boot를 쓰고 있다면, 스프링 부트 2.0.5 이상 버전을 사용할 때는
+
+  * 우리가 위에서 구현했던 Validator중에
+
+  * 스프링 프레임워크가 제공하는 LocalValidatorFactoryBean을 Bean으로 등록해 준다. 스프링 부트가.
+
+  * LocalValidatorFactoryBean은 JSR-380(Bean Validation 2.0.1)의 구현체로 hibernate-validator를 사용한다.
+
+    * Bean Validation 어노테이션들을 지원한다.
+
+  * 따라서 우리는, Bean Validation 어노테이션으로 검증 가능한 것들은 아래와 같이 간단하게 검증할 수 있다.
+
+  * 어노테이션 이외에 복잡한 로직들은 Custom Validator를 만들어서 사용하자.
+
+    * [Spring Boot Common Validation Module 만들기 예제 Repository](https://github.com/namjunemy/spring-common-validation-module)
+
+    ```java
+    public class Event {
+      
+      Interger id;
+      
+      @NotEmpty
+      String title;
+    }
+    ```
+
+    ```java
+    @Component
+    public class TestRunner implements ApplicationRunner {
+      
+      @Autowired
+      Validator validator;
+      
+      @Override
+      public void run(ApplicationArguments args) throws Exception {
+        System.out.println(validator.getClass());
+        
+        Event event = new Event();
+        Errors errors = new BeanPropertyBindingResult(event, "event");
+        
+        validator.validate(event, errors);
+    
+        System.out.println(errors.hasErrors());
+        
+        errors.getAllErrors().forEach(e -> {
+          System.out.println("===== error code : ");
+          Arrays.stream(e.getCodes()).forEach(System.our::println);
+          System.out.println(e.getDefaultMessage());
+        })
+      }
+    }
+    ```
+
+    ```shell
+    class org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
+    ===== error code : 
+    NotEmpty.event.title
+    NotEmpty.title
+    NotEmpty.java.lang.String
+    NotEmpty
+    must not be empty
+    ```
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
