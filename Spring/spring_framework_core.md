@@ -921,6 +921,126 @@
     must not be empty
     ```
 
+### 데이터 바인딩 추상화 - PropertyEditor
+
+* 스프링이 제공하는 org.springframework.validation.DataBinder 인터페이스
+
+* 기술적인 관점에서 보면, 프로퍼티 값을 타겟 객체에 설정하는 기능
+* 사용자 관점에서 보면, 사용자 입력값을 애플리케이션 도메인 모델에 동적으로 변환해 넣어주는 기능
+* 해적하면, 입력값은 대부분 '문자열'인데, 그 값을 객체가 가지고 있는 int, long, Boolean, Date, 심지어 Event와 Book같은 도메인 타입으로도 변환해서 넣어주는 기능이다.
+
+* PropertyEditor를 구현하려면 구현해야 하는 기능들이 너무 많다. 대신 PropertyEditorSupport를 상속받아서, 필요한 것만 오버라이드 해보자.
+
+  * PropertyEditor는 스프링 3.0 이전까지 DataBinder가 변환 작업에 사용하던 인터페이스다.
+
+  * **쓰레드 세이프 하지 않다. 상태정보를 저장하고 있기 때문에, @Bean으로 등록해서 사용하면 치명적인 오류가 발생한다.**
+
+  * 빈으로 등록하려면 thread 스코프로 해야 그나마 안전하고, 빈으로 등록하지 않는 것이 더 낫다.
+
+  * 빈으로 등록 안하면 어떻게 쓰나?
+
+  * @InitBinder를 사용해서 해당 컨트롤러에서 사용할 바인더들을 등록할 수 있다.
+
+  * 코드로 이해하기
+
+    * Event 클래스
+
+      ```java
+      @Getter
+      @Setter
+      public class Event {
+      
+          private Long id;
+          private String title;
+      
+          public Event(Long id) {
+              this.id = id;
+          }
+      
+          @Override
+          public String toString() {
+              return "Event{" +
+                  "id=" + id +
+                  ", title='" + title + '\'' +
+                  '}';
+          }
+      }
+      ```
+
+    * EventController
+
+      * 이벤트 컨트롤러에서 @PathValiable로 이벤트 객체를 받는다. 하지만, 요청은 "/event/1" 형식으로 날라온다.
+      * 어떻게 할까?
+
+      ```java
+      @RestController
+      public class EventController {
+      
+          @InitBinder
+          public void init(WebDataBinder webDataBinder) {
+              webDataBinder.registerCustomEditor(Event.class, new EventEditor());
+          }
+      
+          @GetMapping("/event/{event}")
+          public String getEvent(@PathVariable Event event) {
+              System.out.println(event);
+              return event.getId().toString();
+          }
+      }
+      ```
+
+    * 테스트 코드로 검증해보자.
+
+      * 당연히 에러가 난다. String type을 Event로 변환하는데 실패했다는..
+
+      ```java
+      @RunWith(SpringRunner.class)
+      @WebMvcTest
+      public class EventControllerTest {
+      
+          @Autowired
+          MockMvc mockMvc;
+      
+          @Test
+          public void getTest() throws Exception {
+              mockMvc.perform(get("/event/1"))
+                  .andExpect(status().isOk())
+                  .andExpect(content().string("1"));
+          }
+      
+      }
+      ```
+
+    * EventEditor 생성
+
+      * @PathValiable로 받은 test를 파싱해서 이벤트 객체로 set해준다.
+      * 이렇게 되면 컨트롤러에서 event를 사용할 수 있다.
+
+      ```java
+      public class EventEditor extends PropertyEditorSupport {
+      
+          @Override
+          public String getAsText() {
+              // 프로퍼티 에디터가 받은 객체를 getValue로 받을 수 있다.
+              Event event = (Event) getValue();
+              return event.getId().toString();
+          }
+      
+          @Override
+          public void setAsText(String text) throws IllegalArgumentException {
+              // 텍스트를 받아서 Event 객체로 변환
+              // Thread-safe 하지 않으므로 주의하자.
+              setValue(new Event(Long.parseLong(text)));
+          }
+      }
+      ```
+
+    * 테스트 코드가 통과한다. 정상적으로 컨트롤러에서 Event를 받았다.
+
+* 하지만, PropertyEditor를 구현자체도 편리하지 않고, 스레스 세이프 하지도 않아서 빈으로 등록해서 쓰기도 어렵다.
+
+* 그래서 스프링  3에서는 관련 기능들이 추가 됐다. 
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
