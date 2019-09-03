@@ -1039,7 +1039,150 @@
 
 * 하지만, PropertyEditor를 구현자체도 편리하지 않고, 스레스 세이프 하지도 않아서 빈으로 등록해서 쓰기도 어렵다.
 
-* 그래서 스프링  3에서는 관련 기능들이 추가 됐다. 
+* 그리고 Object와 String간의 변환만 할 수 있어서 사용 범위가 제한적이다.
+
+  * getAsText() - Object to String
+  * SetAsTest() - String to Object
+
+* 이런 단점들 때문에 스프링 3에서는 관련 기능들이 추가 됐다. 
+
+### 데이터 바인딩 추상화 - Converter와 Formatter
+
+* PropertyEditor가 가지고 있던 단점을 커버하기 위해 추가된 기능들
+
+* Converter
+
+  * S 타입을 T 타입으로 변환할 수 있는 매우 일반 적인 변환기.
+
+  * 상태 정보를 가지고 있지 않다. Stateless == 스레드 세이프 하다는 이야기이고, 빈으로 만들어도 상관없다.
+
+  * EventConverter 클래스 구현
+
+    ```java
+    public class EventConverter {
+    
+        public static class StringToEventConverter implements Converter<String, Event> {
+    
+            @Override
+            public Event convert(String source) {
+                return new Event(Long.parseLong(source));
+            }
+        }
+    
+        public static class EventToStringConverter implements Converter<Event, String> {
+    
+            @Override
+            public String convert(Event source) {
+                return source.getId().toString();
+            }
+        }
+    }
+    ```
+
+  * 스프링 MVC 설정의 **ConverterRegistry**에 등록해서 사용한다. 모든 컨트롤러에서 작동한다.
+
+    ```java
+    @Configuration
+    public class WebConfig implements WebMvcConfigurer {
+    
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+            registry.addConverter(new StringToEventConverter());
+        }
+    }
+    ```
+
+  * 기본적으로 Wrapper 타입들 Integer, Long등은 스프링이 해주므로 추가로 등록 할 필요는 없다.
+
+* 컨버터는 굉장히 일반적인 변환기이다.
+
+* 웹에서는 대부분 문자열로 입력 받고, 문자열로 내보내주기 때문에
+
+* Spring은 웹에 특화된 인터페이스를 만들어서 제공한다.
+
+* Formatter
+
+  * PropertyEditor의 대체제이다
+
+  * Object와 String간의 변환을 담당하고,
+
+  * 마찬가지로 Stateless 하므로 빈으로 등록할 수 있다.
+
+  * 빈으로 등록할 수 있다는 얘기는 다른 빈(예를 들면 MessageSource)을 주입 받아서 국제화된 메세지를 보낼 수도 있다.
+
+  * Locale값을 Optional하게 사용할 수 있도록 제공한다.
+
+  * EventFormatter
+
+    ```java
+    @Component
+    public class EventFormatter implements Formatter<Event> {
+    
+    
+        @Override
+        public Event parse(String text, Locale locale) throws ParseException {
+            return new Event(Long.parseLong(text));
+        }
+    
+        @Override
+        public String print(Event object, Locale locale) {
+            return object.getId().toString();
+        }
+    }
+    
+    ```
+
+  * 스프링 MVC 설정의 **FormatterRegistry**에 등록해서 사용한다. 모든 컨트롤러에서 작동한다.
+
+    ```java
+    @Configuration
+    public class WebConfig implements WebMvcConfigurer {
+    
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+            registry.addFormatter(new EventFormatter());
+        }
+    }
+    ```
+
+* 이전에 PropertyEditor를 DataBinder 인터페이스를 통해서 사용했다면,
+
+* 위의 Converter와 Formatter는 ConversionService 인터페이스를 통해서 사용하고 있는 것이다.
+
+* 실제로 ConversionService를 통해서 실제 변환하고 있는 작업들을 한 것이다.
+
+* ConversionService
+
+  * 쓰레드-세이프 하게 사용할 수 있다.
+  * 스프링 MVC, SpEL에서 사용한다. 문자열이 들어있는 특정한 값들을 변환한해야 하는 일이 생길 경우 주로.
+  * 구현체 중에 **DefaultFormattingConversionService** 가 있다. ConversionService 타입의 빈으로 이 구현체가 자주 사용 된다.
+    * 이 구현체는
+    * FormatterRegistry 기능도 하고
+    * ConversionService 기능도 한다. 두가지 인터페이스를 다 구현했다.
+    * 여러 기본 컨버터와 포매터를 등록해준다.
+    * 실제로 Formatter는 FormatterResgistry에 등록해야 되고, Converter는 ConterRegistry에 등록해야 되지만 위에서 MVC 설정파일에 등록할때 FormatterRegistry에 addFormatter(), addConverter()로 둘다 등록 가능한 이유는 FormatterRegistry가 ConverterRegistry를 상속 받고 있기 때문이다.
+
+* **스프링 부트에서는**
+
+  * 웹 애플리케이션인 경우에 DefaultFormattingConversionService를 상속해서 만든 **WebConversionService** 를 빈으로 등록해 준다. 부트에서 확장한 빈이다!
+  * 더 많은 기능을 가지고 있다. Money, Joda time 등..
+  * Formatter와 Converter 빈을 찾아서 자동으로 등록해준다.
+    * WebMvcConfigurer를 구현상속해서 add 해줄 필요가 없다는 이야기다.
+    * Formatter나 Converter가 빈으로 등록되어 있다면, **스프링 부트가 자동으로 WebConversionService에 등록을 해준다.**
+
+  * @WebMvcTest는 컨트롤러 계층을 테스트하기 위한 어노테이션이다.
+    * Converter나 Formatter가 빈으로 등록 되어있지 않으면 깨질 수 있다.
+    * 아래와 같이 컴포넌트 스캔이 가능한 빈을 선언해서 사용할 수 있다.
+    * 주의하자. 일반 클래스는 빈을 선언해줘도 사용할 수 없다.
+    * @WebMvcTest({EventConverter.StringToEventConverter.class, EventController.class})
+  * 등록되어 있는 컨버터들을 모두 확인하는 방법
+    * ConversionService를 주입 받아서 바로 찍어보자.
+    * 기본적으로 Formatter와 컨버터들이 모두 들어간다.
+    * @DateTimeFormat, @NumberFormat 어노테이션과
+    * 여러가지 숫자 타입을 문자로 바꾸는것, 그 반대
+    * 그리고 개발자가 만든 컨버터, 포매터까지 확인할 수 있다.
+
+* 보통 웹과 관련된 개발을 많이 하기 때문에 Formatter를 사용하는 것을 추천한다.
 
 ### Reference
 
