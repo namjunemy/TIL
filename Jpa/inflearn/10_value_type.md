@@ -153,4 +153,176 @@
 
 * 임베디드 타입의 값이 null이라면, 매핑한 컬럼 값은 모두 null로 저장 된다.
 
-### 컬렉션 값 타입(collection value type)
+## 값 타입과 불변 객체
+
+* 값 타입은 복잡한 객체 세상을 조금이라도 단순화하려고 만든 개념이다. 따라서 값 타입은 단순하고 안전하게 다룰 수 있어야 한다.
+
+### 값 타입 공유 참조
+
+* 임베디드 타입 같은 값 타입을 여러 엔티티에서 공유하면 굉장히 위험하다.
+
+* 사이드 이펙트가 발생한다.
+
+* 코드로 이해하기
+
+    * 멤버 클래스
+
+        ```java
+        @Entity
+        @Getter
+        @Setter
+        public class Member extends BaseEntity {
+        
+            @Id
+            @GeneratedValue(strategy = GenerationType.IDENTITY)
+            private Long id;
+        
+            @Column(name = "name")
+            private String username;
+        
+            private Integer age;
+        
+            @Enumerated(EnumType.STRING)
+            private RoleType roleType;
+        
+            @Lob
+            private String description;
+        
+            @ManyToOne(fetch = FetchType.EAGER)
+            @JoinColumn(name = "team_id", insertable = false, updatable = false)
+            private Team team;
+        
+            @OneToOne
+            @JoinColumn(name = "locker_id")
+            private Locker locker;
+        
+            @OneToMany(mappedBy = "member")
+            private List<MemberProduct> memberProducts = new ArrayList<>();
+        
+            @Embedded
+            private Period workPeriod;
+        
+            @Embedded
+            private Address homeAddress;
+        
+            public void changeTeam(Team team) {
+                this.team = team;
+                this.team.getMembers().add(this);
+            }
+        }
+        ```
+
+    * 멤버가 같은 주소 객체를 가지고 있다고 해보자.
+
+    * 중간에 1번 멤버의 주소 객체를 가져와서 city 속성을 바꿔보자.
+
+        ```java
+        Address address = new Address("city", "street", "10000");
+        
+        Member member = new Member();
+        member.setUsername("nj");
+        member.setHomeAddress(address);
+        em.persist(member);
+        
+        Member member2 = new Member();
+        member2.setUsername("kim");
+        member2.setHomeAddress(address);
+        em.persist(member2);
+        
+        member.getHomeAddress().setCity("new city");
+        
+        tx.commit();
+        ```
+
+    * 실행 결과를 보면 UPDATE 쿼리가 두번 날라간다. DB를 확인해봐도 member 1과 2의 주소 값이 다 바뀌었다.
+
+    * 이런 사이드 이펙트는 진짜 잡기가 어렵다.
+
+    * 엔티티 간에 공유하고 싶은 값 타입은 엔티티로 만들어서 공유해야 한다.
+
+### 값 타입 복사
+
+* 위에서 확인한 것 처럼 값 타입의 실제인스턴스인 값을 공유하는 것은 매우  위험한 행위이다. 사이드 이펙트 추적도 어렵다.
+
+* 대신 값(인스턴스)를 복사해서 사용한다.
+
+    ```java
+    Address address = new Address("city", "street", "10000");
+    
+    Member member = new Member();
+    member.setUsername("nj");
+    member.setHomeAddress(address);
+    em.persist(member);
+    
+    //주소 객체 복사
+    Address copyAddress = new Address(address.getCity(), address.getStreet(), address.getZipcode());
+    
+    Member member2 = new Member();
+    member2.setUsername("kim");
+    member2.setHomeAddress(copyAddress);
+    em.persist(member2);
+    
+    member.getHomeAddress().setCity("new city");
+    ```
+
+### 객체 타입의 한계
+
+* 위의 예처럼 항상 값을 복사해서 사용하면 공유 참조로 인해 발생하는 부작용을 피할 수 있다.
+
+* 그런데 문제는, 임베디드 타입처럼 직접 정의한 값 타입은 자바의 기본타입이 아니라 객체 타입이다.
+
+* 자바의 기본타입에 값을 대입하면 자바는 기본적으로 값을 복사한다.
+
+* 근데 객체 타입은 참조 값을 직접 대입하는 것을 박을 방법이 없다. 왜냐면 객체의 타입이 같으면 그냥 다 대입해서 넣을 수 있다. 위의 예처럼 Address 타입에 copyAdress를 넣어야 하는데 개발자가 실수로 address를 넣었다. 피할 방법이 없다. 컴파일에서 잡지 못한다.
+
+* 따라서, 객체의 공유 참조는 피할 수 없다.
+
+* 기본 타입의 값 복사
+
+    ```java
+    int a = 10;
+    int b = a; // 기본 타입은 값을 복사
+    b = 4; // b는 4
+    ```
+
+* 객체 타입
+
+    ```java
+    Address a = new Address("old");
+    Address b = a; // 객체 타입은 참조를 전달한다.
+    b.setCity("new"); // a 주소 객체의 필드 city 가 변경 된다.
+    ```
+
+### 불변 객체(Immutable Object)
+
+* 객체 타입을 수정할 수 없게 만들면 부작용을 원천 차단할 수 있다.
+* 값 타입은 불변 객체(immutable object)로 설계해야 한다.
+* 불변 객체 : 생성 시점 이후 절대 값을 변경할 수 없는 객체
+* 생성자로만 값을 설정하고 Setter를 만들지 않으면 된다.
+* 참 : Integer, String은 자바가 제공하는 대표적인 불변 객체이다.
+
+* 위의 실습에서도 Address 임베디드 타입 객체에 setter를 제거하자.
+
+* 불변이라는 작은 제약으로 사이드 이펙트라는 큰 재앙을 막을 수 있다.
+
+* 그러면 원래 값 객체의 필드를 실제로 바꾸고 싶은 경우는?
+
+    * 아래와 같이 값 객체를 통으로 교체 한다.
+
+    ```java
+    Address address = new Address("city", "street", "10000");
+    
+    Member member = new Member();
+    member.setUsername("nj");
+    member.setHomeAddress(address);
+    em.persist(member);
+    
+    Address newAddress = new Address("new City", address.getStreet(), address.getZipcode());
+    member.setHomeAddress(newAddress);
+    
+    tx.commit();
+    ```
+
+* 결론 : 값 타입은 불변으로 만들자.
+
+## 컬렉션 값 타입(collection value type)
