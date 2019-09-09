@@ -938,7 +938,7 @@ Hibernate:
     * Member 클래스에서 AddressHistory 엔티티로 대체
 
         * @OneToMany와 @JoinColumn 으로 일대다 단방향 매핑을 한다. 
-        * AddressEntity에서 내부적으 Address 값 타입을 포함한다.
+        * AddressEntity에서 내부적으로 Address 값 타입을 포함한다.
 
         ```java
         @Entity

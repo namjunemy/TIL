@@ -706,8 +706,6 @@ member.getName();
       em.persist(member2);
       member2.changeTeam(team2);
       
-      
-      
       em.flush();
       em.clear();
       
@@ -717,7 +715,7 @@ member.getName();
       
       tx.commit();
       ```
-
+      
     * 실행 결과를 보면, 
 
     * 일단 멤버를 조회해서 가져온다.
@@ -731,7 +729,7 @@ member.getName();
       * 아래 처럼 **쿼리를 1개** 날렸는데, 그것 때문에 **추가 쿼리가 N개** 나간다는 의미이다.
 
       ```sql
-      Hibernate: 
+  Hibernate: 
           /* select
               m 
           from
@@ -774,14 +772,14 @@ member.getName();
           where
               team0_.id=?
       ```
-
+    
   * 결론. 실무에서는 LAZY 로딩 전략을 가져가자.
 
     * 근데 실무에서 대부분 멤버 팀을 함께 사용하는 경우가 있는데, 그러면 LAZY로 해놓고 계속 쿼리 두방 날려서 조회 해올까요?
-    * 이런 경우를 위해서 **JPQL의 fetch join** 을 통해서 해당 시점에 한방 쿼리로 가져와서 쓸 수 있다.
+  * 이런 경우를 위해서 **JPQL의 fetch join** 을 통해서 해당 시점에 한방 쿼리로 가져와서 쓸 수 있다.
     * 추가적으로 엔티티그래프와 어노테이션으로 푸는 방법, 배치 사이즈 설정으로 해결하는 방법이 있다.
     * 대부분 fetch join으로 해결 한다.
-
+  
 * @ManyToOne, @OneToOne과 같이 @XXXToOne 어노테이션들은 기본이 즉시 로딩(EAGER) 이다.
   
   * 꼭 LAZY로 명시적으로 설정해서 사용하자

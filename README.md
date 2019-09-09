@@ -52,6 +52,8 @@
     * [06. 연관관계 매핑 기초(단방향, 양방향 매핑 이론, 연관관계의 주인)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/06_relational_mapping.md)
     * [07. 다양한 연관관계 매핑(@ManyToOne, @OneToMany, @OneToOne, @OneToMany)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/07_various_relational_mapping.md)
     * [08. 고급 매핑(상속관계 매핑, @MappedSuperclass)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/08_advanced_mapping.md)
+    * [09. 프록시, 즉시로딩과 지연로딩, 영속성 전이와 고아 객체](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/09_proxy_and_relation_managing.md)
+    * [10. 값 타입, 임베디드 타입, 값 타입 컬렉션](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/10_value_type.md)
     * [99. 단계별 실전 예제](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/99_practical_example.md)
     
 * T아카데미 토크온 세미나
