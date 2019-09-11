@@ -676,7 +676,11 @@
 
     * **JPA에서는 equals()와 hashCode()를 재정의 할 때는 꼭 getter로 접근하자. 그래야 프록시 객체가 실제 엔티티에게 요청할 경우에 정상 동작한다. 주의!!**
     * equals와 hashcode뿐만 아니라 엔티티 내에서는 getter()를 사용해서 짜야 JPA가 프록시 객체를 통해서 접근할 때 안전하다.
-
+      
+      * https://kwonnam.pe.kr/wiki/java/hibernate/gotchas 
+      * https://stackoverflow.com/a/30323810
+      * https://developer.jboss.org/wiki/EqualsAndHashCode
+      
     ```java
     @Embeddable
     @Getter
