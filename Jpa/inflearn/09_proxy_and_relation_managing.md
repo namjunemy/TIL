@@ -729,7 +729,7 @@ member.getName();
       * 아래 처럼 **쿼리를 1개** 날렸는데, 그것 때문에 **추가 쿼리가 N개** 나간다는 의미이다.
 
       ```sql
-  Hibernate: 
+      Hibernate: 
           /* select
               m 
           from
