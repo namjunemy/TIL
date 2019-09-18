@@ -158,6 +158,141 @@ em.createNativeQuery("SELECT ID, TEAM_ID, NAME FROM MEMBER WHERE NAME = `KIM`", 
   * DB 커넥션을 직접 가져와서 쿼리를 날릴때, em.persist() 해줘봤자. 영속성 컨텍스트에만 담겨있고 DB에는 반영되어있지 않다. 그래서 커넥션에서 날라가는 select 쿼리는 정상적이지 않다. 그 이후에 commit시점에 플러시가 동작하게 된다.
 * 예) JPA를 우회해서 SQL을 실행하기 직전에 영속성 컨텍스트 수동 플러시
 
+## JPQL 기본 문법과 기능
+
+*  Java Persistence Query Language
+
+* JPQL은 객체지향 쿼리 언어다. 따라서 테이블을 대상으로 쿼리하는 것이 아니라 **엔티티 객체를 대상으로 쿼리** 한다.
+
+  * **JPQL은 엔티티 객체를 대상으로 쿼리** 를 질의하고
+  * **SQL은 데이터베이스 테이블을 대상으로 쿼리** 를 질의한다.
+
+* JPQL은 SQL을 추상화해서 특정 데이터베이스 SQL에 의존하지 않는다.
+
+* JPQL은 결국 SQL로 변환된다.
+
+* 학습에 사용할 예제 객체 모델과 DB 모델
+
+  ![](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/img/39_jpql.PNG?raw=true)
+
+### JPQL 문법
+
+```sql
+select_문 :: = 
+    select_절
+    from_절
+    [where_절]
+    [groupby_절]
+    [having_절]
+    [orderby_절]
+```
+
+```sql
+update_문 :: = update_절 [where_절]
+delete_문 :: = delete_절 [where_절]
+```
+
+- 몇가지 유의 사항은 존재 한다.
+
+  - from절에 들어가는 것은 객체다!
+
+    `select m from Member m where m.age > 8`
+
+  - 엔티티와 속성은 대소문자를 구분
+
+    - 예를 들면, Member 엔티티와 username 필드
+
+  - JPQL 키워드는 대소문자 구분 안함
+
+    - SELECT, FROM, where
+
+  - 엔티티 이름을 사용한다. 테이블 이름이 아니다
+
+    - 엔티티명 Member
+
+  - 별칭은 필수이다.
+
+    - Member의 별칭 m
+
+### 집합과 정렬
+
+- 기본적인 집합 명령어 다 동작 한다.
+
+  ```sql
+  select
+      COUNT(m),   //회원수
+      SUM(m.age), //나이 합
+      AVG(m.age), //평균 나이
+      MAX(m.age), //최대 나이
+      MIN(m.age)  //회소 나이
+  from Member m
+  ```
+
+- GROUP BY, HAVING
+- ORDER BY
+
+### TypeQuery, Query
+
+* TypeQuery
+
+  * 반환 타입이 명확할 때 사용한다.
+
+    ```sql
+    TypedQuery<Member> query = 
+      em.createQuery("SELECT m FROM Member m", Member.class);
+    ```
+
+* Query
+
+  * 반환 타입이 명확하지 않을 때 사용
+
+    ```sql
+    Query query = 
+      em.createQuery("SELECT m.username, m.age FROM Member m");
+    ```
+
+### 결과 조회 API
+
+- `query.getResultList()`
+  - 결과가 하나 이상인 경우, 리스트를 반환한다.
+- `query.getSingleResult()`
+  - 결과가 정확히 하나, 단일 객체를 반환한다.(정확히 하나가 아니면 예외 발생)
+
+### 파라미터 바인딩 
+
+- 웬만하면 이름으로 바인딩하자.
+
+- 이름 기준
+
+  ```java
+  TypedQuery<Member> query = em.createQuery("SELECT m 
+                                            FROM Member m
+                                            where m.username=:username:, Member.class);
+  query.setParameter("username", "member1");
+  Member member = query.getSingleResult();
+  ```
+
+  * 보통은 위의 과정을 메서드 체이닝으로 처리함.
+
+    ```java
+    Member member = 
+      em.createQuery("SELECT m FROM Member m where m.username=:username:, Member.class)
+                   .query.setParameter("username", "member1")
+                   .getSingleResult();
+    ```
+
+- 위치 기준
+
+  ```sql
+  SELECT m
+  FROM Member m
+  where m.username=?1
+  ```
+
+  ```java
+  query.setParameter(1, usernameParam);
+  ```
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
