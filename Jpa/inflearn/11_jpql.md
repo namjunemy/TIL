@@ -407,6 +407,70 @@ delete_문 :: = delete_절 [where_절]
     System.out.println(members.get(0).getAge());
     ```
 
+## 페이징 API
+
+- JPA는 페이징을 다음 두 API로 추상화 해준다.
+
+- 조회 시작위치(0부터 시작)
+
+  ```java
+  setFirstResult(int startPosition)
+  ```
+
+- 조회할 데이터 수
+
+  ```java
+  setMaxResults(int maxResult)
+  ```
+
+- 페이징 쿼리 예시([커밋로그](https://github.com/namjunemy/orm-jpa-basic/commit/150fe2e9e74cce1e4249a3d8ab4063cec8f1f166))
+
+  ```java
+  String jpql = "select m from Member m order by m.age desc";
+  
+  List<Member> resultList = em.createQuery(jpql, Member.class)
+    .setFirstResult(1)
+    .setMaxResults(20)
+    .getResultList();
+  ```
+
+  - 모든 데이터 베이스의 방언이 동작한다.
+
+  - 위 쿼리의 MySQL 방언
+
+    ```SQL
+    SELECT
+        M.ID AS ID,
+        M.AGE AS AGE,
+        M.TEAM_ID AS TEAM_ID,
+        M.NAME AS NAME
+    FROM
+        MEMBER M
+    ORDER BY
+        M.name DESC LIMIT ?, ?
+    ```
+
+  - 위 쿼리의 Oracle 방언
+
+    ```sql
+    SELECT * FROM
+        ( SELECT ROW_.*, ROWNUM ROWNUM_
+        FROM
+            ( SELECT
+                M.ID AS ID,
+                M.AGE AS AGE,
+                M.TEAM_ID AS TEAM_ID,
+                M.NAME AS NAME
+              FROM MEMBER M
+              ORDER BY M.NAME
+             ) ROW_
+         WHERE ROWNUM <= ?
+         )
+    WHERE ROWNUM_ > ?
+    ```
+
+* Spring Data JPA를 쓰다보면 생각보다 페이징이 쉽게 처리되는데, 내부적으로 JPA가 이런 방식으로 다 지원해 준다.
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
