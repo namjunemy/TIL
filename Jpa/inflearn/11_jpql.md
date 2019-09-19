@@ -293,6 +293,120 @@ delete_문 :: = delete_절 [where_절]
   query.setParameter(1, usernameParam);
   ```
 
+## 프로젝션
+
+* 프로젝션은 SELECT 절에 조회할 대상을 지정하는 것을 말한다.
+
+* 프로젝션의 대상은 엔티티, 임베디드 타입, 스칼라 타입(숫자, 문자등 기본 데이터 타입)
+
+  * RDB 쿼리에서는 SELECT 절에 스칼라 타입만 선택할 수 있지만, JPQL에서는 다양하게 가능하다.
+
+* SELECT **m** FROM Member m
+
+  * 엔티티 프로젝션
+
+    ```java
+    // 엔티티 프로젝션의 대상인 Member 리스트는 영속성 컨텍스트에서 관리 된다.
+    List<Member> members =
+      em.createQuery("select m from Member m", Member.class)
+      .getResultList();
+    
+    //update 쿼리 나간다.
+    Member findMember = members.get(0);
+    findMember.setAge(27);
+    ```
+
+* SELECT **m.team** FROM MEMBER m
+
+  * 엔티티 프로젝션
+  * 이 경우에는 멤버와 팀의 조인 쿼리가 나간다. 뒤에서 배우겠지만, 이럴경우 JPQL에 조인을 명시하는 것이 좋다.
+  * SELECT t FROM Member m JOIN m.team t
+
+* SELECT **m.address** FROM Member m
+
+  * 임베디드 타입 프로젝션
+
+  * 임베디드 타입 자체로 엔티티 프로젝션처럼 사용할 수는 없다. 엔티티에 속해 있기 때문에. 엔티티에서 시작해야 한다.
+
+    ```java
+    em.createQuery("select o.address from Order o", Address.class)
+      .getResultList();
+    ```
+
+* SELECT **m.username, m.age** FROM Member m
+
+  * 스칼라 타입 프로젝션
+
+    ```java
+    em.createQuery("select m.username, m.age from Member m")
+      .getResultList();
+    ```
+
+* **DISTINCT** 로 중복 제거 가능
+
+  ```java
+  em.createQuery("select distinct m.username, m.age from Member m")
+    .getResultList();
+  ```
+
+### 프로젝션 - 여러 값 조회
+
+* SELECT m.username, m.age FROM Member m
+
+  * 스칼라 타입이 string, int인데 어떻게 가져오지?
+
+* Query 타입으로 조회
+
+  * 반환 타입이 명확하지 않을 때 사용
+
+  * 타입이 명확하지 않아서 Object[] 타입으로 넣어준다. 꺼내서 써야 한다...
+
+    ```java
+    List resultList = em.createQuery("select m.username, m.age from Member m")
+      .getResultList();
+    
+    Object o = resultList.get(0);
+    Object[] result = (Object[]) o;
+    log.info(result[0]);
+    log.info(result[1]);
+    ```
+
+* Object[] 으로 조회
+
+  * 한단계가 사라졌지만 그닥..
+
+    ```java
+    List<Object[]> resultList = em.createQuery("select m.username, m.age from Member m")
+      .getResultList();
+    
+    Object[] result = resultList.get(0);
+    log.info(result[0]);
+    log.info(result[1]);
+    ```
+
+* **new 명령어로 조회**
+
+  * 가장 깔끔한 방법
+
+  * 단순 값을 DTO로 바로 조회
+
+  * SELECT **new** UserDTO(m.username, m,age) FROM Member m
+
+  * 순서와 타입이 일치하는 생성자가 필요하고,
+
+  * DTO의 패키지명을 다 적어줘야 하는데, 실제로는 QueryDSL로 극복할 수 있다.
+
+    * `Projections.bean(UserDTO.class, user.firstName, user.lastName));`
+
+    ```java
+    // 스칼라 타입 다수를 DTO로 바로 주입 받는 방법
+    List<MemberDTO> members =
+      em.createQuery("select new jpql.dto.MemberDTO(m.name, m.age) from Member m", MemberDTO.class)
+      .getResultList();
+    System.out.println(members.get(0).getName());
+    System.out.println(members.get(0).getAge());
+    ```
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
