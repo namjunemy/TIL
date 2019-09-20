@@ -471,6 +471,91 @@ delete_문 :: = delete_절 [where_절]
 
 * Spring Data JPA를 쓰다보면 생각보다 페이징이 쉽게 처리되는데, 내부적으로 JPA가 이런 방식으로 다 지원해 준다.
 
+## 조인
+
+- 엔티티를 중심으로 동작한다. 객체 스타일로 쿼리가 작성된다.
+
+- 내부 조인
+
+  - 멤버 내부의 팀에 m.team으로 접근
+
+  ```sql
+  SELECT m
+  FROM Member m
+  [INNER] JOIN m.team t
+  ```
+
+- 외부 조인
+
+  ```sql
+  SELECT m
+  FROM MEMBER m
+  LEFT [OUTER] JOIN m.team t
+  ```
+
+- 세타 조인
+
+  - 일명 막(?) 조인이다. 연관관계 상관 없이 유저명과 팀의이름이 같은 경우 찾아라 라는 쿼리 날릴 수 있다. 이런 조인을 세타 조인이라고 한다.
+
+  ```java
+  SELECT COUNT(m)
+  FROM Member m, Team t
+  WHERE m.username = t.name
+  ```
+
+### 조인 - ON 절
+
+- JPA2.1 부터 ON절을 활용한 조인이 가능하다.
+
+  - 조인시 조인 대상을 미리 필터링 할 수 있음
+  - 하이버네이트 5.1부터 **연관관계가 없는 엔티티도 외부 조인**이 가능!
+
+- **1. 조인 대상 필터링**
+
+  - 예) 회원과 팀을 조인하면서, 팀 이름이 A인 팀만 조인
+
+  - JPQL
+
+    ```sql
+    SELECT m,t 
+    FROM Member m 
+    LEFT JOIN m.team t
+      on t.name = 'A'
+    ```
+
+  - SQL
+
+    ```sql
+    SELECT m.*, t.*
+    FROM Member m
+    LEFT JOIN TEAM t
+      ON m.TEAM_ID = t.id AND t.name = 'A'
+    ```
+
+- **2. 연관관계 없는 엔티티 외부 조인**
+
+  - 예) 회원의 이름과 팀의 이름이 같은 대상 외부 조인. 연관관계가 없다.
+
+  - 서로 아무 연관관계가 없어도 LEFT JOIN 가능하다.
+
+  - JPQL
+
+    ```sql
+    SELECT m,t 
+    FROM Member m 
+    LEFT JOIN Team t
+      on m.username = t.name
+    ```
+
+  - SQL
+
+    ```sql
+    SELECT m.*, t.*
+    FROM Member m
+    LEFT JOIN TEAM t
+      ON m.username = t.name
+    ```
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
