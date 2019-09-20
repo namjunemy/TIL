@@ -556,6 +556,76 @@ delete_문 :: = delete_절 [where_절]
       ON m.username = t.name
     ```
 
+## 서브쿼리
+
+* SQL에서 말하는 서브쿼리의 개념과 동일하다
+
+  * 나이가 평균보다 많은 회원
+
+    * 메인쿼리와 서브쿼리 사이에 연관관계가 없다. 각각 m, m2로 분리되어 있음.
+
+    ```sql
+    select m 
+    from Member m
+    where m.age > (select avg(m2.age) from Member m2)
+    ```
+
+  * 한 건이라도 주문한 고객 
+
+    ```sql
+    select m
+    from Member m
+    where (select count(o) from Order o where m = o.member) > 0
+    ```
+
+### 서브 쿼리 지원 함수
+
+* [NOT] EXISTS (subquery) : 서브쿼리에 결과가 존재하면 참이다.
+
+* {ALL | ANY | SOME} (subquery)
+
+  * ALL : 모두 만족하면 참
+  * ANY, SOME : 같은 의미, 조건을 하나라도 만족하면 참
+
+* [NOT] IN (subquery) : 서브쿼리의 결과 중 하나라도 같은 것이 있으면 참
+
+* 예제)
+
+  * 팀A 소속인 회원
+
+    ```sql
+    select m
+    from Member m
+    where exists (select t from m.team t where t.name = '팀A')
+    ```
+
+  * 전체 상품 각각의 재고보다 주문량이 많은 주문들
+
+    ```sql
+    select o
+    from Order o
+    where o.orderAmount > ALL (select p.stockAmount from product p)
+    ```
+
+  * 어떤 팀이든 팀에 소속된 회원
+
+    ```sql
+    select m
+    from Member m
+    where m.team = ANY (select t from Team t)
+    ```
+
+### JPA 서브 쿼리의 한계
+
+* JPA는 WHERE, HAVING 절에서만 서브 쿼리 사용이 가능하다.
+* 하이버네이트에서는 SELECT절에서도 서브쿼리가 가능하다.
+* **FROM 절의 서브 쿼리는 현재 JPQL에서 불가능하다.**
+  * **조인으로 풀 수 있으면 풀어서 해결한다.**
+  * 조인으로 해결하지 못하면
+    * 네이티브 쿼리로 해결하거나,
+    * 어플리케이션 비즈니스 로직에서 풀어내거나
+    * 쿼리를 두번 날려서 해결할 수 있다.
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
