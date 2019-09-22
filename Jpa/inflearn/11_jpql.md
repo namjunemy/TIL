@@ -761,6 +761,46 @@ delete_문 :: = delete_절 [where_절]
             "select nullif(m.name, '관리자') from Member m";
         ```
 
+## JPQL 기본 함수
+
+* JPQL이 제공하는 표준 함수
+
+- CONCAT
+
+- SUBSTRING
+
+- TRIM
+
+- LOWER, UPPER
+
+- LENGTH
+
+- LOCATE -> indexOf와 같이 자리수 반환
+
+- ABS, SQRT, MOD
+
+- SIZE, INDEX(JPA 용도)
+
+    * 값 타입 컬렉션에 컬렉션의 위치 값을 구할 때 @OrderColumn 사용. INDEX로 위치 참조 가능
+
+    ```java
+    String query = "select size(t.members) from Team t";
+    String query = "select index(t.members) from Team t";
+    ```
+
+## 사용자 정의 함수 호출
+
+- 하이버네이트는 사용전 방언에 추가해야 한다.
+
+- DB에 커스텀 펑션 만든 후 사용
+
+    ```java
+    select function ('group_concat', i.name) from Item i
+    select 'group_concat'(i.name) from Item i //하이버네이트 사용시 function처럼 사용 가능
+    ```
+
+* [커밋로그](https://github.com/namjunemy/orm-jpa-basic/commit/f606aa3bd8fa0be0c9b79b47ec9ffb3541731061)
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
