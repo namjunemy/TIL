@@ -683,6 +683,84 @@ delete_문 :: = delete_절 [where_절]
 * =, >, >=, <, <=, <>
 * BETWEEN, LIKE, IS NULL
 
+## CASE 식
+
+- 기본 CASE 식
+
+    ```sql
+    select
+        case when m.age <= 10 then '학생요금'
+             when m.age >= 60 then '경로요금'
+             else '일반요금'
+        end 
+    from Member m
+    ```
+
+    ```java
+    String query =
+                    "select " +
+                        "case when m.age <= 10 then '학생요금'" +
+                        "     when m.age >= 60 then '경로요금'" +
+                        "     else '일반요금'" +
+                        "end " +
+                    "from Member m";
+    List<String> result = em.createQuery(query, String.class)
+                    .getResultList();
+    ```
+
+    ```java
+    Hibernate: 
+        /* select
+            case 
+                when m.age <= 10 then '학생요금'     
+                when m.age >= 60 then '경로요금'     
+                else '일반요금'
+            end 
+        from
+            Member m */ select
+                case 
+                    when member0_.age<=10 then '학생요금' 
+                    when member0_.age>=60 then '경로요금' 
+                    else '일반요금' 
+                end as col_0_0_ 
+            from
+                Member member0_
+    ```
+
+- 단순 CASE 식
+
+    ```sql
+    select
+        case t.name
+          when '팀A' then '인센티브110%'
+          when '팀B' then '인센티브120%'
+          else '인센티브105%'
+        end
+    from Team t
+    ```
+
+* COALSESCE 
+
+    * 하씩 조회해서 null이 아니면 반환
+
+        ```sql
+        String query =
+            "select coalesce(m.name, '이름 없는 회원') from Member m";
+        ```
+
+* NULLIF
+
+    * 두 값이 같으면 null 반환, 다르면 첫번째 값 반환
+
+    * 사용자 이름이 '관리자'면 null을 반환하고 나머지는 본인의 이름을 반환함.
+
+    * 특정 이름을 숨겨야 할 경우
+
+        ```java
+        String query =
+            "select nullif(m.name, '관리자') from Member m";
+        ```
+
 ### Reference
 
 - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
