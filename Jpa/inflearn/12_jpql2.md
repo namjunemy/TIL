@@ -535,8 +535,61 @@
 
     - 상속관계 매핑의 구현 전략 선택에 따라서 쿼리가 달라 진다.
 
-    ```java
+    ```sql
     select i.* from i
     where i.DTYPE = 'B' and i.author = 'kim'
+    ```
+
+## JPQL 엔티티 직접 사용
+
+### 엔티티 직접 사용 - 기본 키 값
+
+* JPQL에서 엔티티를 직접 사용하면 SQL에서 해당 엔티티의 기본 키 값을 사용한다.
+
+- JPQL
+
+    ```sql
+    select count(m.id) from Member m // 엔티티의 아이디를 사용
+    select count(m) from Member m // 엔티티를 직접 사용
+    ```
+
+- SQL
+
+    - 위의 두 JPQL 다 다음 SQL을 실행한다
+
+    ```sql
+    select count(m.id) as cnt from Member m
+    ```
+
+* 엔티티를 직접 파라미터로 전달하던, 엔티티의 식별자인 ID를 직접 전달하던 간에 SQL에서는 엔티티의 식별자인  ID가 사용 된다.
+
+### 엔티티 직접 사용 - 외래 키 값
+
+* 아래 JPQL에서 파라미터로 넘긴 team은 Team의  PK이고,
+* Member가 team의 FK를 가지고 있다. 관리 한다. @JoinColumn에 선언되어 있다.
+* 때문에 Team이 넘어오면 식별자로 쓰는 PK가 외래키로 인정이 되서 사용 가능하다.
+
+* JPQL
+
+    ```sql
+    Team team = em.find(Team.class, 1L);
+    
+    String query = "select m from Member m where m.team = :team";
+    List result = em.createQuery(query)
+    	.setParameter("team", team)
+    	.getResultList();
+    ```
+
+    ```sql
+    String query = "select m from Member m where m.team.id = :teamId";
+    List result = em.createQuery(query)
+    	.setParameter("teamId", teamId)
+    	.getResultList();
+    ```
+
+* SQL
+
+    ```sql
+    select m.* from Member m where m.team_id = ?
     ```
 
