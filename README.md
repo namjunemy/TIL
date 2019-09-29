@@ -28,6 +28,7 @@
 * [[2018.04.18] 2018 aws summit seoul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180418_aws_summit_seoul.md)
 * [[2018.09.11] 사내 세미나 - 협업의 육하원칙](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20180911_agile_seminar.md)
 * [[2019.04.18] 2019 aws summit seoul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20190418_aws_summit_2019.md)
+* [[2019.09.26] 우아한 스프링 배치](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20190926_spring_batch.md)
 
 ### Java
 
