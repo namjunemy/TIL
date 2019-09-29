@@ -55,6 +55,8 @@
     * [08. 고급 매핑(상속관계 매핑, @MappedSuperclass)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/08_advanced_mapping.md)
     * [09. 프록시, 즉시로딩과 지연로딩, 영속성 전이와 고아 객체](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/09_proxy_and_relation_managing.md)
     * [10. 값 타입, 임베디드 타입, 값 타입 컬렉션](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/10_value_type.md)
+    * [11. JPQL 객체 지향 쿼리 언어 - 기본(프로젝션, 페이징, 조인, 서브쿼리, 타입 표현, 조건식, 함수)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/11_jpql.md)
+    * [12. JPQL 객체 지향 쿼리 언어 - 중급(경로표현식, 페치조인, 다형성쿼리,  Named 쿼리, 벌크 연산)](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/12_jpql2.md)
     * [99. 단계별 실전 예제](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/99_practical_example.md)
     
 * T아카데미 토크온 세미나

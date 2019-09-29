@@ -642,3 +642,53 @@
 * 사실 @Entity에 @NamedQuery를 등록하면 엔티티가 너무 복잡해지고 지저분해 진다. 따라서 실무에서는 Spring Data JPA를 사용하자.
 
 ## JPQL 벌크 연산
+
+* 벌크연산은 SQL에서 하나의 row를 찍어서 update, delete 하는 것을 제외한 모든  update, delete 연산 이라고 생각하면 된다.
+* 예를 들어, 재고가 10개 미만인 모든 상품의 가격을 10% 상승 하려면?
+* JPA의 변경 감지 기능으로 실행하려면 너무 많은  SQL을 실행해야 한다.
+    * 1.재고가 10개 미만인 상품을 리스트로 조회한다. 메모리에 가져온다.
+    * 2.상품 엔티티의 가격을 10% 증가한다.
+    * 3.트랜잭션 커밋 시점에 변경감지가 동작한다
+* 변경된 데이터가 100건이라면 100건의 UPDATE SQL이 실행 된다.
+
+### 벌크 연산 예제
+
+* 쿼리 한번으로 여러 테이블 row 변경(엔티티)
+
+* executeUpdate()의 결과는 영향받은 엔티티 수 반환
+
+* UPDATE, DELETE 지원
+
+* INSERT(insert into ... select 도 지원한다. 표준 스펙이 아닌 하이버네이트에서 지원)
+
+    ```java
+    String query = "update Product p" +
+        "set p.price = p.price * 1.1" +
+        "where p.stockAmount < :stockAomunt";
+    
+    int resultCount = em.createQuery(query)
+        .setParameter("stockAmount", 10)
+        .executeUpdate();
+    ```
+
+### 벌크 연산 주의
+
+* 벌크 연산은 영속성 컨텍스트를 무시하고 DB에 직접 쿼리 한다. 그래서 잘못하면 순서가 꼬일 수 있다.
+
+* 해결책은 두가지 있다.
+
+    * 1.벌크 연산을 먼저 실행한다.
+
+    * 2.벌크 연산 수행 후 영속성 컨텍스트만 초기화 시킨다.
+        * 벌크 연산은 SQL을 실행 시키므로, flush와 같은 효과가 일어난다. 따라서, 영속성 컨텍스트만 clear() 하면 된다.
+
+* [실습 코드 커밋 로그](https://github.com/namjunemy/orm-jpa-basic/commit/c4b17735fc5b0361accc17b17f70663a6f76b0a0)
+
+* Spring Data JPA에서는 이 개념에 대해서 @Modifying을 지원한다.(clearAutomatically)
+
+    * https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.modifying-queries
+
+- ### Reference
+
+    - [자바 ORM 표준 JPA 프로그래밍](https://www.inflearn.com/course/ORM-JPA-Basic)
+
