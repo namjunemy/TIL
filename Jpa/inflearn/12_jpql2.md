@@ -593,3 +593,52 @@
     select m.* from Member m where m.team_id = ?
     ```
 
+## JPQL Named 쿼리 - 정적 쿼리
+
+* 미리 정의해서 이름을 부여해두고 사용하는  JPQL
+
+* 정적 쿼리
+
+* 어노테이션, XML에 정의 가능
+
+* 애플리케이션 로딩 시점에 초기화 후 재사용
+
+    * 정적 쿼리 이므로 변하지 않는다. 따라서, 애플리케이션 로딩 시점에 파싱해서 캐시하고 있는다. 비용이 한번만 발생 한다.
+    
+* **애플리케이션 로딩 시점에 쿼리를 검증한다.**
+
+    * 애플리케이션 로딩 시점에 NamedQuery를 파싱 하므로 쿼리 오류, 문자 오류 등을 잡을 수 있다.
+
+* xml 설정도 가능하다.
+
+    * XML이 항상 우선권을 가진다.
+    * 따라서, 애플리케이션 운영 환경에 따라서 다른  XML을 배포할 수 있다.
+
+* 코드 예시
+
+    ```java
+    @Entity
+    @NamedQuery(
+        name = "Member.findByUsername",
+        query = "select m from Member m where m.name = :username"
+    )
+    public class Member {
+        ...
+    }
+    ```
+    
+    ```java
+    List<Member> resultList = 
+        em.createNamedQuery("Member.findByUsername", Member.class)
+            .setParameter("username", "회원1")
+            .getResultList();
+    ```
+    
+* Spring Data Jpa에서는
+
+    * JpaRepository 인터페이스 메소드 위에 @Query()로 등록해서 사용하는데,
+    * 이게 @NamedQuery로 등록되서, 애플리케이션 로딩 시점에 가져갈 수 있는 이점들을 얻을 수 있다.
+
+* 사실 @Entity에 @NamedQuery를 등록하면 엔티티가 너무 복잡해지고 지저분해 진다. 따라서 실무에서는 Spring Data JPA를 사용하자.
+
+## JPQL 벌크 연산
