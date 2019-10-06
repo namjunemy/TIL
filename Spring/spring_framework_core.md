@@ -1184,6 +1184,66 @@
 
 * 보통 웹과 관련된 개발을 많이 하기 때문에 Formatter를 사용하는 것을 추천한다.
 
+## SpEL(Spring Expression Language)
+
+- 스프링 EL이란?
+
+    -  객체 그래프를 조회하고 조작하는 기능을 제공한다.
+    - Unified EL과 비슷하지만, 메소드 호출을 지원하며, 문자열 템플릿 기능도 제공한다.
+    - OGNL, MVEL, JBOss EL 등 자바에서 사용할 수 있는 여러 EL이 있지만, SpEL은 모든 스프링 프로젝트 전반에 걸쳐 사용할 EL로 만들었다.
+    - 스프링 3.0 부터 지원
+
+- SpEL 구성
+
+    ```java
+    ExpressionParser parser = new SpelExpressionParser();
+    StandardEvaluationContext context = new StandardEvaluationContext(bean);
+    Expression expression = parser.parseExpression("SpEL 표현식");
+    String value = expression.getValue(context, String.class);
+    ```
+
+    - 직접 사용 예시
+
+        - 해당 타입(Integer)으로 변환할 때 이전에 학습한 데이터 바인딩 추상화의 conversionService를 사용한다.
+
+        ```java
+        ExpressionParser parser = new SpelExpressionParser();
+        Expression expression = parser.parseExpression("2 + 100");
+        Integer value = expression.getValue(Integer.class)
+        ```
+
+- 문법
+
+    - \#{"표현식"}
+    - ${"프로퍼티"}
+    - 표현식은 프로퍼티를 가질 수 있지만, 반대는 안됨.
+        - \#{${my.data} + 1}
+    - 레퍼런스
+        - https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html
+
+- 실제로 어디서 쓰나?
+
+    - @Value 애노테이션
+
+        ```java
+        @Value("${my.data}")
+        String myValue;
+        ```
+
+    - @ConditionalOnExpression 애노테이션
+
+    - 스프링 시큐리티
+
+        - 메소드 시큐리티, @PreAuthorize, @PostAuthorize, @PreFilter, @PostFilter
+        - XML 인터셉터 URL 설정
+        - ...
+
+    - 스프링 데이터
+
+        - @Query 애노테이션(NamedQuery)
+
+    - Thymeleaf
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
