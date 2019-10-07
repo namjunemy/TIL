@@ -1244,6 +1244,68 @@
 
     - Thymeleaf
 
+## Spring AOP
+
+### 개념 소개
+
+* 스프링 AOP는 AOP의 구현체를 제공하고, 자바의 또다른 AOP구현체인 AspectJ와 연동할 수 있는 기능도 제공하고, 스프링 자체에서 구현한 스프링 AOP 기능을 활용할 수 있다.
+* 이 기능을 기반으로 스프링 트랜잭션 등의 기술이 적용되고 있다.
+* Aspect-Oriented Programming(AOP)은 OOP를 보완하는 수단으로, **흩어진 Aspect를 모듈화 할 수 있는 프로그래밍 기법** 이다.
+  * Aspect를 한곳에 모아서 더 낳은 OOP를 할 수 있게 도와준다.
+* 예를 들면,
+  * 각 클래스에서 관심사가 아래와 같이 다르다. 관심사가 흩어진 상황이다.(Crossing Concerns)
+    * Class A - 문제 A, 문제 B, 문제 C
+    * Class B - 문제 B, 문제 C
+    * Class C - 문제 A, 문제 C
+    * 만약 문제 C를 처리하는 코드의 변경이 일어나게 되면 A, B, C 클래스를 찾아다니면서 수정해야 한다. 
+  * 이 상황에서 AOP를 적용하게 되면, 아래와 같이 Aspect를 모듈화할 수 있다.
+    * Class A, B, C
+    * Aspect X(문제 A 대응) - A, C
+    * Aspect Y(문제 B 대응) - A, B
+    * Aspect Z(문제 C 대응) - A, B, C
+* AOP의 주요 개념
+  * Aspect
+  * Target - Aspect가 적용되는 대상들
+  * Advice - 해야할 일
+  * Pointcut - 어디에 적용되야 하는지(ex, A 클래스의 B메소드 호출시에)
+  * Join point - advice가 적용될 합류점(ex, 생성자 호출 전, 메소드 호출 후)
+  * [https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md#9-1-aop%EB%9E%80](https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md#9-1-aop란)
+* AOP 구현체
+  * java
+    * AspectJ
+    * 스프링 AOP
+* AOP 적용 방법
+  * 위에서 모듈화한 Aspect들을 적용하는 방법이 세가지 있다.
+  * 컴파일 타임
+    * 자바 파일을 클래스 파일로 만들 때, 바이트 코드를 만들어 내는 법
+  * 로드 타임
+    * 이미 만들어진 바이트코드를 로드하는 로드타임에 weaving을 통해서 적용
+  * 런타임
+    * 스프링 AOP가 런타임시에 사용하는 방법.
+    * A라는 빈에 Aspect X를 적용해야 된다는 것을 스프링이 알고 있고,
+    * A라는 빈을 만들때, A를 감싼 A타입의 프록시 빈을 생성한다.
+    * 프록시 빈을 통해서 A라는 빈의 특정 메소드를 호출하기 전에 AOP advice를 수행한다.
+
+### 프록시 기반 AOP - 스프링 AOP
+
+* 스프링 AOP 특징
+
+  * 프록시 기반의 AOP 구현체다.
+  * 스프링 빈에만 AOP를 적용할 수 있다.
+  * 모든 AOP 기능을 제공하는 것이 목적이 아니라, 스프링 IoC와 연동하여 엔터프라이즈 애플리케이션에서 가장 흔한 문제에 대한 해결책을 제공하는 것이 목적이다.
+
+* 프록시 패턴
+
+  * 왜 프록시 패턴을 사용하나? 기존 코드 변경 없이 접근 제어 또는 부가 기능을 추가하기 위해.
+
+    ![](https://github.com/namjunemy/TIL/blob/master/Spring/img/spring_core_1.PNG?raw=true)
+
+  * **기존 코드를 건드리지 않고**, 프록시 객체로 성능 측정을 해보자.
+
+  * 인터페이스 Subject와 인터페이스를 구현상속한 Real Subject를 만들고, 같은 인터페이스를 구현상속하는 프록시 빈도 만든다.
+
+  * 이 프록시 빈에서 Real Subject의 메소드를 건드리지 않고(접근 제어), 호출하면서 성능을 측정(부가 기능)할 수 있다.
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
