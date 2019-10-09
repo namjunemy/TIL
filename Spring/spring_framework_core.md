@@ -1269,7 +1269,7 @@
   * Advice - 해야할 일
   * Pointcut - 어디에 적용되야 하는지(ex, A 클래스의 B메소드 호출시에)
   * Join point - advice가 적용될 합류점(ex, 생성자 호출 전, 메소드 호출 후)
-  * [https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md#9-1-aop%EB%9E%80](https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md#9-1-aop란)
+  * https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md
 * AOP 구현체
   * java
     * AspectJ
