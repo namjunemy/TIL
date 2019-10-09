@@ -1306,6 +1306,112 @@
 
   * 이 프록시 빈에서 Real Subject의 메소드를 건드리지 않고(접근 제어), 호출하면서 성능을 측정(부가 기능)할 수 있다.
 
+### @AOP
+
+- 애노테이션 기반의 스프링 @AOP
+
+- 의존성 추가
+
+    - spring-boot-starter-aop
+
+- Aspect 정의
+
+    - @Aspect
+    - 빈으로 등록해야 하므로 @Component 추가
+
+- Pointcut 정의
+
+    - @Pointcut(표현식)
+    - 주요 표현식
+        - execution
+            - 포인트 컷 조합 어려움.
+        - @annotation
+            * 어노테이션 기반의 AOP
+        - bean
+            - 빈의 모든 public 메서드에 다 적용
+    - 포인트컷 조합
+        - &&, ||, !
+
+- Advice 정의
+
+    - @Before
+    - @AfterReturning
+    - @AfterThrowing
+    - @Around
+
+- 예시
+
+    - io.namjune 패키지 하위의 EventService 클래스의 모든 메소드에 Advice적용
+    - 이 방법은 코드의 변경이 없이 aop를 적용할 수 있지만 모든 메소드들에 적용된다.
+
+    ```java
+    @Component
+    @Aspect
+    public class PerfAspect {
+        
+        @Around("execution(* io.namjune..*.EventService.*(..))")
+        public Object logPerf(ProceedingJoinPoint pjp) throws Throwable {
+            long begin = System.currentTimeMillis();
+            Object retVal = pjp.proceed();
+            System.out.println(System.currentMillis() - begin);
+            return retVal;
+        }
+    }
+    ```
+
+- **원하는 메소드들에만 aop를 적용하고 싶다면, @annotation 기반의  AOP를 활용할 수 있다.**
+
+- 어노테이션 생성
+
+    - RetentionPolicy - 어노테이션을 어느 선 까지 유지할 것인가에 대한 설정이다.
+        - CLASS - 기본값. 클래스 파일까지 유지한다. 바이트코드까지 남아있다.
+        - SOURCE - 컴파일 하고 나면, 어노테이션 정보가 사라진다.
+        - 정의 하지 않으면 기본 설정.
+    - @Target - 타겟 설정
+    - @Documented - java doc 생성시
+
+    ```java
+    @Documented
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.CLASS)
+    public @interface PerLogging {
+    }
+    ```
+
+- Service 클래스에서 AOP를 적용하고 싶은 메소드에만 어노테이션 설정
+
+    ```java
+    @Service
+    public class EventService {
+        
+        @PerLogging
+        public void methodA() {
+            ...
+        }
+        
+        public void methodB() {
+            ...
+        }
+    }
+    ```
+
+- @Aspect의  Pointcut 표현식 수정
+
+    ```java
+    @Component
+    @Aspect
+    public class PerfAspect {
+        
+        @Around("@annotation(PerLogging)")
+        public Object logPerf(ProceedingJoinPoint pjp) throws Throwable {
+            long begin = System.currentTimeMillis();
+            Object retVal = pjp.proceed();
+            System.out.println(System.currentMillis() - begin);
+            return retVal;
+        }
+    }
+    ```
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
