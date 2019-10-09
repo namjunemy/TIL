@@ -1412,6 +1412,20 @@
     }
     ```
 
+## Null-safety
+
+- 스프링 프레임워크 5에 추가된 Null 관련 어노테이션
+    - intellij의 설정에가서 compiler -> Configure annotations에서 spring의 아래 어노테이션들 등록
+    - 패키지레벨 설정은 pakage-info.java에 어노테이션 등록
+    - @NonNull
+    - @Nullable
+    - @NonNullApi(패키지 레벨  설정)
+        - 패키지 이하의 모든 파라미터와 리턴타입에 NonNull 적용하는 것과 마찬가지의 효과.
+        - 따라서, @Nullable과 섞어서 효과적으로 사용 가능
+    - @NonNullFields(패키지 레벨 설정)
+- 목적
+    - (툴의 진원을 받아) 컴파일 타임에 최대한 NPE를 방지 하는 것이 목적.
+
 ### Reference
 
 * https://spring.io/projects/spring-framework
