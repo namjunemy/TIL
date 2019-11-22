@@ -30,6 +30,7 @@
 * [[2019.04.18] 2019 aws summit seoul](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20190418_aws_summit_2019.md)
 * [[2019.09.26] 우아한 스프링 배치](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20190926_spring_batch.md)
 * [[2019.10.18] Kafka Conference Seoul 2019](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191018_kafka_conference_seoul.md)
+* [[2019.11.21] 우아한 레디스]( https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191121_redis.md )
 
 ### Java
 
