@@ -2,6 +2,10 @@
 
 > 2019.11.27
 
+![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/0.jpg?raw=true)
+
+![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/1.jpg?raw=true)
+
 ## 0. 초청 연사 특강
 
 > 한양대학교 - 김상욱 교수
@@ -23,6 +27,8 @@
 
 > NHN Edu 서버개발팀 - 신승엽
 
+![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/2.jpg?raw=true)
+
 ### 주요 Git 워크플로우 살펴보기
 
 * Git flow
@@ -32,7 +38,7 @@
     * 서포팅 브랜치
         * 필요할 때 생성 후 삭제하는 브랜치
         * feature 브랜치
-            * 특정 feature의 개발이 완료되면 다시 develop으로 머지 이때, fast forward 하지 않도록 주의
+            * 특정 feature의 개발이 완료되면 다시 develop으로 merge 이때, fast forward 하지 않도록 주의
         * release 브랜치
             * feature들이 포함된 develop 에서 따고, 릴리즈 후엔 master와 develop에서 merge
         * hotfix 브랜치
@@ -73,6 +79,7 @@
             * 배포 날짜로 관리. develop-20191121 등
         * **장기간의 배포 일정**인 경우
             * 코드네임으로 관리. develop-tomato 등
+    * git flow base
     * develop 브랜치에서 위의 상황에 맞는 각 sub develop 브랜치를 따고
     * sub develop 브랜치 개발이 완료되면 QA를 진행한다.
     * 사실 이 정책의 경우 릴리즈 브랜치가 필요 없다. sub develop이 명확하다.
@@ -82,9 +89,10 @@
         * 같은 이름의 sub develop 브랜치를 새로 따고, 체리픽 활용
     * 핫픽스는 master에서 따서 완료후 master, develop merge
     * 핫픽스 브랜치 merge 후에 sub develop들을 develop에 다시 merge.
-    * **현재 포털개발팀 TV줌에서 쓰는 방식과 매우 유사함.** (릴리즈 브랜치 관리는 협업 환경에 따라 다르다고 생각함)
+    * **현재 포털개발팀 TV줌파트에서 쓰는 방식과 매우 유사함.** (릴리즈 브랜치 관리는 협업 환경에 따라 다르다고 생각함)
 * 개발 플로우
-    * 사진 첨부
+    
+    ![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/3.jpg?raw=true)
 
 ## 2. DDD-Lite@Spring
 
@@ -154,6 +162,8 @@
 > 3. 2막: 본격 분리 작업
 > 4. 에필로그: 1년간 운영해보니...
 
+![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/4.jpg?raw=true)
+
 ### 프롤로그 : 무엇이 문제인가?
 
 * 일체형 웹 서비스(with MVC) 방식은 기능과 화면이 적을 땐 괜찮았다.
@@ -186,7 +196,8 @@
             * 모든걸 갖췄지만 러닝커브가 높다
         * 리액트
             * 강력한 기능을 가지고 있지만, 더 필요한 도구는 필요에 따라서 선택해야 한다.
-        * 최소한의 있을건 다 있고, 배우기 쉬우며, 빠르개 만들어 낼 수 있다.
+        * vue.js
+            * 최소한의 있을건 다 있고, 배우기 쉬우며, 빠르게 만들어 낼 수 있다.
 * 우리 팀은 어떤가?
     * 자바 개발자가 많고, 자바스크립트 개발 비중은 상대적으로 적은 편
 * Vue.js 를 골랐다
@@ -228,13 +239,21 @@
 * API 호출 방식
     * 일체형 웹 서비스에서는?
         * 서버 렌더를 위해 API 명세에 맞는 VO클래스를 만들어야 한다.
+        
         * 클라이언트 렌더링에서도 이렇게 해야 될까?
+            
             * API Gateway 사용 - 많은 기능중 API 라우팅 기능에 집중
             * Zuul 사용
+            
                 * 부트에서 간단하게 적용 가능
+            
+                  ![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/5.jpg?raw=true)
+            
         * 백엔드는 API Gateway의 역할을 충실하게 하게 된다.
+            
             * 기존의 VO를 제거하고 json으로 쭉쭉 내리면 된다.
     * 결론
+        
         * API Gateway를 적용하고 불필요한 중복 코드를 걷어내자.
 * 상태 관리
     * 프론트엔드의 복잡한 컴포넌트 간 데이터 전달
@@ -304,6 +323,8 @@
 > 2. 연관 관계 맵핑에 대한 모든 것
 > 3. Spring Data JPA Repository의 숨겨진(?) 기능
 
+![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/6.jpg?raw=true)
+
 ### 요약
 
 * 연관관계 매핑
@@ -312,12 +333,12 @@
     * 하지만, 일대다 단방향 연관관계 매핑에서 영속성 전이(cascade)를 사용할 경우 양방향으로 변경하자
         * 추가 update 쿼리 방지
 * Spring Data JPA Repository
-    * JpaResitory 상속하면 웬만한 CRUD, Paging, Sorting 메서드 사용가능
+    * JpaRepository 상속하면 웬만한 CRUD, Paging, Sorting 메서드 사용가능
     * 메서드 이름 규칙을 통한 쿼리 생성 가능
         * 이름 규칙에 따라 interface에 메서드 선언만 하면 쿼리 생성
-    * JPA Repository 메서드로도 JOIN 쿼리 수행 가능
+    * JPA Repository 메서드로도 **JOIN 쿼리 수행 가능**
         * 이름 규칙에 따라 Entity 내 연관관계 필드 탐색함
-    * JPA Repository 메서드에서도 다양한 DTO Projection 지원
+    * JPA Repository 메서드에서도 다양한 **DTO Projection 지원**
         * Dynamic DTO Projection도 가능하다.
 
 ## 5. 바르게, 빠르게! Reactive를 품은 Spring Kafka
@@ -329,6 +350,8 @@
 > 3. Project Reactor의 내부 구조(Publisher-Subscriber 간 처리 흐름)
 >
 > 예제 코드 저장소 - https://github.com/EleganceLESS/nhn-forward-2019
+
+![img](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/img/nhn_forward_2019/7.jpg?raw=true)
 
 ### 01. Kafka 그리고 Spring
 
@@ -348,12 +371,12 @@
 ### 02. 적용 프로젝트 소개
 
 * 서버 모니터링 시스템에서 reactive kafka를 활용했다
-* 기본 로직은 서버에서 매트릭 정보를 가져와서 매트릭DB에 넣고 그것을 보여준다.
-* 그 사이에서 Detector가 존재하여 매트릭 정보를 활용해 사용자에게 Event를 전달한다.
-* 이 때 Detector는 수 많은 서버에서 오는 매트릭을 다 관장해야 한다. 커버링 범위가 매우 크다.
+* 기본 로직은 서버에서 메트릭 정보를 가져와서 메트릭DB에 넣고 그것을 보여준다.
+* 그 사이에서 Detector(관찰자)가 존재하여 메트릭 정보를 활용해 사용자에게 Event를 전달한다.
+* 이 때 Detector는 수 많은 서버에서 오는 메트릭을 다 관장해야 한다. 커버링 범위가 매우 크다.
     * 1000 대 이상의 서버에서 동시다발적으로 이벤트가 감지되면?
     * 해당 이벤트가 짧은 간격으로 수차례 반복하면?
-* 어쨋든 이상 이벤트 통지에 지연이 발생해서는 안되며, 각 이벤트는 상호 독립성이 모장되어야 한다.
+* 어쨋든 이상 이벤트 통지에 지연이 발생해서는 안되며, 각 이벤트는 상호 독립성이 보장되어야 한다.
 
 ### 03. 기본 기능 구현
 
@@ -372,7 +395,7 @@
 * 최악의 상황의 경우? 동시다발적 또는 많은 양의 메세지 발생
 * 기준 시간 동안 발생한 여러 이벤트는 하나의 메세지로 모아서 통지하자.
     * 발생하는대로 메세지를 보내게 되면 1000건 발생하면 1000개의 메세지를 받게 된다.
-    * 30초 단위 등.
+    * ex) 30초 단위로 버퍼에 쌓아서 1건으로.
 * Flux Operator의  buffer() 이용해서 처리 가능하다.
 
 ```java
@@ -392,14 +415,14 @@ public void process() {
 * API 서버도 reactive하게 만들었다. 해결 됐지 않나?
     * **결국 그 요청은 DB가 다 받는다.**
 * 발송 시스템의 경우에도 과도하게 요청을 다 보내면 과금이 어마어마하게 늘어난다.
-* Custom Subscriber를 만들어서 subscribe할 때, **hookOnSubscribe()**를 정의할 수 있다.
+* Custom Subscriber를 만들어서 subscribe할 때, **hookOnSubscribe()** 를 정의할 수 있다. (정해진 양 만큼 발송)
 
 ### 07. 시간을 달리는 메시지
 
 * subscribe 시작시점에는 순차지만, 비동기기 때문에 끝나는 시점에 순서를 보장할 수 없다.
 * request(4)로 요청해서 1243 순서로 끝났는데 서버가 뻗었다.
 * 그 다음 요청은 3부터 시작해서 onNext() 4567을 처리하게 된다.
-* offset이 증가하는 경우에만 commit을 하자.
+* 해결 - offset이 증가하는 경우에만 commit을 하자.
     * 코드는 추후 제공되는 영상 참조
 
 ### 08. 몇 가지 결론
