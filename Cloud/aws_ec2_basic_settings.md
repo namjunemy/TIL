@@ -1,4 +1,4 @@
-## EC2 서버 생성, 접속시 필수 설정
+# EC2 서버 생성, 접속시 필수 설정
 
 > 아마존 리눅스 1 서버 기준
 >
@@ -8,7 +8,7 @@
 > * Timezone 변경
 > * 호스트네임 변경
 
-### EC2 서버 접속 설정
+## EC2 서버 접속 설정
 
 > Mac 기준
 
@@ -44,7 +44,7 @@
 
     * `$ ssh myServiceName`
 
-### Java8 설치
+## Java8 설치
 
 * 아마존 리눅스 1의 경우 기본 자바 버전이 7, 프로젝트 버전에 맞게 변경.
 
@@ -53,14 +53,14 @@
 * Java8 선택 후 변경 완료 확인: `$ java -version`
 * Java7 제거: `$ sudo yum remove java-1.7.0-openjdk`
 
-### Timezone 변경
+## Timezone 변경
 
 * EC2 서버의 기본 타임존은 UTC다. 한국과는 9시간 차이 발생. 애플리케이션에서 생성되는 시간도 모두 9시간 차이나게 됨. 필수 변경 사항.
 * `$ sudo rm /etc/localtime`
-* `$ sudo ln -s /usr/share/zoneinfo/Asiz/Seoul /etc/localtime`
+* `$ sudo ln -s /usr/share/zoneinfo/Asia/Seoul /etc/localtime`
 * 변경 확인 `$ date`
 
-### Hostname 변경
+## Hostname 변경
 
 * 여러 서버를 관리 중일 경우 IP만으로 어떤 서비스의 서버인지 확인이 어려움
 
@@ -102,7 +102,7 @@
             * 비정상이라면 호스트 찾지 못했음을 나타내는 메시지
                 * `Could not resolve host: ...`
 
-### Reference
+## Reference
 
 * `스프링 부트와 AWS로 혼자 구현하는 웹 서비스 - 이동욱`
 * http://woowabros.github.io/experience/2017/01/20/billing-event.html
