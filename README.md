@@ -229,6 +229,7 @@
 
 ### Cloud
 
+* [AWS RDS 기본 설정](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_rds_basic_settings.md)
 * [AWS EC2 서버 생성, 접속시 필수 설정](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_basic_settings.md)
 * [AWS EC2 인스턴스 생성하기](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_create_instance.md)
 * [AWS EC2 ssh 원격 접속과 scp를 통한 파일 업로드](https://github.com/namjunemy/TIL/blob/master/Cloud/aws_ec2_connect_and_scp.md)
