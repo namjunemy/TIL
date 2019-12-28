@@ -21,4 +21,33 @@
     * 테스트용으로 150개로 임의로 설정
 
 * 위의 변경사항 저장 후, RDS의 파라미터 그룹을 기본 그룹에서 새로 생성한 그룹으로 변경
+
 * 적용 후 재부팅을 통해서 완전히 적용
+
+* 추가 확인 사항
+
+    * 위에서 설정한 character-set, collation 설정 적용 확인
+
+        ```sql
+        show variables like 'c%';
+        ```
+
+    * rds 파라미터 설정에서 적용했지만, 일부 기본값인 latin1로 설정 되어있는 항목 존재
+
+    * character_set_database, collation_connection 두가지
+
+    * 직접 쿼리 실행
+
+        ```sql
+        alter database db명
+        character set = 'utf8mb4'
+        collate = 'utf8mb4_general_ci';
+        ```
+
+    * 타임존 확인
+
+        ```sql
+        select @@time_zone, now();
+        ```
+
+        
