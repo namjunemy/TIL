@@ -32,6 +32,7 @@
 * [[2019.10.18] Kafka Conference Seoul 2019](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191018_kafka_conference_seoul.md)
 * [[2019.11.21] 우아한 레디스]( https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191121_redis.md )
 * [[2019.11.27] NHN FORWARD 2019 후기](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191127_nhnforward.md)
+* [[2020.02.11] Google BigQuery](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20200211_bigquery.md)
 
 ### Java
 
