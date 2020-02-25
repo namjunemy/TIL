@@ -179,4 +179,225 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
+## 2-3. POJO 레퍼런스와 자동 연결을 이용해 다른 POJO와 상호 작용하기
+
+* 자바 구성 클래스에 정의된 POJO/빈 인스턴스들 사이의 참조 관계는 표준 자바 코드로도 맺어줄 수 있다.
+* 필드, 세터메서드, 생성자, 또는 다른 아무 메서드에 @Autowired를 붙이면 POJO 레퍼런스를 자동으로 연결해 쓸 수 있다.
+
+### 자바 구성 클래스에서 POJO 참조하기
+
+* 자바 구성 클래스에 POJO 인스턴스를 정의하면, 모든게 자바 코드로 있어서 얼마든지 POJO를 참조할 수 있다.
+
+* 아래 코드와같이 @Bean으로 선언된 DatePrefixGenerator는 관례상 메서드명과 동일한 datePrefixGenerator로 빈을 가져올 수 있지만, **빈 인스턴스화 코드 자체가 표준 자바 메서드로 구현되어 있으므로 그냥 자바 메서드를 호출하듯 불러 써도 된다.**
+
+* datePrefixGenerator() 메서드를 호출해도 빈을 가져올 수 있다.
+
+  ```java
+  @Configuration
+  public class SequesceConfiguration {
+    
+    @Bean
+    public DatePrefixGenerator datePrefixGenerator() {
+      DatePrefixGenerator dpg = new DatePrefixGenerator();
+      dpg.setPattern("yyyyMMdd");
+      return dpg;
+    }
+    
+    @Bean
+    public SequenceGenerator sequenceGenerator() {
+      SequenceGenerator sequence = new SequenceGenerator();
+      sequence.setInitial(100000);
+      sequence.setSuffix("A");
+      sequence.setPrefixGenerator(datePrefixGenerator());
+      return sequence;
+    }
+  }
+  ```
+
+### POJO 필드에 @Autowired를 붙여 자동 연결
+
+* 서비스 객체를 생성하는 서비스 클래스는 실제로 자주 쓰이는 베스트 프랙티스로, DAO를 직접 호출하는 대신 일종의 파사드(관문)를 두는 패턴이다.
+
+* 서비스 객체는 내부적으로 DAO들과 연동한다.
+
+  ```java
+  @Component
+  public class SequenceService {
+    
+    @Autowired
+    private SequenceDao sequenceDao;
+    
+    ...
+  }
+  ```
+
+* SequenceService 클래스는 @Component를 붙였기 때문에 스프링 빈으로 등록 된다. 빈 이름은 클래스명 그대로 sequenceService
+
+* @Autowired가 있기 때문에 SequenceDao(인터페이스 타입) 타입의 빈이 이 프로퍼티에 자동 연결 된다.
+
+* **배열형 프로퍼티에 @Autowired를 붙이면 스프링은 매치된 빈을 모두 찾아 자동 연결한다.**
+
+  ```java
+  public class SequenceGenerator {
+    
+    @Autowired
+    private PrefixGenerator[] prefixGenerators;
+    
+    ...
+  }
+  ```
+
+* **Type-safe 한 컬렉션에 @Autowired를 붙이면 스프링은 이 컬렉션과 타입 호환되는 빈을 모두 찾아서 자동 연결한다.**
+
+  ```java
+  public class SequenceGenerator {
+    
+    @Autowired
+    private List<PrefixGenerator> prefixGenerators;
+    
+    ...
+  }
+  ```
+
+* **Type-safe 한 Map에 @Autowired를 붙이면 스프링은 이 컬렉션과 타입 호환되는 빈을 모두 찾아서 빈 이름이 키인 맵에 추가한다.**
+
+  ```java
+  public class SequenceGenerator {
+    
+    @Autowired
+    private Map<String, PrefixGenerator> prefixGenerators;
+    
+    ...
+  }
+  ```
+
+### @Autowired로 POJO 메서드와 생성자를 자동 연결하기, 자동 연결을 선택적으로 제어하기
+
+* @Autowired는 POJO 세터 메서드에서도 직접 적용할 수 있다. PrefixGeneretor와 타입 호환되는 빈이 연결된다.
+
+  ```java
+  public class SequenceGenerator {
+    ...
+      
+    @Autowired
+    public void setprefixGenerator(PrefixGeneretor prefixGenerator) {
+      this.prefixGenerator = prefixGenerator;
+    }
+  }
+  ```
+
+* 스프링은 기본적으로 @Autowired를 붙인 필수 프로퍼티에 해당하는 빈을 찾지 못하면 예외를 던진다.
+
+* 따라서, **선택적인 프로퍼티는 @Autowired의 required 속성값을 false로 지정해 예외처리 할 수있다.**
+
+  ```java
+  public class SequenceGenerator {
+    ...
+      
+    @Autowired(required = false)
+    public void setprefixGenerator(PrefixGeneretor prefixGenerator) {
+      this.prefixGenerator = prefixGenerator;
+    }
+  }
+  ```
+
+* 생성자에도 @Autowired를 붙여 자동 연결 할 수 있다. 스프링은 생성자 인수가 몇개든 각 인수형과 호환되는 빈을 연결한다.
+
+  * 스프링 4.3버전부터 생성자가 하나뿐인 클래스의 생성자는 자동 연결하는 것이 기본이므로 굳이 @Autowired를 붙이지 않아도 된다.
+
+  ```java
+  @Service
+  public class SequenceService {
+    
+    private final SequenceDao sequenceDao;
+    
+    @Autowired
+    public SequenceService(SequenceDao sequenceDao) {
+      this.sequenceDao = sequenceDao;
+    }
+    
+    ...
+  }
+  ```
+
+### 애너테이션으로 모호한 자동 연결 명시하기
+
+* 타입을 기준으로 자동 연결하면 IoC 컨테이너에 호환 타입이 여럿 존재하거나 프로퍼티가 (배열, 리스트, 맵 등) 그룹형이 아닐 경우 연결이 제대로 되지 않는다.
+* 타입이 같은 빈이 여럿이라면 @Primary, @Qualifier로 해결할 수 있다.
+
+### @Primary
+
+* 스프링에서는 @Primary를 붙여 후보 빈을 명시한다. 여러 빈이 연결 대상일 때 특정한 빈에 우선권을 부여하는 방법이다.
+
+  ```java
+  @Component
+  @Primary
+  public class DatePrefixGenerator imprements prefixGenerator {
+    
+    ...
+  }
+  ```
+
+### Qualifier로 모호한 자동 연결 명시하기
+
+* @Qualifier에 이름을 주어 후보 빈을 명시할 수도 있다.
+
+  ```java
+  @Component
+  public class SequenceGenerator {
+    
+    @Autowired
+    @Qualifier("datePrefixGenerator")
+    private PrefixGenerator prefixGenerator;
+    
+    ...
+  }
+  ```
+
+* @Qualifier는 메서드 인수를 연결하는데도 쓰일 수 있다.
+
+  ```java
+  @Component
+  public class SequenceGenerator {
+    
+    @Autowired
+    public void myOwnCustomInjectionName(
+      @Qualifier("datePrefixGenerator") PrefixGenerator prefixGenerator) {
+      this.prefixGenerator = prefixGenerator;
+    }
+  }
+  ```
+
+### 여러 곳에 분산된 POJO 참조 문제 해결하기
+
+* 스프링 부트가 아닌 프로젝트에서는 애플리케이션 규모가 커질수록 POJO 설정을 하나의 자바 구성 클래스에 담아두기 어렵기 때문에 보통 POJO 기능에 따라 여러 자바 구성 클래스로 나누어 관리한다.
+
+* 근데, 자바 구성 클래스가 여럿 공존하면 상이한 클래스에 정의된 POJO를 자동 연결하거나 참조하는 일이 복잡해진다.
+
+* 한가지 방법은 자바 구성클래스가 위치한 경로마다 애플리케이션 컨텍스트를 초기화하는 방법이다.
+
+* 각 자바 구성 클래서에 선언된 POJO를 컨텍스트와 레퍼런스로 읽으면, POJO간 자동연결이 가능하다.
+
+  ```java
+  AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(PrefixConfiguration.class, SequenceGeneratorConfiguration.class);
+  ```
+
+* @Import로 구성 파일을 나누어 임포트 하는 방법도 있다.
+
+* 두개의 빈이 각각 다른 구성 클래서에 정의되어 있다면, @Import를 통해서 해당 클래스에 정의한 POJO들을 모두 현재 구성 클래스의 스코프로 가져올 수 있다.
+
+* 그런다음 @Value와 SpEL을 써서 필드에 주입할 수 있다.
+
+  ```java
+  @Configuration
+  @Import(PrefixConfiguration.class)
+  public class SequenceConfiguration {
+    
+    @Value("#{datePrefixGenerator}")
+    private PrefixGenerator prefixGenerator;
+    
+    ...
+  }
+  ```
+
   
