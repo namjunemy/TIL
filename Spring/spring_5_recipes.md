@@ -400,4 +400,77 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
-  
+## 2-4 @Resource와 @Inject를 붙여 POJO 자동 연결하기
+
+* 스프링 전용 @Autowired 대신, 자바 표준 애너테이션 @Resource, @Inject로 POJO를 자동 연결할 수 있다.
+* @Resource는 JSR-250(Common Annotations for the Java Platform)에 규정된 애너테이션으로, 이름으로 POJO 레퍼런스를 찾아 연결한다.
+* @Inject는 JSR-330(Standard Annotations for Injection)에 규정된 애너테이션으로, 타입으로 POJO 레퍼런스를 찾아 연결한다.
+
+### @Resource
+
+* 타입으로 POJO를 찾아 자동 연결하는 기능은 @Resource나 @Autowired나 마찬가지지만,
+
+* 타입이 같은 POJO가 여럿일 때 @Autowired를 쓰면 가리키는 대상이 모호해진다. 결국 @Qualifier를 써서 이름으로 다시 POJO를 찾아야 하는 불편함이 따른다.
+
+* @Resource는 기능상 @Autowired + @Qualifier 이므로 대상이 명확하다.
+
+  ```java
+  public class SequenceGenerator {
+    
+    @Resource
+    private PrefixGenerator prefixGenerator;
+    
+    ...
+  }
+  ```
+
+### @Inject
+
+* @Resource와 @Autowired 처럼 @Inject도 일단 타입으로 POJO를 찾는다.
+
+  ```java
+  public class SequenceGenerator {
+    
+    @Inject
+    private PrefixGenerator prefixGenerator;
+    
+    ...
+  }
+  ```
+
+* 하지만 타입이 같은 POJO가 여럿일 때는 @Inject를 이용하려면 POJO 주입 클래스와 주입 지점을 구별하기 위해 커스텀 애너테이션을 작성해야 한다.
+
+  ```java
+  @Qualifier
+  @Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
+  @Documented
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface DatePrefixAnnotation {
+    
+  }
+  ```
+
+* 위의 커스텀 애너테이션에서 붙인 @Qualifier는 스프링에서 제공하는 것이 아닌, javax.inject 패키지에 속한 애너테이션이다.
+
+* 커스텀 애너테이션을 작성한 다음, 빈 인스턴스를 생성하는 POJO 주입클래스에 붙인다.
+
+  ```java
+  @DatePrefixAnnotation
+  public class DatePrefixGenerator implements PrefixGenerator {
+    ...
+  }
+  ```
+
+* 이제 POJO 속성 또는 주입 지점에 커스텀 애너테이션을 붙이면 더이상 모호해질 일은 없다.
+
+  ```java
+  public class SequenceGenerator {
+    
+    @Inject
+    @DatePrefixAnnotation
+    private PrefixGenerator prefixGenerator;
+    ...
+  }
+  ```
+
+* @Autowired, @Resource, @Inject 셋중 어느걸 쓰더라도 결과는 같다. @Autowired는 스프링, @Resource, @Inject는 자바 표준(JSR, Java Specification Requests)에 근거한다. 이름 기반이라면 @Resource, 타입 기반이라면 아무거나 써도 된다.
