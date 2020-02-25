@@ -136,3 +136,47 @@ public class SequesceGeneratorConfiguration {
   )
   ```
 
+## 2-2. 생성자 호출해서 POJO 생성하기
+
+### 자바 구성 클래스 작성하기
+
+* IoC 컨테이너에 POJO 인스턴스를 정의하려면 자바 구성 클래스를 작성해 값을 초기화한다.
+
+* 생성자로 POJO 인스턴스/빈을 생성하는 자바 구성 클래스를 작성해보자
+
+  ```java
+  @Configuration
+  public class ShopConfiguration {
+    
+    @Bean
+    public Product aaa() {
+      Battery p1 = new Battery("AAA", 2.5);
+      p1.setRechargeable(true);
+      return p1;
+    }
+    
+    @Bean
+    public Product bbb() {
+      Disc p2 = new Disc("CD-RW", 1.5);
+      p2.setCapacity(700);
+      return p2
+    }
+  }
+  
+  public class Main {
+    
+    public static void main(String[] args) throws Exception {
+      
+      ApplicationContext context = 
+        new AnnotationConfigApplicationContext(ShopConfiguration.class);
+      
+      Product aaa = context.getBean("aaa", Product.class);
+      Product bbb = context.getBean("bbb", Product.class);
+      
+      System.out.println(aaa);
+      System.out.println(bbb);
+    }
+  }
+  ```
+
+  
