@@ -27,7 +27,7 @@ public class SequesceGeneratorConfiguration {
 
 * 애너테이션을 붙인 자바 클래스를 스캐닝하려면 우선 IoC 컨테이너를 인스턴스화 해야 한다. 그래야 스프링이 나중에 @Configuration과 @Bean등을 발견하고 IoC 컨테이너에서 빈 인스턴스를 가져올 수 있다.
 
-* 스피링은 기본 구현체인 Bean Factory와 이와 호환되는 고급 구현체인 Application Context, 두 가지 IoC 컨테이너를 제공한다.
+* 스프링은 기본 구현체인 Bean Factory와 이와 호환되는 고급 구현체인 Application Context, 두 가지 IoC 컨테이너를 제공한다.
 
 * 애플리케이션 컨텍스트는 기본 기능에 충실하면서도 빈 팩토리보다 발전된 기능을 지니고 있으므로 리소스에 제약을 받는 상황이 아니면 가급적 애플리케이션 컨텍스트를 사용하는게 좋다. 
 
@@ -400,7 +400,7 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
-## 2-4 @Resource와 @Inject를 붙여 POJO 자동 연결하기
+## 2-4. @Resource와 @Inject를 붙여 POJO 자동 연결하기
 
 * 스프링 전용 @Autowired 대신, 자바 표준 애너테이션 @Resource, @Inject로 POJO를 자동 연결할 수 있다.
 * @Resource는 JSR-250(Common Annotations for the Java Platform)에 규정된 애너테이션으로, 이름으로 POJO 레퍼런스를 찾아 연결한다.
@@ -474,3 +474,107 @@ public class SequesceGeneratorConfiguration {
   ```
 
 * @Autowired, @Resource, @Inject 셋중 어느걸 쓰더라도 결과는 같다. @Autowired는 스프링, @Resource, @Inject는 자바 표준(JSR, Java Specification Requests)에 근거한다. 이름 기반이라면 @Resource, 타입 기반이라면 아무거나 써도 된다.
+
+## 2-5. @Scope를 붙여 POJO 스코프 지정하기
+
+* @Component 같은 애너테이션을 POJO에 붙이는 건 빈 생성에 관한 템플릿을 정의하는 것이지, 실제 빈 인스턴스를 정의하는게 아니다.
+
+* getBean() 메서드로 빈을 요청하거나 다른 빈에서 참조할 때 스프링은 빈 스코프에 따라 어느 빈 인스턴스를 반환할지 결정해야 한다.
+
+* 스프링의 빈 스코프
+
+  | 스코프        | 설명                                                         |
+  | ------------- | ------------------------------------------------------------ |
+  | singleton     | IoC 컨테이너당 빈 인스턴스 하나 생성                         |
+  | prototype     | 요청할 때마다 빈 인스턴스 새로 생성                          |
+  | request       | HTTP 요청당 하나의 빈 인스턴스를 생성. 웹 애플리케이션 컨텍스트에만 해당 됨 |
+  | session       | HTTP 세션당 빈 인스턴스 하나 생성. 웹 애플리케이션 컨텍스트에만 해당 됨 |
+  | globalSession | 전역 HTTP 세션당 빈 인스턴스 하나를 생성한다. 포털 애플리케이션 컨텍스트에만 해당된다. |
+
+* 아래와 같은 쇼핑카트 클래스가 존재한다.
+
+  ```java
+  @Component
+  public class ShoppingCart {
+    
+    private List<Product> items = new ArrayList<>();
+    
+    public void addItem(Product item) {
+      items.add(item);
+    }
+    
+    public List<Product> getItems() {
+      return items;
+    }
+  }
+  ```
+
+* 상품 빈들을 카트에 추가핧 수 있게 자바 구성파일에 선언한다.
+
+  ```java
+  @Configuration
+  @ComponentScan("io.namjune.springrecipes.shop")
+  public class ShopConfiguration {
+    
+    @Bean
+    public Product a() {
+      ...
+    }
+    
+    @Bean
+    public Product b() {
+      ...
+    }
+    
+    @Bean
+    public Product c() {
+      ...
+    }
+  }
+  ```
+
+* 카트를 상품에 넣어가면서 테스해보자.
+
+  ```java
+  public class Main {
+    
+    public static void main(String[] args) {
+      ApplicationContext context = 
+        new AnnotationConfigApplicationContext(ShopConfiguration.class);
+      
+      Product a = context.getBean("a", Product.class);
+      Product b = context.getBean("b", Product.class);
+      Product c = context.getBean("a", Product.class);
+     
+      ShoppingCart cart1 = context.getBean("shoppingCart", ShoppingCart.class);
+      cart1.add(a);
+      cart1.add(b);
+      System.out.println("Cart 1 contains " + cart1.getItems());
+      
+      ShoppingCart cart2 = context.getBean("shoppingCart", ShoppingCart.class);
+      cart2.addItem(c);
+      System.out.println("Cart 2 contains " + cart2.getItems());
+    }
+  }
+  ```
+
+* ShoppingCart의 빈 스코프 설정을 아무것도 하지 않았으므로 기본으로 singleton 빈이 생성된다.
+
+* 따라서, 두 고객이 동일한 쇼핑카트를 공유하는 상황이 벌어진다.
+
+  ```java
+  Cart 1 contains [a, b]
+  Cart 2 contains [a, b, c]
+  ```
+
+* 쇼핑몰 방문 고객마다 상이한 카트 인스턴스를 만들어야 맞는 상황이다. ShppingCart 클래스의 빈 스코프를 요청마다 생성하는 prototype으로 설정하자.
+
+  ```java
+  @Component
+  @Scope("prototype")
+  public class ShoppingCart {
+    ...
+  }
+  ```
+
+* 이제 두 고객은 각자의 쇼핑카트를 소유할 수 있다.
