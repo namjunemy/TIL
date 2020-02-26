@@ -578,3 +578,132 @@ public class SequesceGeneratorConfiguration {
   ```
 
 * 이제 두 고객은 각자의 쇼핑카트를 소유할 수 있다.
+
+## 2-6. 외부 리소스(텍스트, XML, 프로퍼티, 이미지 파일)의 데이터 사용하기
+
+### 프로퍼티 파일 데이터를 이용해서 POJO 초깃값 설정하기
+
+* 클래스패스에 아래와 같이 discounts.properties 파일에 키-값이 들어 있다고 가정하자.
+
+  ```properties
+  // discounts.properties
+  
+  specialcustomer.discount=0.1
+  summer.discount=0.15
+  endofyear.discount=0.2
+  ```
+
+* 다음과 같이 구성파일을 작성해서 프로퍼티 파일을 참조할 수 있다.
+
+  * 스프링은 자바 클래스패스(접두어 classpath:)에서 discounts.properties 파일을 찾는다.
+  * @PropertySource를 붙여서 프로퍼티 파일을 로드하려면 PropertySourcesPlaceholderConfigurer 빈을 @Bean으로 선언해야 한다.
+  * 그러면 스프링은 discounts.property 파일을 자동으로 연결하므로, 파일에 나열된 프로퍼티를 빈 프로퍼티로 활용할 수 있다.
+  * Properties 파일에서 가져온 프로퍼티값을 담을 자바 변수를 정의하고, @Value placeholder 표현식을 넣어서 프로퍼티 값을 변수에 할당한다. 형식은 @Value("${key:default_value}") 이다.
+
+  ```java
+  @Configuration
+  @PropertySource("classpath:discounts.properties")
+  @ComponentScan("io.namjune.springrecipes.shop")
+  public class ShopConfiguration {
+    
+    // key가 endofyear.discount이고, 기본 값은 0 이다.ㅎ
+    @Value("${endofyear.discount:0}")
+    private double specialEndofyearDiscountField;
+    
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+      return new PropertySourcesPlaceholderConfigurer();
+    }
+  }
+  ```
+
+* 프로퍼티 파일 데이터를 빈 프로퍼티 구성 외의 다른 용도로 쓰려면 스프링의 Resource 매커니즘을 이용한다.
+
+### POJO에서 외부 리소스 파일 데이터를 가져와 사용하기
+
+* 애플리케이션 시동시 클래스패스에 위치한 banner.txt라는 텍스트 파일 안에 넣은 문구를 배너로 보여주려고 한다.
+
+  ```text
+  //banner.txt
+  
+  *******************
+  Wellcome to My Shop
+  *******************
+  ```
+
+* 배너를 읽어 콘솔에 출력하는 POJO 클래스이다.
+
+  * banner가 스프링 Resource 타입으로 선언되어있고, 그 값은 빈 인스턴스 생성시 세터 주입을 사용해서 채워진다.
+  * showBanner() 메서드는 Files 클래스의 lines(), forEachOrdered() 메서드를 이용해서 배너 파일의 내용을 읽어 한줄씩 출력한다.
+
+  ```java
+  public class BannerLoader {
+    
+    private Resource banner;
+    
+    public void setBanner(Resource banner) {
+      this.banner = banner;
+    }
+    
+    @PostConstructor
+    public void showBanner() throws IOException {
+      Files.lines(Paths.get(banner.getURI()), Charset.forName("UTF-8"))
+        .forEachOrdered(System.out::println);
+    }
+  }
+  ```
+
+* BannerLoader를 인스턴스화 하기 위한 구성 클래스를 작성하자.
+
+  * @Value("classpath:discounts.properties") 덕분에 스프링이 클래스패스에서 banner.txt 파일을 찾아서
+  * banner 필드에 주입한다.
+  * 세터 주입을 거쳐서 BannerLoader 빈에 할당 되고, @PostConstructor로 인해서 IoC 컨테이너 구성 시점에 파일에 있는 배너가 출력 된다.
+
+  ```java
+  @Configuration
+  @PropertySource("classpath:discounts.properties")
+  @ComponentScan("io.namjune.springrecipes.shop")
+  public class ShopConfiguration {
+   
+    @Value("classpath:discounts.properties")
+    // 절대경로 명시 - @Value("file:c:/shop/banner.txt")
+    // 특정 패키지 - @Value("classpath:io/namjune/springrecipes/shop/banner.txt")
+    private Resource banner;
+    
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+      return new PropertySourcesPlaceholderConfigurer();
+    }
+    
+    @Bean
+    public BannerLoader bannerLoader() {
+      BannerLoader bl = new BannerLoader();
+      bl.setBanner(banner);
+      return bl;
+    }
+  }
+  ```
+
+* 자바 클래스패스에 있는 리소스들은 ClassPathResource로 액세스할 수 있지만, 
+
+  ```java
+  // 경로를 지정하지 않으면 클래스패스 루트이다.
+  Resource resource = new ClassPathResource("discount.properties");
+  
+  // 특정 패키지에 위치한 리소스는 클래스패스 루트부터 절대 경로를 명시하면 된다.
+  Resource resource = new ClassPathResource("io/namjune/springrecipes/shop.banner.txt");
+  ```
+
+* 외부 파일시스템에 있는 리소스는 FileSystemResouece를 사용하며,
+
+  ```java
+  Resource resource = new FileSystemResource("c:/shop/banner.txt");
+  ```
+
+* URL로 외부 리소스를 액세스하려면 스프링 UrlResource를 사용한다.
+
+  ```java
+  Resource resource = new UrlResource("http://www.apress.com/");
+  ```
+
+  
