@@ -787,5 +787,109 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
-  
+## 2-8. 애너테이션을 이용해 POJO 초기화/폐기 커스터마이징하기
 
+### @Bean 정의부에서 initMethod, destroyMethod 속성 설정
+
+* 자바 구성클래스의 @Bean 정의부에서 initMethod, destroyMethod를 설정하면, 스프링은 이들을 각각 초기화, 폐기 콜백 메서드로 인지한다.
+
+  ```java
+  public class Cashier {
+    
+    ...
+      
+    public void openFile() throws IOException {
+      ...
+    }
+    
+    public void closeFile() throws IOException {
+      ...
+    }
+  }
+  ```
+
+* 자바 구성파일
+
+  ```java
+  @Configuration
+  public class ShopConfiguration {
+    
+    @Bean(initMethod = "openFile", destroyMethod = "closeFile")
+    public Cashier cashier() {
+      ...
+    }
+  }
+  ```
+
+### @PostConstructor와 @PreDestory로 POJO 초기화/폐기 메서드 지정
+
+* 자바 Configuration 파일 외부에 @Component로 POJO 클래스를 정의할 경우 @PostConstructor와 @PreDestory로 직접 초기화/폐기 메서드를 지정한다.
+
+* 빈 생성 이후에 openFile() 메서드를, 빈 폐기 이전에 closeFile() 메서드가 실행 된다.
+
+  ```java
+  @Component
+  public class Cashier {
+    
+    ...
+    
+    @PostConstructor
+    public void openFile() throws IOException {
+      ...
+    }
+    
+    @PreDestroy
+    public void closeFile() throws IOException {
+      ...
+    }
+  }
+  ```
+
+### @Lazy로 느긋하게 POJO  초기화하기
+
+* 기본적으로 스프링은 모든 POJO를 조급하게 초기화 한다.(Eager Initialiaztion)
+
+* 애플리케이션 시동과 동시에  POJO들을 초기화 하게 되는데, 환경에 따라서 **빈을 처음 요청하기 전**까지 초기화 과정을 미루는 게 더 나을 때도 있다.
+
+* 이렇게 나중에 초기화 하는 개념을 느긋한 초기화라고 한다. 이 경우 시동 시점에 리소스를 집중 소모하지 않아도 된다.
+
+* 아래 클래스는 @Lazy 덕분에 애플리케이션이 요구하거나 다른 POJO가 참조하기 전까지 초기화되지 않는다.
+
+  ```java
+  @Component
+  @Scope("prototype")
+  @Lazy
+  public class ShoppingCart {
+    ...
+  }
+  ```
+
+### @DependsOn으로 초기화 순서 정하기
+
+* POJO가 늘어날 수록 POJO 초기화 횟수도 증가한다.
+
+* 여러 자바 Configuration에 분산 선언된 많은 POJO가 서로를 참조하다 보면 경합 조건(Race Condition)이 일어나기 쉽다.
+
+* 이런 경우 의존관계에 있는 빈의 초기화가 먼저 이루어질 수 있도록 설정할 수 있다.
+
+* @DependsOn은 어떤 POJO가 다른 POJO 보다 먼저 초기화 되도록 강제하며, 그 과정에서 에러가 나도 쉬운 메시지를 돌려 준다.
+
+* @DependsOn은 빈의 초기화 순서를 보장 한다.
+
+* 아래 설정 파일에서 datePrefixGenerator 빈은 sequenceGenerator 빈 보다 반드시 먼저 생성 된다.
+
+  ```java
+  @Configuration
+  public class SequenceConfiguration {
+    
+    @Bean
+    @DependsOn("datePrefixGenerator")
+    public SequenceGenerator sequenceGenerator() {
+      ...
+    }
+  }
+  ```
+
+* @DependsOn의 속성값으로는 { } 로 둘러싼 CSV 리스트 형태로 의존하는 빈을 여러개 지정할 수 있다.
+
+  * ex) @DependsOn({"datePrefixGenerator, numberPrefixGenerator"})
