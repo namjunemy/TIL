@@ -893,3 +893,94 @@ public class SequesceGeneratorConfiguration {
 * @DependsOn의 속성값으로는 { } 로 둘러싼 CSV 리스트 형태로 의존하는 빈을 여러개 지정할 수 있다.
 
   * ex) @DependsOn({"datePrefixGenerator, numberPrefixGenerator"})
+
+## 2-9. 후처리기(BeanPostProcessor)를 만들어 POJO 검증/수정하기
+
+### 모든 빈 인스턴스를 처리하는 후처리기(BeanPostProcessor) 생성
+
+* 빈 후처리기는 BeanPostProcessor 인터페이스를 구현한 객체이다.
+
+* 이 인터페이스를 구현한 빈을 발견하면, 스프링은 자신이 관장하는 모든 빈 인스턴스에  postProcessBeforeInitialization(), posrProcessAfterInitialization() 두 메서드를 적용한다.
+
+* 두 메서드는 하는 일이 없어도 반드시 원본 빈 인스턴스를 반환해야 한다.
+
+* 애플리케이션 컨텍스트는 BeanProcessor 구현 빈을 감지해서 컨테이너 안에 있는 다른 빈 인스턴스에 일괄 적용 한다.
+
+  ```java
+  @Component
+  public class AuditCheckBeanPostProcessor implements BeanPostProcessor {
+    
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+      System.out.println("In AuditCheckBeanPostProcessor.postProcessBeforeInitialization, processing bean type: " + bean.getClass());
+      return bean;
+    }
+    
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+      return bean;
+    }
+  }
+  ```
+
+### 특정 타입의 빈 인스턴스만 처리하는 후처리기(BeanPostProcessor)
+
+* Product 타입인 빈 인스턴스에만 빈 후처리기를 등록할 수 있다.
+
+* postProcessBeforeInitialization(), posrProcessAfterInitialization() 두 메서드는 하는 일이 없어도 처리할 빈 인스턴스를 반드시 반환해야 한다.
+
+* **바꿔서 말하면, 이 과정에서 원본 빈 인스턴스를 다른 인스턴스로 바꿔치기 할 수도 있다는 의미**가 된다.
+
+  ```java
+  @Component
+  public class ProductCheckBeanPostProcessor implements BeanPostProcessor {
+    
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+      if (bean instanceof Product) {
+        System.out.println("In ProductCheckBeanPostProcessor.postProcessBeforeInitialization, processing bean type: " + bean.getClass());
+      }
+      return bean;
+    }
+    
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+      if (bean instanceof Product) {
+        System.out.println("In ProductCheckBeanPostProcessor.postProcessAfterInitialization, processing bean type: " + bean.getClass());
+      }
+     
+      return bean;
+    }
+  }
+  ```
+
+### @Required로 프로퍼티 검사하기
+
+* 특정 빈 프로퍼티가 설정되었는지 체크하고 싶은 경우에는, 커스텀 후처리기(RequiredAnnotationBeanPostProcessor)를 작성하고 해당 프로퍼티에  @Required를 설정한다.
+
+* 스프링 빈 후처리기 RequiredAnnotationBeanPostProcessor는 @Required가 붙은 프로퍼티 값이  null인지만 판단한다.
+
+* 해당 프로퍼티가 null일 경우 BeanInitializationException 예외를 던진다.
+
+* @Required로 검증하려면 RequiredAnnotationBeanPostProcessor가 빈으로 등록되어있어야 한다.
+
+  ```java
+  public class SequenceGenerator {
+    
+    private PrefixGenerator prefixGenerator;
+    private String suffix;
+    
+    @Required
+    public void setPrefixGenerator(PrefixGenerator prefixGenerator) {
+      this.prefixGenerator = prefixGenerator;
+    }
+    
+    @Required
+    public void setSuffix(String suffix) {
+      this.suffix = suffix;
+    }
+  }
+  ```
+
+  
+
