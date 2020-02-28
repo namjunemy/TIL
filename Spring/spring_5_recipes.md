@@ -706,4 +706,86 @@ public class SequesceGeneratorConfiguration {
   Resource resource = new UrlResource("http://www.apress.com/");
   ```
 
+## 2-7. 프로퍼티 파일에서 로케일마다 다른 다국어 메시지 해석하기
+
+* 스프링의 MessageSource 인터페이스는 리소스 번들 메시지를 처리하는 메서드가 몇가지 정의되어 있다.
+
+* ResourceBundleMessageSource는 가장많이 쓰는 MessageSource 구현체로, 로케일별로 분리된 리소스 번들 메세지를 해석한다.
+
+* ResourceBundleMessageSource POJO를 구현하고 Config 파일에 @Bean을 붙여 선언하면 애플리케이션에 필요한 i18n 데이터를 가져다 쓸 수 있다.
+
+* 클래스패스 루트에 messages_en_US.properties 파일을 작성하자
+
+  ```properties
+  alert.checkout=A shopping cart has been checked out.
+  alert.inventory.checkout=A shopping cart with {0} has been checked out at {1}
+  ```
+
+* Config 파일이 빈 인스턴스 정의하기
+
+  * 빈 인스턴스는 반드시 messageSource라고 명명해야 애플리케이션 컨텍스트가 자동 감지한다.
+
+  ```java
+  @Configuration
+  public class ShopConfiguration {
+    
+    @Bean
+    public ReloadableResourceBundleMessageSource messageSource() {
+     
+      ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+      messageSource.setBasenames("classpath:messages");
+      messageSource.setCacheSeconds(1);
+      return messageSource;
+    }
+  }
+  ```
+
+* 위와 같이 MessageSource를 정의하고 영어가 주 언어인 미국 로케일에서 텍스트 메시지를 찾으면,
+
+  * messages_en_US.properties 파일이 제일 먼저 잡힌다. 이 파일이 없다면,
+  * messages_en.properties를 그 다음으로 찾고, 이 파일도 없다면
+  * 기본 파일인 messages.properties를 선택한다.
+
+* 애플리케이션 컨텍스트를 구성해서 getMessage()로 메시지 해석하기
+
+  * getMessage()의 인수는 키, 메시지 매개변수 배열, 대상 로케일 순이다.
+  * 메시지 매개변수 배열은 Object 배열 형태로 넘긴다.
+
+  ```java
+  public class Main {
+    
+    public static void main(String[] args) {
+      ApplicationContext context = new AnnotationConfigApplicationContext(ShoopConfiguration.class);
+      
+      String alert = context.getMessage("alert.checkout", null, Localu.US);
+      // A shopping cart with {0} has been checked out at {1}
+      String alertInventory = context.getMessage("alert.inventory.checkout", new Object[]{"[DVD-RW 3.0]", new Date()}, Locale.US);
+      
+      System.out.println("alert.checkout is: " + alert);
+      System.out.println("alert.inventory.checkout is: " + alertInventory);
+    }
+  }
+  ```
+
+* 텍스트 메시를 해석하는 빈에는 MessageSource를 주입해야 한다.
+
+  ```java
+  @Component
+  public class Cashier {
+    
+    @Autowired
+    private MessageSource messageSource;
+    
+    public void setMessageSource(MessageSource messageSource) {
+      this.messageSource = messageSource;
+    }
+    
+    public void checkout(ShoppingCart cart) theow IOException {
+      String alert = messageSource.getMessage("alert.inventory.checkout", new Object[]{ cart.getItems(), new Date() }, Locale.US);
+      System.out.println(alert);
+    }
+  }
+  ```
+
   
+
