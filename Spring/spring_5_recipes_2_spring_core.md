@@ -1177,4 +1177,74 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
-  
+## 2-11. 스프링 환경 및 프로파일 마다 다른 POJO 로드하기
+
+* 동일한 POJO 인스턴스/빈을 여러 애플리케이션 시나리오(예: 개발, 테스트, 운영)별로 초깃값을 달리해서 구성할 수 있다. 
+* 자바 구성 클래스를 여러개 만들고 각 클래스마다 POJO 인스턴스/빈을 묶는다.
+* 이렇게 묶은 의도를 잘 표현할 수 있게 프로파일을 명명하고 자바 구성클래스에 @Profile을 설정한다. 
+* 그리고, 애플리케이션 컨텍스트가 시나리오에 맞는 구성 클래스 파일을 읽어들여 실행하게 만들면 된다.
+
+### @Profile로 자바 구성 클래스를 프로파일 별로 작성하기
+
+* @Profile은 클래스 레벨로 선언했기 때문에 자바 구성 클래스에 속한 모든 @Bean 인스턴스는 해당 프로파일에 편입 된다.
+
+  ```java
+  @Configuration
+  @Profile("global")
+  @ComponentScan("io.namjune.springrecipes.shop")
+  public class ShopConfiguration {
+    
+    @Bean(initMethod = "openFile", destroyMethod = "closeFile")
+    public Cashier cashier() {
+      ...
+    }
+  }
+  ```
+
+  ```java
+  @Configuration
+  @Profile({"summer", "winter"})
+  public class ShopConfigurationSumWin {
+    
+    @Bean
+    public Product aaa() {
+      ...
+    }
+    
+    @Bean
+    public Product bbb() {
+      ...
+    }
+    
+    @Bean
+    public Product ccc() {
+      ...
+    }
+  }
+  ```
+
+### 프로파일을 환경에 로드하기
+
+* 프로파일에 속한 빈을 애플리케이션에 로드하려면 프로파일을 활성화 해야 한다.
+
+* 프로파일 여러개를 한 번에 로드하는 것도 가능하며, 자바 런타임 플래그나 WAR파일 초기화 매개변수를 지정해서 프로그램 방식으로 프로파일을 로드할 수도 있다.
+
+* 프로그램 방식으로 프로파일을 로드하려면 먼저 컨텍스트를 가져와서 setActiveProfiles() 메서드를 호출한다.
+
+  ```java
+  AnnotationConfigApplicationContext context = new AnnotaionConfigApplicationContext();
+  context.getEnvironment().setActiveProfiles("global", "winter");
+  context.scan("io.namjune.springrecipes.shop");
+  context.refresh();
+  ```
+
+* 자바 런타임 플래그로 로드할 프로파일을 명시할 수도 있다.
+
+  ```java
+  -Dspring.profiles.active=global,winter
+  ```
+
+* 기본 프로파일을 지정하려면
+
+  * 프로그램 방식의 경우 setActiveProfiles() 대신 setDefaultProfiles() 메서드를 쓰면 되고,
+  * 자바 런타임 플래그나, WAR파일 초기화 매개변수를 쓸때는 spring.profiles.active 대신 spring.profiles.default로 대신하면 된다.
