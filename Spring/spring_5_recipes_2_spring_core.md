@@ -982,5 +982,199 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
-  
 
+## 2-10. 팩토리(정적 메서드, 인스턴스 메서드, 스프링 Factory Bean)로 POJO 생성하기
+
+* 자바 Configuration 클래스의 @Bean 메서드는(일반 자바 구문으로) 정적 팩토리를 호출하거나 인스턴스 팩토리 메서드를 호출해서 POJO를 생성할 수 있다.
+
+### 정적 팩토리 메서드로 POJO 생성하기
+
+* 아래 ProductCreator 클래스에서 정적 팩토리 메서드 createProduct는 productId에 해당하는 Product 객체를 생성한다.
+
+* id에 따라서 인스턴스화 할 실제 Product 객체를 내부 로직으로 결정한다.
+
+  ```java
+  public class ProductCreator {
+    
+    public static Product createProduct(String productId) {
+      if ("aaa."equals(productId)) {
+        return new Battery("AAA", 2.5);
+      } else if ("bbb".equals(productId)) {
+        return new Disc("CD-RW", 1.5);
+    } else if ("ccc".equals(productId)) {
+        return new Disc("DVD-RW", 3.0);
+      }
+      throw new IllegalArgumentException("Unknown product!");
+    }
+  }
+  ```
+  
+* 자바 구성 클래스 @Bean 메서드에서 일반 자바 구문으로 정적 팩토리 메서드를 호출해서 POJO를 생성한다.
+
+  ```java
+  @Configuration
+  public class ShopConfiguration {
+    
+    @Bean
+    public Product aaa() {
+      return ProductCreator.createProduct("aaa");
+    }
+    
+    @Bean
+    public Product bbb() {
+      return ProductCreator.createProduct("bbb");
+    }
+    
+    @Bean
+    public Product ccc() {
+      return ProductCreator.createProduct("ccc");
+    }
+  }
+  ```
+
+### 인스턴스 팩토리 메서드로 POJO 생성하기
+
+* 맵을 구성해서 상품 정보를 담아두는 방법도 있다.
+
+* 인스턴스 팩토리 메서드 createProduct() 에서는 productId에 해당하는 상품을 맵에서 찾는다.
+
+  ```java
+  public class ProductCreator {
+    
+    private Map<String, Product> products;
+    
+    public void setProducts(Map<String, Product> products) {
+      this.products = products;
+    }
+    
+    public Product createProduct(String productId) {
+      Product product = products.get(productId);
+      if (product != null) {
+        return product;
+      }
+      throw new IllegalArgumentException("Unknown product");
+    }
+  }
+  ```
+
+* ProductCreator에서 상품을 생성하기 위해서 먼저 팩토리 값을 인스턴스화하고, 팩토리의 파사드 역할을 하는 @Bean 을 선언한다. 마지막으로 팩토리를 호출하고 createProduct() 메서드를 호출해서 다른 빈들을 인스턴스화 한다.
+
+  ```java
+  @Configuration
+  public class ShopConfiguration {
+    
+    @Bean
+    public ProductCreator productCreatorFactory() {
+      ProductCreator factory = new ProductCreator();
+      Map<String, Product> products = new HashMap<>();
+      products.put("aaa", new Battery("AAA", 2.5));
+      products.put("bbb", new Disc("CD-RW", 1.5));
+      products.put("ccc", new Disc("DVD-RW", 3.0));
+      factory.setProducts(products);
+      return factory;
+    }
+    
+    @Bean
+    public Product aaa() {
+      return productCreatorFactory().createProduct("aaa");
+    }
+    
+    @Bean
+    public Product bbb() {
+      return productCreatorFactory().createProduct("bbb");
+    }
+    
+    @Bean
+    public Product ccc() {
+      return productCreatorFactory().createProduct("ccc");
+    }
+  }
+  ```
+
+### 스프링 팩토리 빈으로 POJO 생성하기
+
+* 직접 팩토리 빈을 구현할 일은 별로 없겠지만, 내부 작동 원리를 이해하는 건 여러모로 유익하다. 그리고 나는 이런게 재미있다.
+
+* 할인가가 적용된 상품을 생성하는 팩토리 빈을 작성해보자.
+
+* 이 빈은 product, discount 두 프로퍼티값을 받아 주어진 상품에 할인가를 계산하여 적용하고 Product 빈을 새로 만들어 반환한다.
+
+  * 팩토리 빈은 제네릭 클래스 AbstractFactoryBean\<T\>를 상속하고, createInstance() 메서드를 오버라이드해서 대상 빈 인스턴스를 생성한다.
+  * 자동 연결이 가능하록 getObjectType() 메서드로 대상 빈 타입을 반환한다.
+
+  ```java
+  public class DiscountFactoryBean extends AbstractFactoryBean<Product> {
+    
+    private Product product;
+    private double discount;
+    
+    public void setProduct(Product product) {
+      this.product = product;
+    }
+    
+    public void setDiscount(double discount) {
+      this.discount = discount;
+    }
+    
+    @Override
+    public Class<> getObjectType() {
+      return product.getClass();
+    }
+    
+    @Override
+    protected Product createInstance throws Exception {
+      product.setPrice(product.getPrice() * (1 - discount));
+      return Product;
+    }
+  }
+  ```
+
+* Product 인스턴스를 생성하는 팩토리 빈에 DiscountFactoryBean을 적용해보자.
+
+  ```java
+  @Configuration
+  @ComponentScan("io.namjune.springrecipes.shop")
+  public class ShopConfiguration {
+   
+    @Bean
+    public Product aaa() {
+      return productCreatorFactory().createProduct("aaa");
+    }
+    
+    @Bean
+    public Product bbb() {
+      return productCreatorFactory().createProduct("bbb");
+    }
+    
+    @Bean
+    public Product ccc() {
+      return productCreatorFactory().createProduct("ccc");
+    }
+    
+    @Bean
+    public DiscountFactoryBean discountFactoryBeanAAA() {
+      DiscountFactoryBean factory = new DiacountFactoryBean();
+      factory.setProduct(aaa());
+      factory.setDiscount(0.2);
+      return factory;
+    }
+    
+    @Bean
+    public DiscountFactoryBean discountFactoryBeanBBB() {
+      DiscountFactoryBean factory = new DiacountFactoryBean();
+      factory.setProduct(bbb());
+      factory.setDiscount(0.21);
+      return factory;
+    }
+    
+    @Bean
+    public DiscountFactoryBean discountFactoryBeanCCC() {
+      DiscountFactoryBean factory = new DiacountFactoryBean();
+      factory.setProduct(ccc());
+      factory.setDiscount(0.1);
+      return factory;
+    }
+  }
+  ```
+
+  
