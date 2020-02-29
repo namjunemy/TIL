@@ -1248,3 +1248,57 @@ public class SequesceGeneratorConfiguration {
 
   * 프로그램 방식의 경우 setActiveProfiles() 대신 setDefaultProfiles() 메서드를 쓰면 되고,
   * 자바 런타임 플래그나, WAR파일 초기화 매개변수를 쓸때는 spring.profiles.active 대신 spring.profiles.default로 대신하면 된다.
+
+## 2-12. POJO에게 IoC 컨테이너 리소스 알려주기
+
+* 컴포넌트가 IoC 컨테이너와 직접적인 의존 관계를 가지도록 설계하는 방법은 바람직하진 않지만,
+
+* 때로는 빈에서 컨테이너의 리소스를 인지해야 하는 경우도 있다.
+
+* 빈이 IoC 컨테이너 리소스를 인지하게 하려면 Aware(인지) 인터페이스를 구현한다. 스프링은 이 인터페이스를 구현한 빈을 감지해서 대상 리소스를 세터 메서드로 주입한다.
+
+* 자주 쓰는 스프링 Aware 인터페이스
+
+  * ApplicationContext는 MessageSource, ApplicationEventPublisher, ResourceLoader를 모두 상속한 인터페이스라서, ApplicationContext만 인지하면 나머지 서비스도 엑세스 할 수 있다.
+  * **그러나 요건을 충족하는 최소한의 범위 내에서 타이트하게 Aware 인터페이스를 선택하는 게 바람직하다.**
+
+  | Aware 인터페이스               | 대상 리소스 타입                                             |
+  | ------------------------------ | ------------------------------------------------------------ |
+  | BeanNameAware                  | IoC 컨테이너에 구성한 인스턴스의 빈 이름                     |
+  | BeanFactoryAware               | 현재 빈 팩토리, 컨테이너 서비스를 호출하는 데 쓰인다.        |
+  | ApplicationContextAware        | 현재 애플리케이션 컨텍스트, 컨테이너 서비스를 호출하는 데 쓰인다. |
+  | MessageSourceAware             | 메시지 소스, 텍스트 메시지를 해석하는 데 쓰인다.             |
+  | ApplicationEventPublisherAware | 애플리케이션 이벤트 퍼블리셔, 애플리케이션 이벤트를 발행하는 데 쓰인다. |
+  | ResourceLoaderAware            | 리소스 로더. 외부 리소스를 로드하는 데 쓰인다.               |
+  | EnvironmentAware               | ApplicationContext 인터페이스에 묶인 org.springframework.core.env.Environment 인스턴스 |
+
+* Aware 인터페이스의 세터 메서드는 스프링이 빈 프로퍼티를 설정한 이후, 초기화 콜백 메서드를 호출하기 이전에 호출한다. 정리하자면 아래의 순서이다.
+
+  * 생성자나 팩토리 메서드를 호출해서 빈 인스턴스를 생성한다.
+  * 빈 프로퍼티에 값, 빈 레퍼런스를 설정한다.
+  * Aware 인터페이스에 정의한 세터메서드를 호출한다.
+  * 빈 인스턴스는 각 BeanPostProcessor에 있는 postProcessBeforeInitialization() 메서드로 넘겨 초기화 콜백 메서드를 호출한다.
+  * 빈 인스턴스는 각 BeanPostProcessor에 있는 PostProcessAfterInitialization() 메서드로 넘긴다. 이제 빈을 사용할 준비가 끝났다.
+  * 컨테이너가 종료되면 폐기 콜백 메서드를 호출한다.
+
+* **주의!** Aware 인터페이스를 구현한 클래스는 스프링과 엮이게 되므로 IoC 컨테이너 외부에서는 제대로 작동하지 않는다는 것을 꼭 기억해야 한다. 스프링에 종속된 인터페이스를 꼭 구현해야 할 필요가 있는지 잘 따져봐야 한다.
+
+  * 스프링 최신 버전에서는 사실 Aware 인터페이스를 구현할 필요가 없다.
+  * 왜냐면 @Autowired로 얼마든지 ApplicationContext를 가져올 수 있다. 물론 프레임워크나 라이브러리를 개발할 때에는 Aware를 구현하는 것이 나을 수도 있다.
+
+* 아래의 Cashier POJO가 자신의 빈 이름을 인지해서 저장하는 파일의 이름으로 쓰려고 하면, BeanNameAware를 구현하도록 수정해야 한다.
+
+  ```java
+  public class Cashier implements BeanNameAware {
+    ...
+    private String fileName;
+    
+    @Override
+    public void setBeanName(String beanName) {
+      this.fileName = beanName;
+    }
+  }
+  ```
+
+  
+
