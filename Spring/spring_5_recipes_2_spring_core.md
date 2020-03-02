@@ -1300,5 +1300,195 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
-  
 
+## 2-13. 애너테이션을 활용해 애스펙트 지향 프로그래밍하기
+
+* 애스팩트를 정의하려면 일단 자바 클래스에 @Aspect를 붙이고, 메서드별로 적절한 애너테이션을 붙여 어드바이스로 만든다.
+* 어드바이스 애너테이션은 @Before, @After, @AfterReturning, @AfterThrowing, @Around 5개 중 하나를 쓸 수 있다.
+* IoC 컨테이너에서 애스펙트 애너테이션 기능을 활성화하려면 구성 클래스 중 하나에 @EnableAspectAutoProxy를 붙인다.
+* 기본적으로 스프링인 인터페이스 기반의 JDK 다이나믹 프록시를 생성하여 AOP를 적용한다. 인터페이스를 사용할 수 없거나 애플리케이션 설계상 사용하지 않을 경우엔 CGLIB으로 프록시를 만들 수 있다.
+* @EnableAspectAutoProxy에서 proxyTargetClass 속성을 true로 설정하면 동적프록시 대신 CGLIB을 사용한다.
+* 스프링에서는 AspectJ와 동일한 애너테이션으로 애너테이션 기반 AOP를 구현한다. 포인트것을 파싱, 매치하는 AspectJ 라이브러리를 그대로 빌려왔다.
+* 하지만, AOP 런타임 자체는 순수 스프링 AOP 이기 때문에 AspectJ 컴파일러나 위버(weaver)와는 아무런 의존 관계가 없다.
+
+### 애스펙트, 어드바이스, 포인트컷 선언
+
+* 애스펙트는 여러 타입과 객체에 공통 관심사(로깅, 트랜잭션 관리 등)를 모듈화한 자바 클래스로, @Aspect를 붙여 표시한다.
+* AOP에서 말하는 애스펙트란 어디에서(포인트컷) 무엇을 할 것인지(어드바이스)를 합쳐 놓은 개념이다.
+* **어드바이스** 는 **@Advice를 붙인 단순 자바 메서드**로, AspectJ는 @Before, @After, @AfterReturning, @AfterThrowing, @Around 다섯 개 어드바이스 애너테이션을 지원한다.
+* **포인트컷** 은 **어드바이스에 적용할 타입 및 객체를 찾는 표현식**이다.
+
+### @Before 어드바이스
+
+* Before 어드바이스는 특정 프로그램 **실행 지점 이전**의 공통 관심사를 처리하는 메서드로, @Before를 붙이고 포인트컷 표현식을 애너테이션 값으로 지정한다.
+
+  * 이 포인트컷 표현식은 ArithmeticCalculator 인터페이스의 add() 메서드 실행을 가리킨다.
+  * 와일드카드(*)는 모든 제어자(public, protected, pricate), 모든 반환형을 매치함을 의미한다.
+  * 인수 목록 부분에 쓴 두 점(..)은 인수 갯수는 몇 개라도 좋다는 뜻이다. 
+  * @Aspect만 붙여서는 스프링이 클래스패스에서 자동 감지하지 않기 때문에 POJO 마다 개별적으로 @Component선언을 해야 한다. 
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    private Log log = LogFactory.getLog(this.getClass());
+    
+    @Before("execution(* ArtimeticCalculator.add(..))")
+    public void logBefore() {
+      log.info("The method add() begins");
+    }
+  }
+  ```
+
+* 자바 Configuration 클래스에 @EnableAspectJAutoProxy를 붙여 POJO와 애스펙트를 스프링이 스캐닝하게 한다.
+
+  ```java
+  @Configuration
+  @EmableAspectJAutoProxy
+  @ComponentScan
+  public class CalcuratorConfiguration {
+    
+  }
+  ```
+
+* 포인트컷으로 매치한 실행 지점을 **조인포인트**(JoinPoint)라고 한다.
+
+* 포인트컷은 여러 조인포인트를 매치하기 위해 지정한 표현식이고, 이렇게 매치된 조인포인트에서 해야 할 일이 바로 **어드바이스** 이다.
+
+* 어드바이스가 현재 조인포인트의 세부적인 내용에 액세스하려면 JoinPont형 인수를 어드바이스 메서드에 선언해야 한다.
+
+* 그러면 메서드면, 인수값 등 자세한 조인포인트 정보를 조회할 수 있다.
+
+* 클래스명, 메서드명에 와일드카드를 써서 모든 메서드에 예외없이 포인트 컷을 적용하는 코드는 아래와 같다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    ...
+      
+    @Before("execution(* *.*(..))")
+    public void logBefore(JoinPoint joinPoint) {
+      log.info("The Method " + joinPoint.getSignature.getName() 
+               + "() begins with " + Arrays.toString(joinPoint.getArgs()));
+    }
+  }
+  ```
+
+### @After 어드바이스
+
+* After 어드바이스는 조인포인트가 끝나면 실행되는 메서드, @After를 붙여 선언한다.
+
+* 조인포인트가 정상 실행되든, 도중에 예외가 발생하든 상관없이 실행된다.
+
+  ```java
+  @Aspect
+  @Component
+  public class ClaculatorLoggingAspect {
+    ...
+    
+    @After("execution(* *.*(..))")
+    public void logAfter(JoinPoint joinPoint) {
+      log.info("The method " + joinPoint.getSignature().getName() + "() ends");
+    }
+  }
+  ```
+
+### @AfterReturning 어드바이스
+
+* After 어드바이스는 조인포인트 실행의 성공 여부와 상관없이 작동한다.
+
+* logAfterReturning() 메서드에서 조인포인트가 값을 반환할 경우에만 로깅하고 싶다면, 다음과 같이 AfterReturning 어드바이스로 대체하면 된다.
+
+* Return 값을 가져오려면, @AfterReturning의 returning 속성으로 지정한 변수명을 어드바이스 메서드의 인수로 지정한다.
+
+* 스프링은 런타임에 조인포인트의 반환값을 이 인수에 넣어 전달한다.
+
+* 이때 포인트컷 표현식은 pointcut 속성으로 따로 정의한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    ...
+    
+    @AfterReturning(
+      pointcut = "execution(* *.*(..))",
+      returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+      log.info("The method {}() ends with {}", joinPoint.getSignature().getName(), result);
+    }
+  }
+  ```
+
+### @AfterThrowing 어드바이스
+
+* After Throwing 어드바이스는 조인포인트 실행 도중 예외가 날 경우에만 실행된다.
+
+* 작동 원리는 @AfterReturning과 같다. 
+
+* 발생한 예외는 @AfterThrowing의 throwing 속성에 담아 전달할 수 있다.
+
+* 아래와 같이 모든 에러/예외 클래스의 상위 타입인 Throwable을 어드바이스에 적용하면, 조인포인트에서 발생한 에러/예외를 전부 가져온다.
+
+* 특정한 예외만 관심있다면, 충분히 NPE만 잡을 수도 있다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    ...
+    
+    @AfterThrowing(
+      pointcut = "execution(* *.*(..))",
+      throwing = "e")
+    public void logAfterReturning(JoinPoint joinPoint, Throwable e) {
+      log.info("An exception {} has been thrown in {}()",
+               e, joinPoint.getSignature().getName());
+    }
+  }
+  ```
+
+### @Around 어드바이스
+
+* Around는 가장 강력한 어드바이스다. 조인포인트를 완전히 장악하기 때문에,
+
+* 앞서 살펴본 어드바이스 모두 Around 어드바이스로 조합할 수 있다.
+
+* 심지어 원본 조인포인트를 언제 실행할지, 실행 할지말지, 계속 실행할지 여부 까지 제어할 수 있다.
+
+* 아래 코드는 Before, After Returning, After Throwing 어드바이스를 Around 어드바이스로 조합한 코드이다.
+
+  * Around 어드바이스의 조인포인트 인수형은 ProceedingJoinPoint로 고정되어 있다.
+  * JoinPoint의 하위 인터페이스인 ProceedingJoinPoint를 이용하면 원본 조인포인트를 언제 진행할지 그 시점을 제어할 수 있다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    @Around("execution(* *.*(..))")
+    public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+      // @Before
+      log.info("The method {}() begins with {}", joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));
+      
+      try {
+        Object result = joinPoint.proceed();
+        // @AfterRetuning
+        log.info("The method{}() ends with", joinPoint.getSignature().getName(), result);
+        return result;
+      } catch (IllegalArgumentException e) {
+        // @AfterThrowing
+        log.error("Illegal argument {} in {}()", Arrays.toString(joinPoint.getArgs()), joinPoint.getSignature.getName());
+        throw e;
+      }
+    }
+  }
+  ```
+
+* Around는 매우 강력하고 유연해서 원본 인수값을 바꾸거나, 최종 반환값을 바꾸는 것도 가능하지만, 산혹 원본 조인포인트를 진행하는 호출을 잊어버리기 쉬우므로 사용을 주의해야 한다.
+
+* **최소한의 요선을 충족하면서도 가장 기능이 약한 어드바이스를 쓰는게 바람직하다.**
+
+  * ApplicationContextAware가 강력하지만 가장 타이트하게 MessageSourceAware를 쓰는 것과 같은 이치이다.
