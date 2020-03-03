@@ -1623,4 +1623,193 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
+## 2-17. AspectJ 포인트컷 표현식 작성하기
+
+* AspectJ는 다양한 종류의 조인포인트를 매치할 수 있는 강력한 표현식 언어를 제공한다.
+* 하지만, 스프링 AOP가 지원하는 조인포인트 대상은 IoC 컨테이너 안에 선언된 빈에 국한된다.
+* 스프링 AOP에서는 AspectJ 포인트컷 언어를 활용해 포인트컷을 정의하며, 런타임에 AspectJ 라이브러리를 이용해서 포인트컷 표현식을 해석한다.
+* IoC 컨테이너 스코프를 벗어나 포인트컷 표현식을 쓰면 IllegalArgumentException이 발생한다.
+* 스프링에 구현된 포인트컷 표현식 패턴을 알아본다.
+
+### 매서드 시그니처 패턴
+
+* 포인트컷 표현식의 가장 일반적인 모습은 시그니처를 기준으로 여러 메서드를 매치하는 것이다.
+
+* 예를 들면, 다음 포인트컷 표현식은 ArithmeticCalculator 인터페이스에 선언한 메서드 전부를 매치한다.
+
+  * `execution(* io.namjune.springrecipes.calculator.ArithmeticCalculator.*(..))`
+
+* 대상 클래스나 인터페이스가 애스펙트와 같은 패키지에 있으면 패키지명은 안 써도 된다.
+
+* 다음 포인트컷 표현식은 모든 public 메서드를 매치한다.
+
+  * `execution(public * ArithmethcCalculator.*(..))`
+
+* 메서드 반환형을 특정할 수도 있다. 다음은 double형을 반환하는 메서드만 매치한다.
+
+  * `execution(public double ArithmeticCalculator.*(..))`
+
+* 인수 목록도 제약을 둘 수 있다. 다음은 첫 번째 인수가 double 형인 메서드만 매치하며 두 점(..)은 두 번째 이후 인수는 몇개라도 상관 없음을 의미한다.
+
+  * `execution(public double ArithmeticCalculator.*(double, ..))`
+
+* 또는 인수형과 갯수가 정확히 매치되게 할 수도 있다.
+
+  * `execution(public double ArithmeticCalculator.*(double, double))`
+
+* AspectJ는 충분히 강력하지만, 간혹 매치하고 싶은 메서드들 사이에 공통 특성이 없는 경우도 있다.
+
+* 이럴때는 메서드/타입 레벨에 다음과 같은 **커스텀 애너테이션을 만들어 붙이면 된다.**
+
+  * 로깅이 필요한 모든 메서드에 커스텀 애너테이션 @LoggingRequired를 붙이면 된다.
+  * 클레스 레벨에 붙이면 모든 메서드에 적용된다.
+  * 단, 애너테이션은 상속되지 않으므로 인터페이스가 아닌 구현 클래스에만 붙여야 한다.
+
+  ```java
+  @Target({Element.METHOD, Element.TYPE})
+  @Retention(RetentionPolict.RUNTIME)
+  @Documented
+  public @interfacc LoggingRequired {
+    
+  }
+  ```
+
+* 커스텀 애너테이션 활용 클래스
+
+  ```java
+  @LoggingRequired
+  public class ArithmeticCalculatorImpl implements ArithmeticCalculator {
+    
+    public double add(double a, double b) {
+      ...
+    }
+    
+    public double sub(double a, double b) {
+      ...
+    }
+  }
+  ```
+
+* 그 다음, @LoggingRequired를 붙인 클래스/메서드를 스캐닝하도록 @Pointcut의 annotation 안에 포인트컷 표현식을 세팅해 준다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorPointcuts {
+  
+    @Pointcut("annotation(io.namjune.springrecipes.calculator.LoggingRequired)")
+    public void loggingOperation() {}
+  }
+  ```
+
+### 타입 시그니처 패턴
+
+* 특정한 타입 내부의 모든 조인포인트를 매치하는 포인트컷 표현식도 있다.
+
+* 스프링 AOP에 적용하면 그 타입 안에 구현된 메서드를 실행할 때만 어드바이스가 적용되도록 포인트컷 적용 범위를 줄일 수 있다.
+
+* 다음 포인트컷은 io.namjune.springrecipes.calculator 패키지의 전체 메서드 실행 조인포인트를 매치한다.
+
+  * `within(io.namjune.springrecipes.calculator.*)`
+
+* 하위 패키지도 함께 매치하려면 와일드카드 앞에 점 하나를 더 쓴다.
+
+  * `within(io.namjune.springrecipes.calculator..*)`
+
+* 어느 한 클래스 내부에 구현된 메서드 실행 조인포인트를 매치하려면 아래와 같다.
+
+  * `within(io.namjune.springrecipes.calculator.ArithmeticCalculatorImpl)`
+
+* 해당 클래스의 패키지가 애스펙트와 같으면 패키지명은 안 써도 된다.
+
+* ArithmeticCalculator 인터페이스를 구현한 모든 클래스의 메서드 실행 조인포인트를 매치하려면 맨 뒤에(+)를 덧붙인다.
+
+  * `within(ArithmeticCalculator+)`
+
+* 위에서 만든 커스텀 애노테이션 @LoggingRequired는 클래스/메서드 레벨에 적용 가능하다.
+
+* 다음 @Pointcut에 within키워드로 @LoggingRequired를 붙인 모든 클래스/메서드의 조인포인트를 매치할 수 있다.
+
+  ```java
+  @Pointcut("within(io.namjune.springrecipes.calculator.LoggingRequired)")
+  public void loggingOperation() {}
+  ```
+
+### 포인트컷 표현식 조합하기
+
+* AspectJ 포인트컷 표현식은 **, ||, ! 등의 연산자로 조합할 수 있다.
+
+* 다름 포인트 컷은 ArithmeticCalculator 또는 UnitCalculator 인터페이스를 구현한 클래스의 조인포인트를 매치한다.
+
+  `within(ArithmeticCalculator+) || within(UnitCalculator+)`
+
+* 다른 포인트컷을 가리키는 레퍼런스 모두 연산자로 묶을 수 있다. 아래처럼 메서드로 표현한 포인트컷 표현식도 조합할 수 있다 
+
+  ```java
+  @Aspectt
+  @Component
+  public class CalculatorPointCuts {
+    
+    @Pointcut("within(ArithmeticCalculator+)")
+    public void arithmeticOperation() {}
+    
+    @Pointcut("within(UnitCalcunator+)")
+    public void unitOperation() {}
+    
+    @Pointcut("arithmeticOperation() || unitOperation()")
+    public void loggingOperation() {}
+  }
+  ```
+
+### 포인트컷 매개변수 선언하기
+
+* 조인포인트 정보는 어드바이스 메서드에서 JoinPoint형 인수를 사용해서 리플렉션으로 액세스 할 수 있다.
+
+* 이외에도 몇가지 특수한 포인트컷 표현식을 쓰면 선언적인 방법으로 조인포인트 정보를 얻을 수도 있다.
+
+* target()과 args()로 현재 조인포인트의 대상 객체 및 인수값을 포착하면 포인트컷 매개변수로 빼낼 수 있다. 
+
+* 이 매개변수는 자신과 이름이 똑같은 어드바이스 메서드의 인수로 전달한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    
+    @Before("execution(* *.*(..)) && target(target) && args(a, b)")
+    public void logParameter(Object target, double a, double b) {
+      log.info("Target class : {}", target.getClass().getName());
+      log.info("Arguments : {}, {}", a, b);
+    }
+  }
+  ```
+
+* 독립적인 포인트컷을 선언해서 재사용할 경우에는 포인트컷 메서드의 인수 목록에도 함께 넣는다.
+
+  ```java
+  @Aspect
+  public class CalculatorPointcuts {
+    ...
+      
+    @Pointcut("execution(* *.*(..)) && target(target) && args(a, b)")
+    public void parameterPointcut(Object target, double a, double b) {}
+  }
+  ```
+
+* 위와 같이 매개변수화한 포인트컷을 참조하는 모든 어드바이스는 같은 이름의 메서드 인수를 선언해서 포인트컷 매개변수를 참조할 수 있다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    ...
+      
+    @Before("CalculatorPointcuts.parameterPointcut(target, a, b)")
+    public void logParameter(Object target, double a, double b) {
+      log.info("Target class : {}", target.getClass().getName());
+      log.info("Arguments : {}, {}", a, b);
+    }
+  }
+  ```
+
   
