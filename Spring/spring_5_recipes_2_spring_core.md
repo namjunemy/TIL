@@ -1492,3 +1492,69 @@ public class SequesceGeneratorConfiguration {
 * **최소한의 요선을 충족하면서도 가장 기능이 약한 어드바이스를 쓰는게 바람직하다.**
 
   * ApplicationContextAware가 강력하지만 가장 타이트하게 MessageSourceAware를 쓰는 것과 같은 이치이다.
+
+## 2-14. 조인포인트 정보 가져오기
+
+* 어드바이스에서 조인포인트 정보를 액세스 할 수 있다.
+
+* 조인포인트 유형(스프링 AOP의 메서드 실행만 해당), 메서드 시그니처(선언 타입 및 메서드명), 인수값, 대상 객체(프록시로 감싼 원본 빈), 프록시 객체
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    private Logger log = LoggerFactory.getLogger(this.getClass());
+    
+    @Before("execution(* *.*(..))")
+    public void logJoinPoint(JoinPoint joinPoint) {
+      
+      // method-execution
+      log.info("JoinPoint Kind : {}", joinPoint.getKind()); 
+      
+      // io.namjune.springrecipes.shop.calculator.ArithmeticCalculator
+      log.info("signathre declaring type : {}", joinPoint.getSignature().getDeclaringTypeName());
+      
+      // add
+      log.info("Signature name : {}", joinPoint.getSignature().getName());
+  
+      // [1.0, 2.0]
+      log.info("Arguments : {}", Arrays.toString(joinPoint.getArgs()));
+      
+      // io.namjune.springrecipes.calculator.ArithmeticCalculator
+      log.info("Target class : {}", joinPoint.getTarget().getClass().getName());
+      
+      // com.sum.proxy.$Proxy6
+      log.info("This class : {}", joinPoint.getThis().getClass().getName());
+    }
+  }
+  ```
+
+## 2-15. @Order로 애스펙트 우선순위 설정하기
+
+* Log를 찍는 애스펙트 말고, 계산기의 인수를 검증하는 애스펙트를 하나 더 만들었다고 가정하자.
+
+* 로깅 애스펙트와 검증 애스펙트 둘 다 쓰자면 어느 쪽을 먼저 적용해야할지 알 수 없다.
+
+* 따라서, 애스펙트의 우선순위를 부여할 수 있다.
+
+* **Ordered 인터페이스를 구현해서 getOrder() 오버라이드 한다. 이 메서드가 반환하는 값이 작을수록 우선순위가 높게 세팅 된다.**
+
+* 또는, **@Order를 활용해서 우선순위값을 세팅한다. 마찬가지로 작을수록 우선순위가 높다.**
+
+  ```java
+  @Aspect
+  @Component
+  @Order(0)
+  public class CalculatorValidationAspect{
+    ...
+  }
+  
+  @Aspect
+  @Component
+  @Order(1)
+  public class CalculatorLoggingAspect{
+    ...
+  }
+  ```
+
+  
