@@ -1557,4 +1557,70 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
+
+## 2-16. 애스펙트 포인트컷 재사용하기
+
+* 포인트컷 표현식을 여러번 반복해서 쓸 경우엔 매번 어드바이스에 직접 정의하는 것 보다, 재사용할 방법이 필요하다.
+
+* @Pointcut을 이용하면 포인트컷만 따로 정의해서 여러 어드바이스에서 재사용할 수 있다.
+
+* 애스펙트에서 포인트컷은 @Pointcut을 붙인 단순 메서드로 선언할 수 있다.
+
+* @Pointcut은 메서드 바디는 보통 비워두고, 포인트컷의 가시성은 메서드 접근제한자로 조정한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+  	...
+    
+    @Pointcut("execution(* *.*(..))")
+    private void loggingOperation() {}
+    
+    @Before("loggingOperation()")
+    public void logBefore(JoinPoint joinPoint) {
+      ...
+    }
+    
+    @AfterReturning(
+    	pointcut = "loggingOperation()",
+      returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Object result) {
+      ...
+    }  
+  }
+  ```
+
+* 여러 애스펙트가 포인트컷을 공유하는 경우에는 공통 클래스 한 곳에 포인트컷을 모아두는게 좋다.
+
+* 당연히 메서드는 public으로 선언해야 한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorPointcuts {
+    
+    @Pointcut("execution(* *.*(..))")
+    public void loggingOperation() {}
+    
+    ...
+  }
+  ```
+
+* 외부에서 포인트컷을 참조할 때는 클래스명도 함께 적는다. 참조할 포인트컷이 현재 애스펙트와 다른 패키지에 있으면 패키지명까지 기재한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorLoggingAspect {
+    
+    @Before("CalculatorPointcuts.loggingOperation()")
+    public void logBefore(JoinPoint joinPoint) {
+      ...
+    }
+    
+    ...
+  }
+  ```
+
   
