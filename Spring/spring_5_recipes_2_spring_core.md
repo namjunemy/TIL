@@ -1306,7 +1306,7 @@ public class SequesceGeneratorConfiguration {
 * 애스팩트를 정의하려면 일단 자바 클래스에 @Aspect를 붙이고, 메서드별로 적절한 애너테이션을 붙여 어드바이스로 만든다.
 * 어드바이스 애너테이션은 @Before, @After, @AfterReturning, @AfterThrowing, @Around 5개 중 하나를 쓸 수 있다.
 * IoC 컨테이너에서 애스펙트 애너테이션 기능을 활성화하려면 구성 클래스 중 하나에 @EnableAspectAutoProxy를 붙인다.
-* 기본적으로 스프링인 인터페이스 기반의 JDK 다이나믹 프록시를 생성하여 AOP를 적용한다. 인터페이스를 사용할 수 없거나 애플리케이션 설계상 사용하지 않을 경우엔 CGLIB으로 프록시를 만들 수 있다.
+* 기본적으로 스프링은 인터페이스 기반의 JDK 동적(dynamic) 프록시를 생성하여 AOP를 적용한다. 인터페이스를 사용할 수 없거나 애플리케이션 설계상 사용하지 않을 경우엔 CGLIB으로 프록시를 만들 수 있다.
 * @EnableAspectAutoProxy에서 proxyTargetClass 속성을 true로 설정하면 동적프록시 대신 CGLIB을 사용한다.
 * 스프링에서는 AspectJ와 동일한 애너테이션으로 애너테이션 기반 AOP를 구현한다. 포인트것을 파싱, 매치하는 AspectJ 라이브러리를 그대로 빌려왔다.
 * 하지만, AOP 런타임 자체는 순수 스프링 AOP 이기 때문에 AspectJ 컴파일러나 위버(weaver)와는 아무런 의존 관계가 없다.
@@ -1808,6 +1808,87 @@ public class SequesceGeneratorConfiguration {
     public void logParameter(Object target, double a, double b) {
       log.info("Target class : {}", target.getClass().getName());
       log.info("Arguments : {}, {}", a, b);
+    }
+  }
+  ```
+
+## 2-18. 인트로덕션을 이용해 POJO에 기능 더하기
+
+* 인트로덕션(introduction)은 AOP 어드바이스의 특별한 타입이다.
+
+* 객체가 어떤 인터페이스의 구현클래스를 공급받아서 동적으로 인터페이스를 구현하는 기술이다.
+
+* 게다가 여러 구현클래스를 지닌 여러 인터페이스를 동시에 인트로듀스할 수 있어서, 사실상 다중상속도 가능하다.
+
+* 아래의 두 인터페이스가 존재한다.
+
+  ```java
+  public interface MaxCalculator {
+    public double max(double a, double b);
+  }
+  
+  public interface MinCalculator {
+    public double min(double a, double b);
+  }
+  
+  public class MaxCalculatorImpl implements MaxCalculator {
+    ...
+  }
+  
+  public class MinCalculatorImpl implements MinCalculator {
+    ...
+  }
+  ```
+
+* 두 인터페이스를 구현해서 어느 한 클래스에서 둘을 상속받아서 max(), min()을 동시에 사용할 수 는 없다. 자바는 다중상속이 안되기 때문에다.
+
+* 구현 코드를 복붙하던지, 하나는 인터페이스 하나는 추상클래스로 구현하는 방법 뿐인데,
+
+* 이때 인트로덕션 사용하면 인터페이스 둘 다 동적으로 구현한 것처럼 구현클래스 MaxCalculatorImpl과 MinCalculatorImpl을 이용할 수 있다. 다중 상속한것 처럼 쓸 수 있는 것이다.
+
+  * 이게 어떻게 될까? 기본적으로 스프링은 인터페이스 기반의 JDK 동적(dynamic) 프록시를 생성하여 AOP를 적용한다.
+  * 인트로덕션은 동적 프록시에 인터페이스를 추가하는 방식으로 작동한다.
+  * 이 인터페이스에 선언된 메서드를 프록시 객체에서 호출하면 프록시는 백엔드 구현클래스에 처리를 위임한다. 
+
+* 인트로덕션 역시 어드바이스 처럼 애스펙트 안에서 필드에 @DeclareParents를 붙여 선언한다.
+
+  * 인트로덕션 대상 클래스는 value로 지정하며, 이 애너테이션을 붙인 필드형에 따라 들여올 인터페이스가 결정된다.
+  * 이 인터페이스에서 사용할 구현 클래스는 defaultImpl에 명시한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorIntroduction {
+    
+    @DeclareParents(
+    	value = "io.namjune.springrecipes.calculator.ArithmeticCalculatorImpl",
+      defalutImpl = "MaxCalculatorImpl"
+    )
+    public MaxCalculator maxCalculator;
+    
+    @DeclareParents(
+    	value = "io.namjune.springrecipes.calculator.ArithmeticCalculatorImpl",
+      defalutImpl = "MinCalculatorImpl"
+    )
+    public MinCalculator minCalculator;
+  }
+  ```
+
+* 이렇게 설정한 두 인트로덕션을 사용해서 ArithmeticCalculatorImpl 클래스로 두 인터페이스를 동적으로 들여올 수 있다.
+
+* MaxCalculator와 MinCalculator 인터페이스 두개를 ArithmeticCalculatorImpl에 들여왔으면, 해당 인터페이스로 캐스팅하고, min(), max()를 활용할 수 있다.
+
+  ```java
+  public class Main {
+    public static void main(String[] args) {
+      ...
+      ArithmeticCalculator arithmeticCalculator = (ArithmeticCalculator) context.getBean("arithmeticCalculator");
+      ...
+      MaxCalculator maxCalculator = (MaxCalculator) arithmeticCalculator;
+      maxCalculator.max(1, 2);
+      
+      MinCalculator minCalculator = (MinCalculator) arithmeticCalculator;
+      minCalculator.max(1, 2)
     }
   }
   ```
