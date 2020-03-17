@@ -1893,4 +1893,94 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
+## 2-19. AOP 인트로덕션을 이용해서 POJO에 상태 추가하기
+
+* 기존 객체에 새로운 상태를 추가해서 호출 횟수, 최종 수정 일자 등 사용 내역을 파악하고 싶은 경우가 있다
+
+* 모든 객체가 동일한 베이스 클래스를 상속하는 건 해결책이 될 순 없다. 레이어가 다른 구조가 다른 여러 클래스에 상태를 추가하기란 더 어렵다.
+
+* 원본 클래스에는 호출 횟수를 담을 카운트 필드가 없기 때문에, 구현클래스를 스프링 AOP 인트로덕션으로 공급 받아서 처리한다.
+
+* 카운터 인터페이스 작성
+
+  ```java
+  public interface Counter {
+    public void increase();
+    public int getCount();
+  }
+  ```
+
+* 구현 클래스 생성, 호출 횟수는 count 필드에 저장
+
+  ```java
+  public class CounterImpl implements Counter {
+    private int count;
+    
+    @Override
+    public void increase() {
+      count++
+    }
+    
+    @Override
+    public int getCount() {
+      return count;
+    }
+  }
+  ```
+
+* Counter 인터페이스를 CounterImpl로 구현한 다음, 모든 Calculator 객체에 공급하기 위해 다음과 같이 타입 매치 표현식을 통해서 인트로덕션을 적용한다. 
+
+  * Calculator 인터페이스의 구현체들(*CalculatorImpl)에게 Counter 인터페이스의 구현체인 CounterImpl을 공급 한다.
+
+  ```java
+  @Aspect
+  @Component
+  public class CalculatorIntroduction {
+    ...
+    
+    @DeclareParents(
+      value = "io.namjune.springrecipes.calculator.*CalculatorImpl",
+      defaultImpl = CounterImpl.class)
+    public Counter counter;
+  }
+  ```
+
+* 위에서 인터페이스를 동적으로 구현 한 뒤, 호출 횟수를 기록하기 위해서 계산기 메서드를 한번씩 호출할 때마다 counter 값을 하나씩 증가시키려면, 아래 코드처럼 After 어드바이스를 적용해야 한다.
+
+  * 그리고, Counter 인터페이스를 구현한 객체는 프록시가 유일하므로 반드시 현재 조인포인트의 대상객체는 target이 아닌 this 객체를 가져와서 사용해야 한다.
+
+    ```java
+    @Aspect
+    @Component
+    public class CalculatorIntroduction {
+      ...
+      
+      @After("execution(* io.namjune.springrecipes.calculator.*Calculator.*(..))"
+            + " && this(counter)")
+      public void increaseCouunt(Counter counter) {
+        counter.increase();
+      }
+    }
+    ```
+
+* Main 클래스에서 각 Calculator 객체를 Counter형으로 캐스팅해서 호출 횟수를 얻을 수 있다.
+
+  ```java
+  public class Main {
+    public static void main(String[] args) {
+      ...
+      ArithmeticCalculator arithmeticCalculator = (ArithmeticCalculator) context.getBean("arithmeticCalculator");
+      
+      UnitCalculator unitCalculator = (UnitCalculator) context.getBean("unitCalculator");
+      ...
+      
+      Counter arithmeticCounter = (Counter) arithmeticCalculator;
+      System.out.println(arithmeticCounter.getCount());
+      
+      Counter unitCounter = (Counter) unitCalculator;
+      System.out.println(unitCounter.getCount());
+    }
+  }
+  ```
+
   
