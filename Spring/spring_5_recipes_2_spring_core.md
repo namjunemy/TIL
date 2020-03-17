@@ -1983,4 +1983,40 @@ public class SequesceGeneratorConfiguration {
   }
   ```
 
+## 2-20. AspectJ 애스펙트를 로드 타임 위빙하기
+
+* 스프링 AOP 프레임워크는 제한된 타입의 AspectJ 포인트컷만 지원하며 **IoC 컨테이너에 선언한 빈에 한하여 애스펙트를 적용할 수 있다.**
+* 따라서, 포인트컷 타입을 추가하거나, IoC 컨테이너 외부에 있는 객체에 애스펙트를 적용하려면 스프링 애플리케이션에서 AspectJ 프레임워크를 직접 끌어쓰는 수 밖에 없다.
+* 위빙(Weaving)은 애스펙트를 대상 객체에 적용하는 과정을 말한다.
+* **스프링 AOP는 런타임에 동적 프록시를 활용해서 위빙**하는 반면, AspectJ 프레임워크는 **컴파일 타임 위빙**, **로드 타임 위빙**을 모두 지원한다.
+  * AspectJ에서 컴파일 타임 위빙은 ajc라는 전용 컴파일러가 담당한다. 컴파일 타임 위빙은 애스펙트를 자바 소스파일에 엮고 위빙된 바이너리 클래스 파일을 결과물로 내놓는다. 이미 컴파일된 클래스 파일이나 JAR 파일 안에도 애스펙트를 욱여 넣을 수 있다. 이를 **포스트 컴파일 타임(컴파일 이후에 적용되는) 위빙** 이라고 한다.
+    * **컴파일 타임 위빙, 포스트 컴파일 타임 위빙 모두 클래스를 IoC 컨테이너에 선언하기 이전에 수행할 수 있으며, 스프링은 이 위빙 과정에 전혀 관여하지 않는다.**
+  * AspectJ 로드타임 위빙은 JVM이 클래스 로더를 이용해 대상 클래스를 로드하는 시점에 일어난다. 바이트코드에 코드를 넣어 클래스를 위빙하려면 특수한 클래스가 필요한데, AspectJ와 스프링 둘 다 클래스 로더에 위빙 기능을 부여한 로드 타임 위버를 제곤한다. 로드 타임 위버는 간단한 설정으로 바로 사용할 수 있다.
+
+## 2-21. 스프링에서 커스텀 AspectJ 애스펙트 구성하기
+
+* AspectJ 프레임워크가 사용하는 애스펙트는 이 프레임워크가 자체적으로 인스턴스화하기 때문에 **원하는 대로 구성하려면 AspectJ 프레임워크에서 인스턴스를 가져와야 한다.**
+
+* 모든 AspectJ 애스펙트에는 Aspects라는 팩토리 클래스가 있고 이 클래스의 정적 팩토리 메서드 aspectOf()를 호출하면 현재 애스펙트 인스턴스를 액세스할 수 있다. 원하는 대로 애스펙트를 구성하려면 IoC 컨테이너에서 빈을 만들때Aspects.aspectOf(ComplexCachingAspect.class)를 호출해서 빈을 선언한다.
+
+* 그런 다음 AspectJ 위버로 애플리케이션을 실행해보자.
+
+  ```java
+  @Configuration
+  @ConponentScan
+  public class CalculatorConfiguration {
+    
+    @Bean
+    public ComplexCachingAspect complexCachingAspect() {
+      Map<String, Complex> cache = new HashMap<>();
+      cache.put("2,3", new Complex(2, 3));
+      cache.put("3,5", new Complex(3, 5));
+      
+      ComplexCachingAspect complexCachingAspect = Aspects.aspectOf(ComplexCachingAspect.class);
+      complexCachingAspect.setCache(cache);
+      return complexCachingAspect;
+    }
+  }
+  ```
+
   
