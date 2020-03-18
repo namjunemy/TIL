@@ -128,6 +128,8 @@
 
 ### Spring
 
+* [Spring 5 레시피 - 스프링 코어](https://github.com/namjunemy/TIL/blob/master/Spring/spring_5_recipes_2_spring_core.md)
+
 - [스프링 프레임워크 핵심 기술](https://github.com/namjunemy/TIL/blob/master/Spring/spring_framework_core.md)
 - [1. 스프링이란?](https://github.com/namjunemy/TIL/blob/master/Spring/what_is_spring.md)
 - [2. 프로젝트 만들기](https://github.com/namjunemy/TIL/blob/master/Spring/create_spring_project.md)

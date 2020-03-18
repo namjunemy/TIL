@@ -2157,3 +2157,91 @@ public class SequesceGeneratorConfiguration {
 
   * [https://github.com/HomoEfficio/dev-tips/blob/master/Java-Spring%20Thread%20Programming%20%EA%B0%84%EB%8B%A8%20%EC%A0%95%EB%A6%AC.md](https://github.com/HomoEfficio/dev-tips/blob/master/Java-Spring Thread Programming 간단 정리.md)
 
+## 2-24. POJO끼리 애플리케이션 이벤트 주고받기
+
+* POJO들이 서로 통신할 때에는 대부분 sender가 receiver를 찾아 그 메서드를 호출한다. 이처럼 sender가 반드시 receiver를 임지해야 하는 구조는 단순하고 직접적은 통신이 가능하지만 두개의 POJO가 단단하게 결합할 수 밖에 없다.
+* 스프링 애플리케이션 컨텍스트는 빈 간의 이벤트 기반 통신을 지원한다. 이벤트 기반 통신 모델에서는 실제로 receiver가 여럿 존재할 가능성이 있기 때문에 sender는 누가 수신할지 모른채 이벤트를 발행한다.
+* receiver 역시 누가 이벤트를 발행했는지 알 필요 없고, 여러 sender가 발행한 여러 이벤트를 리스닝할 수도 있다. 이런식으로 sender와 receiver를 느슨하게 엮는다.
+* 커스텀 ApplicationEvent를 만들어 발행한 다름, 이 이벤트를 받고 어떤 일을 하는 컴포넌트를 작성해보자.
+
+### ApplicationEvent로 이벤트 정의하기
+
+* 이벤트 기반 통신을 하려면 제일 먼저 이벤트 자체를 정의해야 한다.
+
+* 쇼핑카트를 체크아웃 하면 Casher 빈이 체크아웃 시각이 기록된 CheckoutEvent를 발행한다고 가정하자.
+
+  ```java
+  public class CheckoutEvent extends ApplicationEvent {
+    private final ShoppingCart cart;
+    private final Date time;
+    
+    public CheckoutEvent(ShoppingCart cart, Date time) {
+      super(cart);
+      this.cart = cart;
+      this.time = time;
+    }
+    
+    ...(getters)
+  }
+  ```
+
+### 이벤트 발행하기
+
+* 이벤트를 인스턴스화 한다음 애플리케이션 이벤트 발행기에서 publishEvent() 메서드를 호출하면 이벤트가 발행 된다.
+
+  ```java
+  public class Cashier {
+    ...
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+    
+    public void checkout(ShoppingCart cart) throws IOException {
+      ...
+        
+      CheckoutEvent event = new CheckoutEvent(cart, new Date());
+      applicationEventPublisher.publishEvent(event);
+    }
+  }
+  ```
+
+### 이벤트 리스닝하기
+
+* ApplicationListener 인터페이스를 구현한 애플리케이션 컨텍스트에 정의된 빈은 타입 매개 변구에 매치되는 이벤트를 모두 알림받는다.
+
+* 이런식으로 ApplicationContextEvent 같은 특정 그룹의 이벤트들을 리스닝한다.
+
+  ```java
+  @Component
+  public class CheckoutListener implements ApplicationListener<CheckoutEvent> {
+    
+    @Override
+    public void onApplicationEvent(CheckoutEvent event) {
+      // 체크아웃 시각을 통해서 처리할 비즈니스로직 구현.
+      System.out.println("Checkout Event [" + event.getTime() + "]")
+    }
+  }
+  ```
+
+* 스프링 4.2부터는 @EventListener 애너테이션을 붙여도 이벤트 리스너로 만들 수 있다.
+
+  ```java
+  @Component
+  public class CheckoutListener {
+    
+    @EventListener
+    public void onApplicationEvent(CheckoutEvent event) {
+      // 체크아웃 시각을 통해서 처리할 비즈니스로직 구현.
+      System.out.println("Checkout Event [" + event.getTime() + "]")
+    }
+  }
+  ```
+
+### 애플리케이션 컨텍스트에 전체 이벤트를 리스닝할 리스너 등록
+
+* 등록 절차는 매우 간단하다.
+* 리스너의 빈 인스턴스를 선언하거나, 컴포넌트 스캐닝으로 감지하면 된다.
+* 애플리케이션 컨텍스트는 ApplicationListener 인터페이스를 구현한 빈과 @EventListener가 붙은 메서드를 가진 빈을 인지해서 이들이 관심있는 이벤트를 각각 통지한다.
+* @EventListener의 큰 장점은 ApplicationListener\<CheckoutEvent\> 를 상속받지 않아도 되므로, 애초에 CheckoutEvent가 ApplicationEvent를 상속받지 않아도 되게 할 수 있다는 것이다.
+* 이런 방식으로 이벤트 객체를 스프링 프레임워크에 종속된 클래스가 아닌 평범한 POJO로 되살릴 수 있다.
+* 더불어 ApplicationContext 자신도 ContextClosedEvent, ContextRefreshedEvent, RequestHandledEvent 등 컨테이너 이벤트를 발행한다. 이떤 빈이든 이런 이벤트를 받고 싶다면 ApplicationListener 인터페이스를 구현하면 된다.
+
