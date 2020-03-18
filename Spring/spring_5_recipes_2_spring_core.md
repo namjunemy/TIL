@@ -2029,3 +2029,131 @@ public class SequesceGeneratorConfiguration {
 
 * 필요시 추가 학습 필요.
 
+## 2-23. 스프링 TaskExecutor로 동시성 적용하기
+
+* Thread 기반의 동시성(Concurrent) 프로그램을 스프링으로 개발하고 싶은데, 이렇다 할 표준 가이드가 없어서 어떻게 접근해야 할 지 모를 경우 
+
+  * 스프링 TaskExecutor(작업 실행기) 추상체가 정답이다. TaskExecutor는 기본 자바의 Executor, CommonJ의 WorkManager 등 다양한 구현체를 제공하며 필요하면 커스텀 구현체를 만들어 쓸 수도 있다.
+  * 스프링은 이들 구현체를 모두 자바 Executor 인터페이스로 단일화 했다. 
+
+* 자바 SE가 제공하는 표준 스레드를 이용해서 개발하다 보면 자칫 지겹고 난해한 늪에 빠지기 쉽다. 동시성은 서버사이드 컴포넌트의 아주 중요한 요건이지만 엔터프라이즈 자바 세계에는 딱히 표준이라 할 만한 것이 없다.
+
+* 스레드를 명시적으로 생성하거나 조작하는 행위를 금지하는 내용이 일부 자바 EE 명세에 포함되어 있을 따름이다.
+
+* 자바 기술자들은 오래 전부터 스레드 및 동시성을 다루기 위해 여러 가지 궁리를 했다. 우선 초기 JDK 1.0 시절부터 표준 java.lang.Thread가 있었고, 작업을 주기적으로 실행시킬 수 있는 TimerTask가 1.3 버전에 등장했다. 
+
+* 이어서 자바 5부터는 java.util.concurrent 패키지를 선보였고, 이와 동시에 java.util.concurrent.Executor를 중심으로 Thread Pool을 생성하는 체계가 완전히 개편 되었다.
+
+* Executor API는 의외로 간단하다.
+
+  ```java
+  package java.util.concurrent;
+  
+  public inferface Executor {
+    void execute(Runnable command);
+  }
+  ```
+
+* 스레드 관리 기능이 강화된 ExecutorService 이하 인터페이스는 shutdown()처럼 스레드에 이벤트를 일으키는 메서드를 제공한다. 자바 5부터 여러 구현 클래스가 추가됐다. 재부분 java.util.concurrent 패키지의 정적 팩토리 메서드를 사용해 쓸 수 있다. 자바 SE 클래스를 응용한 예제를 몇 가지 살펴보자.
+
+* **ExecutorService 클래스에는 Future\<T\> 형 객체를 반환하는 submit() 메서드가 있다**. **Future\<T\> 인스턴스는 대개 비동기 실행 스레드의 진행 상황을 추적하는 용도로 쓰인다. Future.idDone(), Future.isCalcelled() 메서드는 각각 어떤 잡이 완료되었는지, 취소되었는지 확인한다.**
+
+* **run() 메서드가 반환형 없는 Runnable 인스턴스 내부에서** **ExecutorService와 submit()을 사용할 경우**, **반환된 Future의 get() 메서드를 호출하면 null 또는 전송시 지정한 값(다음 코드는 Boolean.TRUE)이 반환된다.**
+
+  ```java
+  public static void main(String[] args) {
+    Runnable task = new Runnable() {
+      public void run() {
+        try {
+          Thread.sleep(1000 * 60);
+          System.out.println("Done sleeping for a minute, returning! ");
+        } catch(Exception e) {
+          ...
+        }
+      }
+    }
+    
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    
+    if (executorService.submit(task, Boolean.TRUE).get().equals(Boolean.TRUE)) {
+      System.out.println("Job has finished!");
+    }
+  }
+  ```
+
+* 위의 배경 지식 정도만 있으면 다양한 구현체마다 독특한 기능을 응용할 수 있다. 다음은 Runnable을 응용해 시간 경과를 나타낸 클래스이다.
+
+  ```java
+  public class DemostrationRunnable implements Runnable {
+    
+    @Override
+    public void run() {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      System.out.println(Thread.currentThread().getName());
+      System.out.printf("Hello %s \n", new Date);
+    }
+  }
+  ```
+
+* 위의 DemostrationRunnable 인스턴스를 자바 Executors와 스프링 TaskExecutor에서 사용해보자.
+
+  * 각 ExecutorService의 submit(task)을 호출하고, get()을 호출했을때(인자를 넘겨주지 않았으므로) null을 반환한다.
+  * submit(task, Boolean.TRUE)를 호출했다면, get() 호출시 Boolean.TRUE가 반환 된다.
+  * 그러면 작업이 완료라고 판단하고 log를 찍는다.
+
+  ```java
+  public class ExecutorDemo {
+    public static void main(String[] args) throws Throwable {
+      Runnable task = new DemostrationRunnable();
+      
+      ExecutorService cachedThreadPoolExecutorService = Executors.newCachedThreadPool();
+      if (cachedThreadPoolExecutorService.submit(task).get() == null) {
+        System.out.printf("The cachedThreadPoolExecutorService " 
+                          + "has succeeded at %s \n", new Date());
+      }
+      
+      ExecutorService fixedThreadPool = Executors.newFixedThreadPool(100);
+      if (fixedThreadPool.submit(task).get() == null) {
+        System.out.printf("fixedThreadPool has succeeded at %s \n", new Date());
+      }
+      
+      ExecutorService es = Executors.newCachedThreadPool();
+      if (es.submit(tash, Boolean.TRUE).get().equals(Boolean.TRUE)) {
+        System.out.println("Job has finished!");
+      }
+      
+      ScheduledExecutorService scheduledThreadExecutorService = Executors.newScheduledThreadPool(10);
+      if (scheduledThreadExecutorService.schedule(task, 30, TimeUnit.SECONDS)
+          .get() == null) {
+        System.out.printf("The scheduledThreadExecutorService " 
+                          + "has succeeded at %s \n", new Date());
+      }
+      
+      scheduledThreadExecutorService.scheduledAtFixedRate(task, 0, 5, TimeUnit.SECONDS);
+    }
+  }
+  ```
+
+  * ExecutorService.submit(task).get()이 null을 반환하는 이유는 하위 인터페이스에서 Callable\<T\> 를 인수로 받는 submit() 메서드를 호출하면 Callable의 call() 메서드가 반환한 값을 그대로 반환하기 때문이다.
+  * ExecutorService.submit(task, Boolean.TRUE).get()이 TRUE를 반환하는 이유는  Runnable과 T를 받아서 T를 반환하기 때문이다.
+
+* 스프링은 자바 5의 java.util.concurrent.Executor를 상속한 org.springframeworks.core.task.TaskExecutor 인터페이스라는 통합 솔루션을 제공한다.
+
+* 사실 TaskExecutor 인터페이스는 스프링 프레임워크 내부에서 두루 쓰인다.(스레드를 지원하는) 스프링 쿼츠 연계 및 메세지 드리븐 POJO 컨테이너 지원 기능 등에도 TaskExecutor가 쓰일 정도로 응용 범위가 넓다.
+
+  ```java
+  package org.springframework.core.task;
+  
+  public interface TaskExecutor extends Executor {
+    void execute(Runnable task);
+  }
+  ```
+
+* 스레드 프로그래밍의 기본과 ThreadPoolTaskExecutor에 대하여 공부하자!
+
+  * [https://github.com/HomoEfficio/dev-tips/blob/master/Java-Spring%20Thread%20Programming%20%EA%B0%84%EB%8B%A8%20%EC%A0%95%EB%A6%AC.md](https://github.com/HomoEfficio/dev-tips/blob/master/Java-Spring Thread Programming 간단 정리.md)
+
