@@ -54,3 +54,27 @@
     * 코드가 흩어질 확률이 높음.
     * 따라서, 일급 컬렉션 안에 리스트와 계산식을 같이 두면, 상태와 로직이 한곳에서 관리 됨.
   * 일급컬렉션의 이름으로 명확한 식별에 도움(글 참조)
+
+## 카프카
+
+* 메세지 전송 후 성공/실패에 따른 콜백 리스너를 등록할 수 있다.
+
+  ```java
+  ListenableFuture<SendResult<String, CustomMessage>> future = listkafkaTemplate.send(message);
+  
+  future.addCallback(new ListenableFutureCallback<SendResult<String, CustomMessage>>() {
+    
+    @Override
+    public void onFailure(Throwable ex) {
+      log.debug("fail");
+    }
+  
+    @Override
+    public void onSuccess(SendResult<String, CustomMessage> result) {
+      log.debug("success");
+    }
+  });
+  
+  ```
+
+  
