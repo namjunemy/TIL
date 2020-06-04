@@ -55,15 +55,23 @@
     * 따라서, 일급 컬렉션 안에 리스트와 계산식을 같이 두면, 상태와 로직이 한곳에서 관리 됨.
   * 일급컬렉션의 이름으로 명확한 식별에 도움(글 참조)
 
-## 카프카
+## Kafka
 
-* 메세지 전송 후 성공/실패에 따른 콜백 리스너를 등록할 수 있다.
+* Spring-kafka의 KafkaTemplate을 통해 카프카 메세지 전송 하면 ListenableFuture를 반환하는데,
+
+* 퓨처에 콜백 리스너를 등록할 수 있다.
+
+* 전송 후 성공/실패에 따른 동작을 구현할 수 있다.
 
   ```java
-  ListenableFuture<SendResult<String, CustomMessage>> future = listkafkaTemplate.send(message);
+  Message<T> message = MessageBuilder
+    .withPayload(data)
+    .setHeader(KafkaHeaders.TOPIC, topic)
+    .build();
+  
+  ListenableFuture<SendResult<String, CustomMessage>> future = kafkaTemplate.send(message);
   
   future.addCallback(new ListenableFutureCallback<SendResult<String, CustomMessage>>() {
-    
     @Override
     public void onFailure(Throwable ex) {
       log.debug("fail");
@@ -77,4 +85,12 @@
   
   ```
 
-  
+## Spring
+
+* 팩토리메서드 패턴을 이용해서 스프링에서 빈 동적으로 처리하기
+  * 스프링에서는 Bean을 컬렉션으로 주입할 수 있다. 하나의 인터페이스를 상속받고 있는 구현체인 Bean들을 List로 주입받을 수 있다.
+  * 이렇게 되면 같은 행동을 하는 다른 타입의 빈들을 모조리 주입받아서 if-else 또는 switch처리하지 않아도 된다.
+  * 빈의 의존객체들이 줄어들고, 분기 로직도 없앨 수 있다.
+  * 이 방식으로 SQS가 여러 타입의 메세지를 처리해야 하는 상황을 효율적으로 처리할 수 있었다.
+    * 이 과정 블로그 포스팅해보자!
+  * https://zorba91.tistory.com/306
