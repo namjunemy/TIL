@@ -102,3 +102,14 @@
 * 원인은 @RequiredArgsConstructor가 생성자를 만들때 인자에 @Qualifier를 넣어주지 않기 때문이다.
 * 인스턴스 이름을 변경하거나, Lombok config를 변경해서 사용해야 한다.
   * https://www.podo-dev.com/blogs/224
+
+## 테스트
+
+### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
+
+* https://jojoldu.tistory.com/226?category=635883
+* https://jojoldu.tistory.com/239?category=635883
+
+* http://blog.devenjoy.com/?p=529
+
+* [https://velog.io/@june0313/Mockito-Mock-%EB%A6%AC%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EC%A3%BC%EC%9E%85%ED%95%98%EA%B3%A0-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%95%98%EA%B8%B0](https://velog.io/@june0313/Mockito-Mock-리스트를-주입하고-테스트-하기)
