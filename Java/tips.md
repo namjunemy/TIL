@@ -109,6 +109,37 @@
 * underscore나 camelCase는 인식하지 못하니 주의하자.
 * 하지만 하위 속성인 요소들은 기존과 동일하게 모든 케이스 다 가능하다.
 
+### jackson 으로 json string -> Object 변환시 snake_case to camelCase
+
+* RestTemplate으로 외부 연동 API 응답 값을 받을때 굉장히 다양한 case convention을 경험할 수 있다.
+
+* 하지만 restTemplate에 기본적으로 등록되어 있는 messageConverters에서는 snake_case를 제대로 매핑하지 못해서 null이 들어가곤 한다.
+
+* 해결하려면 restTemplate에 Spring이 이미 등록한 기본값보다 우선하도록 새롭게 커스텀한 messageConverter를 높은 우선순위에 등록하자.
+
+  ```java
+  // AdapterConfig.java
+  
+  private ObjectMapper createCustomObjectMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+    return objectMapper;
+  }
+  
+  private MappingJackson2HttpMessageConverter createMappingJackson2HttpMessageConverter() {
+    MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+    converter.setObjectMapper(createCustomObjectMapper());
+    return converter;
+  }
+  
+  @Bean(name = "restTemplate")
+  public RestTemplate restTemplate() {
+    RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+    restTemplate.getMessageConverters().add(0, createMappingJackson2HttpMessageConverter());
+    return restTemplate;
+  }
+  ```
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
