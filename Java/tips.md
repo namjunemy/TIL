@@ -117,7 +117,9 @@
 
 * 해결하려면 restTemplate에 Spring이 이미 등록한 기본값보다 우선하도록 새롭게 커스텀한 messageConverter를 높은 우선순위에 등록하자.
 
-  ```java
+* jackson version 2.7 이전에서는 PropertyNamingStrategy. CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES 를 이후 버전에서는 PropertyNamingStrategy.SNAKE_CASE 를 사용해야 한다.
+
+* ```java
   // AdapterConfig.java
   
   private ObjectMapper createCustomObjectMapper() {
