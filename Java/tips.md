@@ -119,7 +119,7 @@
 
 * jackson version 2.7 이전에서는 PropertyNamingStrategy. CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES 를 이후 버전에서는 PropertyNamingStrategy.SNAKE_CASE 를 사용해야 한다.
 
-* ```java
+  ```java
   // AdapterConfig.java
   
   private ObjectMapper createCustomObjectMapper() {
