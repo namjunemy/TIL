@@ -103,6 +103,12 @@
 * 인스턴스 이름을 변경하거나, Lombok config를 변경해서 사용해야 한다.
   * https://www.podo-dev.com/blogs/224
 
+### SpringBoot 2.0 부터 @ConfigurationProperties(prefix = "camelCase") 주의
+
+* 2.0부터는 **prefix 인식**을 **kebab-case** 또는 **소문자**만 인식한다.
+* underscore나 camelCase는 인식하지 못하니 주의하자.
+* 하지만 하위 속성인 요소들은 기존과 동일하게 모든 케이스 다 가능하다.
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
