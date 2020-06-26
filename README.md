@@ -32,6 +32,7 @@
 * [[2019.11.21] 우아한 레디스]( https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191121_redis.md )
 * [[2019.11.27] NHN FORWARD 2019 후기](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20191127_nhnforward.md)
 * [[2020.02.11] Google BigQuery](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/20200211_bigquery.md)
+* [교육자 자바지기님의 토크&세미나](https://github.com/namjunemy/TIL/blob/master/SeminarAndConference/javajigi_seminar.md)
 
 ### Java
 
