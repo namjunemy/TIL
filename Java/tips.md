@@ -142,6 +142,12 @@
   }
   ```
 
+### MySQL Character Set utf8mb4 설정 후 JDBC Url
+
+* connector 5.1.47 이후 버전으로 업데이트 후
+  * jdbc:mysql://localhost:3306/customersdb?useSSL=false&amp;useUnicode=yes&characterEncoding=UTF-8
+  * 내일 다시 정리 필요
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
