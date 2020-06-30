@@ -148,6 +148,15 @@
   * jdbc:mysql://localhost:3306/customersdb?useSSL=false&amp;useUnicode=yes&characterEncoding=UTF-8
   * 내일 다시 정리 필요
 
+## JPA
+
+### 순환참조 해결 방법과 엔티티 직접반환 금지.
+
+* ORM은 양방향 참조를 필요로 한다. 그래서 컨트롤러에서 응답값에 엔티티를 절대로 직접 반환하지 말자.
+* JSON 생성 라이브러리가 양방향 관계의 엔티티를 JSON으로 Serialize하는 순간 서로의 toString()을 무한호출한다.
+* 또 하나, 엔티티는 충분히 변경의 여지가 있는데, 엔티티 변경시 API 스펙 자체가 변경되므로 엔티티 직접반환은 실무에선 하지 않는 편이 좋다.
+* 웬만하면 DTO로 만들어서 반환하자.
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
