@@ -158,3 +158,10 @@
 * http://blog.devenjoy.com/?p=529
 
 * [https://velog.io/@june0313/Mockito-Mock-%EB%A6%AC%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EC%A3%BC%EC%9E%85%ED%95%98%EA%B3%A0-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%95%98%EA%B8%B0](https://velog.io/@june0313/Mockito-Mock-리스트를-주입하고-테스트-하기)
+
+## CI/CD
+
+### 젠킨스 빌드 파이프라인
+
+* http://blog.kingbbode.com/posts/jenkins-build
+* https://jojoldu.tistory.com/355
