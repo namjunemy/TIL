@@ -156,6 +156,13 @@
 * JSON 생성 라이브러리가 양방향 관계의 엔티티를 JSON으로 Serialize하는 순간 서로의 toString()을 무한호출한다.
 * 또 하나, 엔티티는 충분히 변경의 여지가 있는데, 엔티티 변경시 API 스펙 자체가 변경되므로 엔티티 직접반환은 실무에선 하지 않는 편이 좋다.
 * 웬만하면 DTO로 만들어서 반환하자.
+* **순환참조 해결 방법**
+  * @JsonIgnore를 사용하는 방법
+    * 실제로 property에 null을 할당하는 방식.
+  * @JsonManagedReference와 @JsonBackReference를 사용하는 방법
+    * 부모클래스 측에 @JsonManagedReference를, 자식 측에 @JsonBackReference 어노테이션을 추가해주면 된다.
+    * https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    * https://pasudo123.tistory.com/350
 
 ## 테스트
 
