@@ -148,6 +148,26 @@
   * jdbc:mysql://localhost:3306/customersdb?useSSL=false&amp;useUnicode=yes&characterEncoding=UTF-8
   * 내일 다시 정리 필요
 
+### Spring Boot에서 Gradle에 정의된 정보 가져오기.
+
+* Boot의 application.yml에서 gradle에 정의된 정보들을 사용할 수 있다.
+
+* gradle build 과정중에 processResources 단계에서 아래와 같은 설정을 해주면 된다.
+
+  ```groovy
+  ...
+  
+  processResources {
+      filesMatching('**/application.yml') {
+          expand(project.properties)
+      }
+  }
+  
+  ...
+  ```
+
+* https://nevercaution.github.io/spring-boot-use-gradle-value/
+
 ## JPA
 
 ### 순환참조 해결 방법과 엔티티 직접반환 금지.
