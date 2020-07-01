@@ -195,6 +195,18 @@
 
 * [https://velog.io/@june0313/Mockito-Mock-%EB%A6%AC%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EC%A3%BC%EC%9E%85%ED%95%98%EA%B3%A0-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%95%98%EA%B8%B0](https://velog.io/@june0313/Mockito-Mock-리스트를-주입하고-테스트-하기)
 
+## Thumbnail 처리
+
+### CMYK -> RGB 처리하기
+
+* 내가알고 있었던 상식은 RGB는 빛의 삼원색이고, CMY는 색의 삼원색이라는 것이다.
+* 근데, 이미지 중에 CMYK 형식으로 오는 이미지가 존재했다.
+* CMYK는 CMY + black으로 인쇄물에 쓰이는 4원색을 뜻한다.
+* 이 cmyk파일을 그대로 읽으면 색이 깨지거나 문제가 발생하는 경우가 있다.
+* cmyk파일을 rgb로 변환 후 썸네일링을 해야 정상적으로 서빙할 수 있다.
+  * https://stackoverflow.com/questions/3123574/how-to-convert-from-cmyk-to-rgb-in-java-correctly
+  * http://huskdoll.tistory.com/347
+
 ## CI/CD
 
 ### 젠킨스 빌드 파이프라인
