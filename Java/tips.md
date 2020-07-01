@@ -145,8 +145,12 @@
 ### MySQL Character Set utf8mb4 설정 후 JDBC Url
 
 * connector 5.1.47 이후 버전으로 업데이트 후
-  * jdbc:mysql://localhost:3306/customersdb?useSSL=false&amp;useUnicode=yes&characterEncoding=UTF-8
-  * 내일 다시 정리 필요
+  * 5.1.47 이후버전에서 characterEncoding UTF-8이 mysql character set utf8mb4로 매핑.
+  * jdbc:mysql://localhost:3306/customersdb?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    * useUnicode는 default true. 생략가능
+  * https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-charsets.html
+  * https://www.lesstif.com/dbms/mysql-jdbc-url-14090356.html
+  * http://minsql.com/mysql/MySQLWithEmoji/
 
 ### Spring Boot에서 Gradle에 정의된 정보 가져오기.
 
