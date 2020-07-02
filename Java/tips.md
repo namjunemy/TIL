@@ -2,7 +2,9 @@
 
 > 개발하면서 마주한 팁들
 
-## Enum
+## Java
+
+### Enum
 
 * [Java enum의 사용 - 이종립님](https://johngrib.github.io/wiki/java-enum/)
 * [이펙티브 자바 38 - 확장할 수 있는 열거 타입이 필요하면 인터페이스를 사용하라](https://jaehun2841.github.io/2019/02/04/effective-java-item38/)
@@ -40,7 +42,7 @@
 
 * 예를 들어, VOD 또는 IMG가 저장될 수 있는 Storage 엔티티에서 FileType에 따라서 다른 행동을 구현하고 싶었을 때 위와 같이 해결 할 수 있다.
 
-## 일급컬렉션
+### 일급컬렉션
 
 * https://jojoldu.tistory.com/412
   * **비지니스에 종속적인 자료구조**가 만들어져, 이후 발생할 문제가 최소화 됨
@@ -54,6 +56,15 @@
     * 코드가 흩어질 확률이 높음.
     * 따라서, 일급 컬렉션 안에 리스트와 계산식을 같이 두면, 상태와 로직이 한곳에서 관리 됨.
   * 일급컬렉션의 이름으로 명확한 식별에 도움(글 참조)
+
+### Effective java
+
+* https://jaehun2841.github.io/tags/Effective-Java/
+
+* https://github.com/ryudung/effective-java3-E
+* [https://javabom.tistory.com/category/Reading%20Record/%EC%9D%B4%ED%8E%99%ED%8B%B0%EB%B8%8C%EC%9E%90%EB%B0%94](https://javabom.tistory.com/category/Reading Record/이펙티브자바)
+* [https://medium.com/@ddt1984/effective-java-3-e-%EC%A0%95%EB%A6%AC-c3fb43eec9d2](https://medium.com/@ddt1984/effective-java-3-e-정리-c3fb43eec9d2)
+* [https://wonsohana.wordpress.com/2019/06/23/effective-java-3-e-%EC%A0%95%EB%A6%AC1/](https://wonsohana.wordpress.com/2019/06/23/effective-java-3-e-정리1/)
 
 ## Kafka
 
