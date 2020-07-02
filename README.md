@@ -49,6 +49,8 @@
 
 ### JPA
 
+* [JPA의 트랜잭션 범위의 영속성 컨텍스트 전략, 스프링이 엔티티매니저의 Thread-safe를 보장하는 방법](https://github.com/namjunemy/TIL/blob/master/Jpa/transaction_persistence_context.md)
+
 * 자바 ORM 표준 JPA 프로그래밍 - 기본편
     * [01. SQL 중심적인 개발의 문제점](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/01_sql_centric_problem.md)
     * [02. JPA 소개](https://github.com/namjunemy/TIL/blob/master/Jpa/inflearn/02_jpa_intro.md)
