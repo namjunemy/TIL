@@ -183,6 +183,34 @@
 
 * https://nevercaution.github.io/spring-boot-use-gradle-value/
 
+## DB
+
+### DB 스키마 가이드
+
+* Indexes
+
+  * 인덱스 명명 규칙은 "테이블명" + "인덱스 약어" + "컬럼명"으로 한다.
+
+    ```sql
+    CREATE TABLE person(
+      id bigserial PRIMARY KEY,
+      email text NOT NULL,
+      first_name text NOT NULL,
+      last_name text NOT NULL,
+      CONSTRAINT person_ck_email_lower_case CHECK(email = LOWER(email))
+    );
+    
+    CREATE INDEX person_ix_first_name_last_name ON person (first_name, last_name);
+    ```
+
+  * 인덱스 타입별 약어
+
+    * Primary Key : pk
+    * Index : ix
+    * Check Key : ck
+    * Unique Key : uk
+    * Foreign Key : fk
+
 ## JPA
 
 ### 순환참조 해결 방법과 엔티티 직접반환 금지.
