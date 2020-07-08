@@ -233,10 +233,37 @@
 
 * https://jojoldu.tistory.com/226?category=635883
 * https://jojoldu.tistory.com/239?category=635883
-
 * http://blog.devenjoy.com/?p=529
-
 * [https://velog.io/@june0313/Mockito-Mock-%EB%A6%AC%EC%8A%A4%ED%8A%B8%EB%A5%BC-%EC%A3%BC%EC%9E%85%ED%95%98%EA%B3%A0-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%95%98%EA%B8%B0](https://velog.io/@june0313/Mockito-Mock-리스트를-주입하고-테스트-하기)
+
+### 테스트 케이스 스터디 step - by beyondJ2EE
+
+* 기본편
+  * **Step1 : junit 과 테스트 방법에 대한 이해**
+    * 스터디에 앞서서 junit란것에 대한 개론을 먼저 이해 합니다. ppt로 되어 있기 때문에 부담 없이  보실수 있을 겁니다.  [https://www.slideshare.net/tom.zimmermann/unit-testing-with-junit](https://www.google.com/url?q=https%3A%2F%2Fwww.slideshare.net%2Ftom.zimmermann%2Funit-testing-with-junit&sa=D&sntz=1&usg=AFQjCNF97psz39TRUC7qH6cASXL4i2rlmg) 
+  * **Step2 : Test Tool이 무엇이 있는지 간략하게 보기** 
+    * 테스트 툴들이 어떤것이 있는지 둘러봅니다. 참고로 testNG는 거의 사용을 안합니다.  
+    * [https://dzone.com/articles/10-essential-testing-tools-for-java-developers](https://www.google.com/url?q=https%3A%2F%2Fdzone.com%2Farticles%2F10-essential-testing-tools-for-java-developers&sa=D&sntz=1&usg=AFQjCNFhxIahcutRuOY1u0IU9SpmMkmNYg)  
+  * **Step3 : 예제코드를 보면서 Junit 익히기**  
+    * 외국 서적 "Mastering Software Testing with JUnit 5"에 나온 예제 코드는 아래와 같습니다.  
+    * [https://github.com/bonigarcia/mastering-junit5](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fbonigarcia%2Fmastering-junit5&sa=D&sntz=1&usg=AFQjCNHSJno9Ln04daahZ5kKl6-zoMZtZw) 
+    * 본인들이 필요한 부분만 확인하고 필요없는 부분은 skip 하세요  
+    * 해당 소스를 보면서 메뉴얼을 같이 참고 하세요 
+    * Junit5 User Guide : [https://junit.org/junit5/docs/snapshot/user-guide/index.pdf](https://www.google.com/url?q=https%3A%2F%2Fjunit.org%2Fjunit5%2Fdocs%2Fsnapshot%2Fuser-guide%2Findex.pdf&sa=D&sntz=1&usg=AFQjCNG5ily-hn7FOS-qfEuMn4Q4jKkUWQ)
+    * mockito 한글 소개 [https://github.com/mockito/mockito/wiki/Mockito-features-in-Korean](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fmockito%2Fmockito%2Fwiki%2FMockito-features-in-Korean&sa=D&sntz=1&usg=AFQjCNF1UeIeobYsHM0H0J56HOmR-UwrQQ)
+    * mockito 메뉴얼[https://www.tutorialspoint.com/mockito/](https://www.google.com/url?q=https%3A%2F%2Fwww.tutorialspoint.com%2Fmockito%2F&sa=D&sntz=1&usg=AFQjCNHaLQlVVc_zNQhBYfrRYurDdGldzw)
+      * Hamcrest 메뉴얼[https://www.baeldung.com/java-junit-hamcrest-guide](https://www.google.com/url?q=https%3A%2F%2Fwww.baeldung.com%2Fjava-junit-hamcrest-guide&sa=D&sntz=1&usg=AFQjCNEsKTOQyNKcZL1hFpI5h3br9UZQGw)  					
+
+* 응용편
+  * **Step4 : Spring Boot Test Quick Guide 한글 블로그**
+    * springboot에서 제공하는 테스트 어노테이션이 어떤것들이 있는지 알아 봅니다.
+    * [https://meetup.toast.com/posts/124](https://www.google.com/url?q=https%3A%2F%2Fmeetup.toast.com%2Fposts%2F124&sa=D&sntz=1&usg=AFQjCNEScz9RLJMTPUCsWBZbVsBmALHfPA)  
+  * **Step5 : Controller Service Repository 테스트 코드** 
+    * 비즈니스 로직을 위한 테스트 코드를 알아 봅니다.
+    *  [https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples/spring-boot-sample-test/src/test/java/sample/test](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fspring-projects%2Fspring-boot%2Ftree%2Fmaster%2Fspring-boot-samples%2Fspring-boot-sample-test%2Fsrc%2Ftest%2Fjava%2Fsample%2Ftest&sa=D&sntz=1&usg=AFQjCNGDFBJtNP2EW2-x_m-fsyP6o_8eog)
+  * Step6 : springboot 기타 (properties, json, web, mock, context, util) 테스트 코드 
+    * [https://tuhrig.de/testing-configurationproperties-in-spring-boot/](https://www.google.com/url?q=https%3A%2F%2Ftuhrig.de%2Ftesting-configurationproperties-in-spring-boot%2F&sa=D&sntz=1&usg=AFQjCNFhhgfBs9pQoR8FzZGScIkaOEnbaw)[https://github.com/spring-projects/spring-boot/tree/master/spring-boot-project/spring-boot-test/src/test/java/org/springframework/boot/test](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fspring-projects%2Fspring-boot%2Ftree%2Fmaster%2Fspring-boot-project%2Fspring-boot-test%2Fsrc%2Ftest%2Fjava%2Forg%2Fspringframework%2Fboot%2Ftest&sa=D&sntz=1&usg=AFQjCNGnYBRzzH1m1kgefe-nxz5a3T4JHg) 
+* 각자 알아서 스터디를 하시면서 가장 중요한건 위에서 스터디한 코드 와 내용을 참고로 본인의 test-example-bestpractice를 하나 만드셔서 실무에서 테스트 코드를 짤때 참고 하는 방향으로 하면 어떨까 합니다.
 
 ## Thumbnail 처리
 
