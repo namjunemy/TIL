@@ -283,3 +283,15 @@
 
 * http://blog.kingbbode.com/posts/jenkins-build
 * https://jojoldu.tistory.com/355
+
+## Intellij
+
+* copyright
+
+  * simple
+
+    ```text
+    Created by njkim $today.year.$today.month.$today.day.
+    ```
+
+    
