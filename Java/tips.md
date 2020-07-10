@@ -261,6 +261,8 @@
   * **Step5 : Controller Service Repository 테스트 코드** 
     * 비즈니스 로직을 위한 테스트 코드를 알아 봅니다.
     *  [https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples/spring-boot-sample-test/src/test/java/sample/test](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fspring-projects%2Fspring-boot%2Ftree%2Fmaster%2Fspring-boot-samples%2Fspring-boot-sample-test%2Fsrc%2Ftest%2Fjava%2Fsample%2Ftest&sa=D&sntz=1&usg=AFQjCNGDFBJtNP2EW2-x_m-fsyP6o_8eog)
+    * https://www.baeldung.com/spring-boot-testing
+    * https://cheese10yun.github.io/spring-boot-test/
   * Step6 : springboot 기타 (properties, json, web, mock, context, util) 테스트 코드 
     * [https://tuhrig.de/testing-configurationproperties-in-spring-boot/](https://www.google.com/url?q=https%3A%2F%2Ftuhrig.de%2Ftesting-configurationproperties-in-spring-boot%2F&sa=D&sntz=1&usg=AFQjCNFhhgfBs9pQoR8FzZGScIkaOEnbaw)[https://github.com/spring-projects/spring-boot/tree/master/spring-boot-project/spring-boot-test/src/test/java/org/springframework/boot/test](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fspring-projects%2Fspring-boot%2Ftree%2Fmaster%2Fspring-boot-project%2Fspring-boot-test%2Fsrc%2Ftest%2Fjava%2Forg%2Fspringframework%2Fboot%2Ftest&sa=D&sntz=1&usg=AFQjCNGnYBRzzH1m1kgefe-nxz5a3T4JHg) 
 * 각자 알아서 스터디를 하시면서 가장 중요한건 위에서 스터디한 코드 와 내용을 참고로 본인의 test-example-bestpractice를 하나 만드셔서 실무에서 테스트 코드를 짤때 참고 하는 방향으로 하면 어떨까 합니다.
