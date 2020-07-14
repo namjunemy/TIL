@@ -183,6 +183,10 @@
 
 * https://nevercaution.github.io/spring-boot-use-gradle-value/
 
+### Collection 타입 @Vaild 검증하기
+
+* [https://medium.com/chequer/valid-%EC%95%A0%EB%84%88%ED%85%8C%EC%9D%B4%EC%85%98%EC%9D%84-%EC%BB%AC%EB%A0%89%EC%85%98-%ED%83%80%EC%9E%85-requestbody%EC%97%90-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-6aef15bb8dff](https://medium.com/chequer/valid-애너테이션을-컬렉션-타입-requestbody에-사용하기-6aef15bb8dff)
+
 ## DB
 
 ### DB 스키마 가이드
