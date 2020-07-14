@@ -227,6 +227,61 @@
     * https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
     * https://pasudo123.tistory.com/350
 
+### JPA AttributeConverter 로 도메인 <-> DB 변환
+
+* ORM, JPA위에서 개발하다 보면 도메인 모델을 DB의 VARCHAR 타입 컬럼에 매핑 해야 할 일이 빈번하게 발생한다.
+
+* 예를 들어, 카테고리 리스트를 DB의 VARCHAR컬럼에 ,로 joining 해서 집어넣거나( ,로 joining된 문자열을 잘라서 리스트에 매핑하는 반대의 경우도.)
+
+* 어플리케이션에서 ENUM으로 관리하는 코드를 VARCHAR 컬럼에 매핑해야하는 경우도 마찬가지다.
+
+* 엔티티 - Content.java
+
+  ```java
+  @Entity
+  public class Content {
+    ...
+      
+    @Convert(converter = ContentCategoryListConverter.class)
+    private List<CategoryCode> caregories;
+    
+    ...
+  }
+  ```
+
+* 컨버터 - ContentCategoryListConverter.java
+
+  ```java
+  @Converter
+  public class ContentCategoryListConverter implements AttributeConverter<List<CategoryCode>, String> {
+    private static final String CATEGORY_DELIMITER = ",";  // 구분자
+    
+    // 도메인 CategoryCode 리스트를 DB VARCHAR에 맵핑
+    @Override
+    public String convertToDatabaseColumn(List<CategoryCode> attribute) {
+      if (CollectionUtils.isEmpty(attribute)) {
+        return null;
+      }
+      return attribute.stream()
+        .map(CategoryCote::getCode)
+        .collect(Collectors.joining(CATEGORY_DELIMETER));
+    }
+    
+    // DB 컬럼에서 도메인의 CategoryCode 리스트로 변환
+    @Override
+    public List<CategoryCode> convertToEntityAttributes(String dbData) {
+      if (StringUtils.isEmpty(dbData)) {
+        return new ArrayList<>();
+      }
+      
+      String[] split = dbData.split(CATEGORY_DELEMITER);
+      return Arrays.stream(split)
+        .map(CategoryCode::getCategoryByCode)
+        .collect(Collectors.toList());
+    }
+  }
+  ```
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
