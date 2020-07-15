@@ -187,6 +187,15 @@
 
 * [https://medium.com/chequer/valid-%EC%95%A0%EB%84%88%ED%85%8C%EC%9D%B4%EC%85%98%EC%9D%84-%EC%BB%AC%EB%A0%89%EC%85%98-%ED%83%80%EC%9E%85-requestbody%EC%97%90-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-6aef15bb8dff](https://medium.com/chequer/valid-애너테이션을-컬렉션-타입-requestbody에-사용하기-6aef15bb8dff)
 
+### Bean Validation
+
+* [https://medium.com/@gaemi/java-%EC%99%80-spring-%EC%9D%98-validation-b5191a113f5c](https://medium.com/@gaemi/java-와-spring-의-validation-b5191a113f5c)
+* [https://cnpnote.tistory.com/entry/SPRING-Spring%EC%97%90%EC%84%9C-Valid%EC%99%80-Validated%EC%9D%98-%EC%B0%A8%EC%9D%B4%EC%A0%90](https://cnpnote.tistory.com/entry/SPRING-Spring에서-Valid와-Validated의-차이점)
+* https://jongmin92.github.io/2019/11/18/Spring/bean-validation-1/
+* https://jongmin92.github.io/2019/11/21/Spring/bean-validation-2/
+* [https://javacan.tistory.com/tag/JSR%20380](https://javacan.tistory.com/tag/JSR 380)
+* https://www.notion.so/Bean-Validation-2f70a3f0aae94621886487477097abfa
+
 ## DB
 
 ### DB 스키마 가이드
