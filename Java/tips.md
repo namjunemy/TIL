@@ -66,6 +66,37 @@
 * [https://medium.com/@ddt1984/effective-java-3-e-%EC%A0%95%EB%A6%AC-c3fb43eec9d2](https://medium.com/@ddt1984/effective-java-3-e-정리-c3fb43eec9d2)
 * [https://wonsohana.wordpress.com/2019/06/23/effective-java-3-e-%EC%A0%95%EB%A6%AC1/](https://wonsohana.wordpress.com/2019/06/23/effective-java-3-e-정리1/)
 
+### 커스텀 컬렉터로 스트림 파티셔닝, Map에 담기
+
+```java
+@DisplayName("스트림 파티셔닝 테스트")
+public class StreamPartitioningTest {
+
+    @Test
+    @Order(1)
+    @DisplayName("소수와 비소수로 분할하기")
+    public void partition01() {
+        int candidate = 10;
+        Map<Boolean, List<Integer>> collect = IntStream.rangeClosed(2, candidate)
+            .boxed()
+            .collect(Collectors.partitioningBy(this::isPrime));
+
+        int nonPrime = collect.get(false).size();
+        int prime = collect.get(true).size();
+
+        assertThat(nonPrime).isEqualTo(5); //[4, 6, 8, 9, 10]
+        assertThat(prime).isEqualTo(4);  //[2, 3, 5, 7]
+    }
+
+    private boolean isPrime(int candidate) {
+        // 소수의 대상을 주어진 수의 제곱근 이하의 수로 제한 할 수 있음.
+        int candidateRoot = (int) Math.sqrt(candidate);
+        return IntStream.rangeClosed(2, candidateRoot)
+            .noneMatch(i -> candidate % i == 0);
+    }
+}
+```
+
 ## Kafka
 
 * Spring-kafka의 KafkaTemplate을 통해 카프카 메세지 전송 하면 ListenableFuture를 반환하는데,
