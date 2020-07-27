@@ -326,6 +326,59 @@ public class StreamPartitioningTest {
   }
   ```
 
+### Spring-Data JPA Auditing 
+
+* @Configuration 클래스에 @EnableJpaAuditing 어노테이션을 선언한다.
+
+* @CreatedBy나 @LastModifiedBy로 엔티티의 creater, updater를 관리하는 것의 기본은 스프링 시큐리티의 Principal의 이름으로 채워진다. 이 값은 SecurityContext의 인증 인스턴스에서 가져온다.
+
+  * 커스텀한 값을 채우고싶은 경우 AuditorAware\<T>를 구현할 수 있다.
+  * 그리고 해당 빈 이름을 auditorAwareRef에 매개변수 값으로 지정한다.
+
+  ```java
+  @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+  public class JpaAuditingConfig {
+      
+    private static final String UPDATER = "수정자 이름"
+    
+    @Bean("auditorProvider")
+    public AuditorAware<String> auditorProvider() {
+        return () -> Optional.of(UPDATER)
+    }
+  }
+  ```
+
+* 해당 엔티티에 AuditingEntityListener를 등록한다. 그리고 스프링 데이터에서 제공하는 엔티티 리스너 클래스인 AuditingEntityListener를 지정한다.
+
+* 그리고 위에서 등록해놓은 변경 author 감사 기능을 통해서 생성자와 수정자를 트래킹할 수 있다.
+
+  ```java
+  @Entity
+  @EntityListeners(AuditingEntityListener.class)
+  public class Content{
+    
+    ...
+      
+    @Column(name = "created_date", nullable = false, updatable = false)
+    @CreatedDate
+    private long createdDate;
+    
+    @Column(name = "modified_date" 
+    @LastModifiedDate
+    private long modifiedDate;
+            
+    ...
+            
+    @Column(name = "created_by")
+    @CreatedBy
+    private String createdBy;
+   
+    @Column(name = "modified_by")
+    @LastModifiedBy
+    private String modifiedBy;
+  }
+  ```
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
