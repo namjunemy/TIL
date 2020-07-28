@@ -97,6 +97,40 @@ public class StreamPartitioningTest {
 }
 ```
 
+### Primitive Type vs Wapper class
+
+* 개발하다보면 long 과 Long을 혼용해서 쓸 때가 있다. 다른 primitive 타입도 마찬가지다.
+
+* 나름대로 고민을 가지고 있었는데, 지금까지 알고 있는 것을 정리해 놓고 계속해서 이유를 추가하자.
+
+* primitive type
+
+  * 일반적인 경우에 primitive 타입을 사용한다. 기본값이 있기 떄문에 null이 존재하지 않는다.
+  * 별도의 객체를 생성하지 않기 때문에 메모리 효율성을 조금 챙길 수 있다.
+  * 값의 비교가 ==으로 직관적으로 비교가 가능하다.
+
+* wapper class
+
+  * null을 반환할 여지가 있을 경우 유용하다.
+
+  * 객체로 필요할 경우 사용한다. 제네릭과 stream 등.
+
+  * 대신에 객체의 == 비교는 주의해야한다.
+
+    ```java
+    Integer a = 127;
+    Integer b = 127;
+    Integer c = 128;
+    Integer d = 128;
+    
+    System.out.println(a == b); //true
+    Ststem.out.println(c == d); //false
+    ```
+
+    * c == d가 false인 이유는?
+      * Integer.class의 안을 까보면 IntegerCache라는 static innerClass로 -128 ~ 127 범위의 값들을 caching하고 있다.
+      * 127까지는 같은 객체지만, 128부터는 새로 생성된 Integer 객체이다.
+
 ## Kafka
 
 * Spring-kafka의 KafkaTemplate을 통해 카프카 메세지 전송 하면 ListenableFuture를 반환하는데,
