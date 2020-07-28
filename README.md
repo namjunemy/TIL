@@ -36,6 +36,8 @@
 
 ### Java
 
+* [개발하면서 마주한 자주 사용되는 팁 & 문제 해결 노트](https://github.com/namjunemy/TIL/blob/master/Java/tips.md)
+
 * [DI(Dependency Injection)를 이용한 빈 의존성 관리](https://github.com/namjunemy/TIL/blob/master/Java/dependency_injection_for_bean_management.md)
 * [12장. 멀티 스레드](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_12_multi_thread.md)
 * [13장. 제네릭](https://github.com/namjunemy/TIL/blob/master/Java/thisisjava_13_generic.md)
@@ -45,7 +47,6 @@
 * [개발서버에 소스코드를 배포하는 과정에 대한 자동화](https://github.com/namjunemy/TIL/blob/master/Java/source_code_deploy_automation.md)
 * [Java Logging Framework, LOGBack](https://github.com/namjunemy/TIL/blob/master/Java/logging_framework.md)
 * [Ehcache Configuration](https://github.com/namjunemy/TIL/blob/master/Java/ehcache_config.md)
-* [Tips](https://github.com/namjunemy/TIL/blob/master/Java/tips.md)
 
 ### JPA
 
