@@ -413,6 +413,14 @@ public class StreamPartitioningTest {
   }
   ```
 
+### JPA에서 TEXT 데이터 타입 저장하기
+
+* JPA와 DB TEXT 데이터 타입을 사용하는 경우
+* @Lob을 사용하는 방법이 있고, @Column의 columnDefinition을 TEXT로 주는 방법도 있다.
+* MySQL에서는 @Lob을 사용하면 항상 longtext 타입이 세팅되니까 주의하자.
+* 텍스트 데이터 용량에 따라서 적절히 선택해서 사용하자.
+  * http://chomman.github.io/blog/java/mysql/jpa/jpa-text-date-length/
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
