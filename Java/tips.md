@@ -261,6 +261,10 @@ public class StreamPartitioningTest {
 * [https://javacan.tistory.com/tag/JSR%20380](https://javacan.tistory.com/tag/JSR 380)
 * https://www.notion.so/Bean-Validation-2f70a3f0aae94621886487477097abfa
 
+### @Transactional 메서드 내부호출 금지
+
+* https://kwonnam.pe.kr/wiki/springframework/transaction
+
 ## DB
 
 ### DB 스키마 가이드
