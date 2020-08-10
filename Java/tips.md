@@ -430,6 +430,8 @@ public class StreamPartitioningTest {
 * https://kwonnam.pe.kr/wiki/java/jpa/one-to-one
 * 조인테이블을 사용하는 방법
   * https://parkhyeokjin.github.io/jpa/2019/10/28/JPA-chap6.html
+  * https://www.logicbig.com/tutorials/java-ee-tutorial/jpa/one-to-one-join-table.html
+    * 테스트시 entityManager.createNativeQuery()로 조인테이블 먼저 제거
 
 ## 테스트
 
