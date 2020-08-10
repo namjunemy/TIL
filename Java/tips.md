@@ -425,6 +425,12 @@ public class StreamPartitioningTest {
 * 텍스트 데이터 용량에 따라서 적절히 선택해서 사용하자.
   * http://chomman.github.io/blog/java/mysql/jpa/jpa-text-date-length/
 
+### JPA OneToOne 주의사항
+
+* https://kwonnam.pe.kr/wiki/java/jpa/one-to-one
+* 조인테이블을 사용하는 방법
+  * https://parkhyeokjin.github.io/jpa/2019/10/28/JPA-chap6.html
+
 ## 테스트
 
 ### @Spy, @Mock, @SpyBean, @MockBean, @InjectMock
