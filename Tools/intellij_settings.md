@@ -19,3 +19,10 @@ go settings/preferences
   * ```
     Created by njkim $today.year.$today.month.$today.day.
     ```
+
+### intellij junit5 @DisplayName 미적용 이슈 해결방법
+
+* https://jojoldu.tistory.com/450
+* http://jmlim.github.io/intellij/2020/03/02/intellij-junit5-display-name-did-not-show-issue/
+
+* https://medium.com/@sorravitbunjongpean/fix-junit5-display-name-did-not-show-in-run-tab-intellij-a00c94f39679
