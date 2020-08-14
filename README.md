@@ -216,6 +216,7 @@
 * [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
 * [MySQL CURRENT_TIMESTAMP(vs Oracle SYSDATE)](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_CURRENT_TIMESTAMP.md)
 * [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
+* [MySQL unique index vs index](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_UniqueIndex_Index.md)
 
 ### Redis
 
