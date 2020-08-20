@@ -265,6 +265,48 @@ public class StreamPartitioningTest {
 
 * https://kwonnam.pe.kr/wiki/springframework/transaction
 
+### SpringBoot AutoConfiguration Exclude 처리
+
+* boot의 자동설정 중에 db관련 설정을 java config로 custom하게 관리하고 있다면, 아래와 같은 에러메세지를 마주할 수 있다.
+
+  ```
+  ***************************
+  
+  APPLICATION FAILED TO START
+  
+  ***************************
+  
+  
+  
+  Description:
+  
+  
+  
+  Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
+  
+  
+  
+  Reason: Failed to determine a suitable driver class
+  ```
+
+* spring.datasource.* 프로퍼티들이 정의되어 있지 않기 때문인데,
+
+* 이 자동설정을 제외시키고 별도의 java config로 설정해주면 된다.
+
+  ```java
+  ...
+  
+  #===========================================================================
+  # springboot auto property
+  #===========================================================================
+  spring:
+    autoconfigure:
+      exclude:
+        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  
+  ...
+  ```
+
 ## DB
 
 ### DB 스키마 가이드

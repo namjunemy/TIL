@@ -76,6 +76,94 @@
     * [06. JPA 객체지향 쿼리, JPQL](<https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/06_jpa_query.md>)
     * [07. Spring Data JPA와 QueryDSL 이해, 실무 경험 공유](https://github.com/namjunemy/TIL/blob/master/Jpa/tacademy/07_spring_data_jpa.md)
 
+### Spring Boot
+
+* [[스프링 부트 개념과 활용] 1. 스프링 부트 시작하기](https://github.com/namjunemy/TIL/blob/master/SpringBoot/01_springboot_intro.md)
+* [[스프링 부트 개념과 활용] 2. 스프링 부트 원리](https://github.com/namjunemy/TIL/blob/master/SpringBoot/02_springboot_principle.md)
+* [[스프링 부트 개념과 활용] 3. 스프링 부트 활용](https://github.com/namjunemy/TIL/blob/master/SpringBoot/03_springboot_utilization.md)
+* [[스프링 부트 개념과 활용] 4. 스프링 MVC](https://github.com/namjunemy/TIL/blob/master/SpringBoot/04_springboot_spring_web_mvc.md)
+* [[스프링 부트 개념과 활용] 5. 스프링 데이터](https://github.com/namjunemy/TIL/blob/master/SpringBoot/05_springboot_spring_data.md)
+
+### Spring
+
+* [Spring 5 레시피 - 스프링 코어](https://github.com/namjunemy/TIL/blob/master/Spring/spring_5_recipes_2_spring_core.md)
+
+- [스프링 프레임워크 핵심 기술](https://github.com/namjunemy/TIL/blob/master/Spring/spring_framework_core.md)
+- [1. 스프링이란?](https://github.com/namjunemy/TIL/blob/master/Spring/what_is_spring.md)
+- [2. 프로젝트 만들기](https://github.com/namjunemy/TIL/blob/master/Spring/create_spring_project.md)
+- [3,4. Dependency Injection](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection.md)
+- [5. DI 활용](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection_uses.md)
+- [6. DI 설정 방법(xml, java)](https://github.com/namjunemy/TIL/blob/master/Spring/how_to_set_up_DI.md)
+- [7. 생명주기와 범위(Life Cycle, Scope)](https://github.com/namjunemy/TIL/blob/master/Spring/lifecycle_and_scope.md)
+- [8. 외부 파일을 이용한 스프링 설정(Environment, Properties, Profile)](https://github.com/namjunemy/TIL/blob/master/Spring/settings_using_external_files.md)
+- [9,10. Spring AOP(Aspect Oriented Programming)](https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md)
+- [11. Spring MVC basic](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_basic.md)
+- [12. MVC Controller](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_controller.md)
+- [13. MVC Form Data](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_form_data.md)
+- [14. @RequestMapping Parameter](https://github.com/namjunemy/TIL/blob/master/Spring/request_mapping_parameter.md)
+- [15. Form 데이터 값 검증](https://github.com/namjunemy/TIL/blob/master/Spring/form_data_validation.md)
+- [16. 스프링 MVC 게시판1(프로젝트 설계, DB 구축)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_1.md)
+- [17. 스프링 MVC 게시판2(패키지 구성, Controller, list page)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_2.md)
+- [18. 스프링 MVC 게시판3(리스트 조회, 게시물 등록, 상세조회)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_3.md)
+- [19. 스프링 MVC 게시판(게시물 수정, 게시물 삭제)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_4.md)
+- [20. 스프링 MVC 게시판(댓글 등록)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_5.md)
+- [21. 스프링 JDBC](https://github.com/namjunemy/TIL/blob/master/Spring/spring_jdbc.md)
+- [22. 트랜잭션1(개념 및 사용 방법)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_1.md)
+- [23. 트랜잭션2(TransactionTemplate, 복수 트랜잭션 처리)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_2.md)
+- [24. 트랜잭션3(트랜잭션 전파 속성)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_3.md)
+- [25. Security1(보안 관련 설정, 라이브러리 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_1.md)
+- [26. Security2(로그인 페이지 생성 및 연동, 기능 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_2.md)
+- [27. Security3(보안 관련 taglibs 사용법)](https://github.com/namjunemy/TIL/blob/master/Spring/security_3.md)
+- [28. Mybatis1(기본 설정)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_1.md)
+- [29. Mybatis2(리스트 출력)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_2.md)
+- [30. Mybatis1(글 작성 및 삭제, 마무리)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_3.md)
+
+### Database
+
+* [database의 본질](https://github.com/namjunemy/TIL/blob/master/Database/Database_Intro_Opentutorials.md)
+* [MySQL 01 - Intro](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_01.md)
+* [MySQL 02 - CRUD](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_02.md)
+* [MySQL 03 - 관계형 데이터베이스의 필요성과 JOIN](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_03.md)
+* [Windows10 환경에서 Mysql-5.7.19 설치 및 세팅 가이드](https://github.com/namjunemy/TIL/blob/master/Database/MySQL-5.7.19_Installation_Guide.md)
+* [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
+* [MySQL CURRENT_TIMESTAMP(vs Oracle SYSDATE)](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_CURRENT_TIMESTAMP.md)
+* [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
+* [MySQL unique index vs index](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_UniqueIndex_Index.md)
+
+### Node.js
+
+* [[Node API 서버] Hello Nodejs](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_hello_node.md)
+* [[Node API 서버] Express basic](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_express_basic.md)
+* [[Node API 서버] NPM](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_npm.md)
+* [[Node API 서버] REST API(첫번째 API 만들기)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_rest_api.md)
+* [[Node API 서버] 테스트 주도 개발(mocha, should, supertest)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_test_driven_development.md)
+* [[Node API 서버] TDD로 하는 API 서버 개발](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_tdd_api_server.md)
+* [[Node API 서버] 코드 리팩토링(라우터, 컨트롤러, 테스트 코드, 테스트 환경 개선)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_code_refactoring.md)
+* [[Node API 서버] ORM DB연동 및 학습 마무리](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_database.md)
+
+### Vue.js
+
+* [Vue를 위한 개발환경 설정](https://github.com/namjunemy/TIL/blob/master/Vue/02_environment_settings.md)
+* [Vue 시작하기](https://github.com/namjunemy/TIL/blob/master/Vue/03_vue_getting_started.md)
+* [Vue Instance, Lifecycle](https://github.com/namjunemy/TIL/blob/master/Vue/04_vue_instance.md)
+* [Vue Components(global, local)](https://github.com/namjunemy/TIL/blob/master/Vue/05_vue_components.md)
+* [Vue Component 통신(props, event bus, v-for)](https://github.com/namjunemy/TIL/blob/master/Vue/06_vue_component_communication.md)
+* [Vue Router(Nested Router, Named View)](https://github.com/namjunemy/TIL/blob/master/Vue/07_vue_router.md)
+* [Vue Resource](https://github.com/namjunemy/TIL/blob/master/Vue/08_vue_resource.md)
+* [Vue Template](https://github.com/namjunemy/TIL/blob/master/Vue/09_vue_template.md)
+* [Vue Data Binding](https://github.com/namjunemy/TIL/blob/master/Vue/10_vue_data_binding.md)
+* [Single File Component(.vue)](https://github.com/namjunemy/TIL/blob/master/Vue/11_single_file_component.md)
+* [Vue CLI를 이용한 프로젝트 구성 방법 + Single File Component](https://github.com/namjunemy/TIL/blob/master/Vue/12_vue_development_workflow.md)
+* [Vue Loader, 전체 내용 정리](https://github.com/namjunemy/TIL/blob/master/Vue/13_vue_loader.md)
+* [Vue.js를 위한 ES6](https://github.com/namjunemy/TIL/blob/master/Vue/es6_for_vuejs.md)
+* [Vuex 개요](https://github.com/namjunemy/TIL/blob/master/Vue/14_vuex_intro.md)
+* [Vuex의 기술 요소](https://github.com/namjunemy/TIL/blob/master/Vue/15_vuex_element.md)
+* [Vuex Helper](https://github.com/namjunemy/TIL/blob/master/Vue/16_vuex_helper.md)
+
+### Git
+
+* [gitignore 파일 생성 및 사용자 규칙 정의](https://github.com/namjunemy/TIL/blob/master/Git/gitignore_file_create_and_customizing.md)
+
 ### JavaScript
 
 * [[INSIDE JavaScript] 01. 자바스크립트 기본 개요](https://github.com/namjunemy/TIL/blob/master/JavaScript/01_js_core_concepts.md)
@@ -129,94 +217,6 @@
 - [8-4. Dynamic Programming 04 - Matrix Chain Multiplication](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_04.md)
 - [8-5. Dynamic Programming 05 - Longest Common Subsequence](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_05.md)
 - [8-6. Dynamic Programming 06 - Knapsack Problem](https://github.com/namjunemy/TIL/blob/master/Algorithm/dynamic_programming_06.md)
-
-### Spring
-
-* [Spring 5 레시피 - 스프링 코어](https://github.com/namjunemy/TIL/blob/master/Spring/spring_5_recipes_2_spring_core.md)
-
-- [스프링 프레임워크 핵심 기술](https://github.com/namjunemy/TIL/blob/master/Spring/spring_framework_core.md)
-- [1. 스프링이란?](https://github.com/namjunemy/TIL/blob/master/Spring/what_is_spring.md)
-- [2. 프로젝트 만들기](https://github.com/namjunemy/TIL/blob/master/Spring/create_spring_project.md)
-- [3,4. Dependency Injection](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection.md)
-- [5. DI 활용](https://github.com/namjunemy/TIL/blob/master/Spring/dependency_injection_uses.md)
-- [6. DI 설정 방법(xml, java)](https://github.com/namjunemy/TIL/blob/master/Spring/how_to_set_up_DI.md)
-- [7. 생명주기와 범위(Life Cycle, Scope)](https://github.com/namjunemy/TIL/blob/master/Spring/lifecycle_and_scope.md)
-- [8. 외부 파일을 이용한 스프링 설정(Environment, Properties, Profile)](https://github.com/namjunemy/TIL/blob/master/Spring/settings_using_external_files.md)
-- [9,10. Spring AOP(Aspect Oriented Programming)](https://github.com/namjunemy/TIL/blob/master/Spring/aspect_oriented_programming.md)
-- [11. Spring MVC basic](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_basic.md)
-- [12. MVC Controller](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_controller.md)
-- [13. MVC Form Data](https://github.com/namjunemy/TIL/blob/master/Spring/mvc_form_data.md)
-- [14. @RequestMapping Parameter](https://github.com/namjunemy/TIL/blob/master/Spring/request_mapping_parameter.md)
-- [15. Form 데이터 값 검증](https://github.com/namjunemy/TIL/blob/master/Spring/form_data_validation.md)
-- [16. 스프링 MVC 게시판1(프로젝트 설계, DB 구축)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_1.md)
-- [17. 스프링 MVC 게시판2(패키지 구성, Controller, list page)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_2.md)
-- [18. 스프링 MVC 게시판3(리스트 조회, 게시물 등록, 상세조회)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_3.md)
-- [19. 스프링 MVC 게시판(게시물 수정, 게시물 삭제)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_4.md)
-- [20. 스프링 MVC 게시판(댓글 등록)](https://github.com/namjunemy/TIL/blob/master/Spring/spring_mvc_board_5.md)
-- [21. 스프링 JDBC](https://github.com/namjunemy/TIL/blob/master/Spring/spring_jdbc.md)
-- [22. 트랜잭션1(개념 및 사용 방법)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_1.md)
-- [23. 트랜잭션2(TransactionTemplate, 복수 트랜잭션 처리)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_2.md)
-- [24. 트랜잭션3(트랜잭션 전파 속성)](https://github.com/namjunemy/TIL/blob/master/Spring/transaction_3.md)
-- [25. Security1(보안 관련 설정, 라이브러리 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_1.md)
-- [26. Security2(로그인 페이지 생성 및 연동, 기능 추가)](https://github.com/namjunemy/TIL/blob/master/Spring/security_2.md)
-- [27. Security3(보안 관련 taglibs 사용법)](https://github.com/namjunemy/TIL/blob/master/Spring/security_3.md)
-- [28. Mybatis1(기본 설정)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_1.md)
-- [29. Mybatis2(리스트 출력)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_2.md)
-- [30. Mybatis1(글 작성 및 삭제, 마무리)](https://github.com/namjunemy/TIL/blob/master/Spring/mybatis_3.md)
-
-### Spring Boot
-
-* [[스프링 부트 개념과 활용] 1. 스프링 부트 시작하기](https://github.com/namjunemy/TIL/blob/master/SpringBoot/01_springboot_intro.md)
-* [[스프링 부트 개념과 활용] 2. 스프링 부트 원리](https://github.com/namjunemy/TIL/blob/master/SpringBoot/02_springboot_principle.md)
-* [[스프링 부트 개념과 활용] 3. 스프링 부트 활용](https://github.com/namjunemy/TIL/blob/master/SpringBoot/03_springboot_utilization.md)
-* [[스프링 부트 개념과 활용] 4. 스프링 MVC](https://github.com/namjunemy/TIL/blob/master/SpringBoot/04_springboot_spring_web_mvc.md)
-* [[스프링 부트 개념과 활용] 5. 스프링 데이터](https://github.com/namjunemy/TIL/blob/master/SpringBoot/05_springboot_spring_data.md)
-
-### Node.js
-
-* [[Node API 서버] Hello Nodejs](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_hello_node.md)
-* [[Node API 서버] Express basic](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_express_basic.md)
-* [[Node API 서버] NPM](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_npm.md)
-* [[Node API 서버] REST API(첫번째 API 만들기)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_rest_api.md)
-* [[Node API 서버] 테스트 주도 개발(mocha, should, supertest)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_test_driven_development.md)
-* [[Node API 서버] TDD로 하는 API 서버 개발](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_tdd_api_server.md)
-* [[Node API 서버] 코드 리팩토링(라우터, 컨트롤러, 테스트 코드, 테스트 환경 개선)](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_code_refactoring.md)
-* [[Node API 서버] ORM DB연동 및 학습 마무리](https://github.com/namjunemy/TIL/blob/master/Node.js/node_api_server_database.md)
-
-### Vue.js
-
-* [Vue를 위한 개발환경 설정](https://github.com/namjunemy/TIL/blob/master/Vue/02_environment_settings.md)
-* [Vue 시작하기](https://github.com/namjunemy/TIL/blob/master/Vue/03_vue_getting_started.md)
-* [Vue Instance, Lifecycle](https://github.com/namjunemy/TIL/blob/master/Vue/04_vue_instance.md)
-* [Vue Components(global, local)](https://github.com/namjunemy/TIL/blob/master/Vue/05_vue_components.md)
-* [Vue Component 통신(props, event bus, v-for)](https://github.com/namjunemy/TIL/blob/master/Vue/06_vue_component_communication.md)
-* [Vue Router(Nested Router, Named View)](https://github.com/namjunemy/TIL/blob/master/Vue/07_vue_router.md)
-* [Vue Resource](https://github.com/namjunemy/TIL/blob/master/Vue/08_vue_resource.md)
-* [Vue Template](https://github.com/namjunemy/TIL/blob/master/Vue/09_vue_template.md)
-* [Vue Data Binding](https://github.com/namjunemy/TIL/blob/master/Vue/10_vue_data_binding.md)
-* [Single File Component(.vue)](https://github.com/namjunemy/TIL/blob/master/Vue/11_single_file_component.md)
-* [Vue CLI를 이용한 프로젝트 구성 방법 + Single File Component](https://github.com/namjunemy/TIL/blob/master/Vue/12_vue_development_workflow.md)
-* [Vue Loader, 전체 내용 정리](https://github.com/namjunemy/TIL/blob/master/Vue/13_vue_loader.md)
-* [Vue.js를 위한 ES6](https://github.com/namjunemy/TIL/blob/master/Vue/es6_for_vuejs.md)
-* [Vuex 개요](https://github.com/namjunemy/TIL/blob/master/Vue/14_vuex_intro.md)
-* [Vuex의 기술 요소](https://github.com/namjunemy/TIL/blob/master/Vue/15_vuex_element.md)
-* [Vuex Helper](https://github.com/namjunemy/TIL/blob/master/Vue/16_vuex_helper.md)
-
-### Git
-
-* [gitignore 파일 생성 및 사용자 규칙 정의](https://github.com/namjunemy/TIL/blob/master/Git/gitignore_file_create_and_customizing.md)
-
-### Database
-
-* [database의 본질](https://github.com/namjunemy/TIL/blob/master/Database/Database_Intro_Opentutorials.md)
-* [MySQL 01 - Intro](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_01.md)
-* [MySQL 02 - CRUD](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_02.md)
-* [MySQL 03 - 관계형 데이터베이스의 필요성과 JOIN](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_03.md)
-* [Windows10 환경에서 Mysql-5.7.19 설치 및 세팅 가이드](https://github.com/namjunemy/TIL/blob/master/Database/MySQL-5.7.19_Installation_Guide.md)
-* [MySQL 사용자 계정 추가/삭제, 권한 제어](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_User_Create_Remove_Grant_Revoke.md)
-* [MySQL CURRENT_TIMESTAMP(vs Oracle SYSDATE)](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_CURRENT_TIMESTAMP.md)
-* [ORACLE_sequence_in_MySQL](https://github.com/namjunemy/TIL/blob/master/Database/ORACLE_sequence_in_MySQL.md)
-* [MySQL unique index vs index](https://github.com/namjunemy/TIL/blob/master/Database/MySQL_UniqueIndex_Index.md)
 
 ### Redis
 
