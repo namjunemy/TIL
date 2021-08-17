@@ -18,7 +18,7 @@
 
 한 계정에서 다른 계정으로 돈을 보내는 Use Case를 구현하려고 한다.
 
-이것을 객체 지향 방식으로 모델링하는 한 가지 방법은 Account에서 돈을 인출하고 대상 계정에 입금할 수 있도록 돈을 인출 및 입금할 수 있는 **Account** 엔터티를 만드는 것입니다.
+이것을 객체 지향 방식으로 모델링하는 한 가지 방법은 Account에서 돈을 인출하고 대상 계정에 입금할 수 있도록 돈을 인출 및 입금할 수 있는 **Account** 엔터티를 만드는 것이다.
 
 ```java
 package buckpal.domain;
@@ -31,12 +31,12 @@ public class Account {
   // constructors and getters omitted
   
   public Money calculateBalance() {
-    return money.add(
-    	  this.baselineBalance,
-        this.activityWindow.calculateBalance(this.id)
+    return money.add(this.baselineBalance,
+                     this.activityWindow.calculateBalance(this.id)
     );
   }
   
+  // 출금
   public boolean withdraw(Money money, AccountId targetAccountId) {
     if (!mayWithdraw(money)) {
       return false;
@@ -55,13 +55,14 @@ public class Account {
     return true;
   }
   
-  privatge boolean mayWithdraw(Money money) {
+  private boolean mayWithdraw(Money money) {
     return money.add(
         this.calculateBalance(),
         money.negate()
     ).isPositive();
   }
   
+  // 입금
   public boolean deposit(Money money, AccountId sourceAccountId) {
     Activity deposit = new Activity(
         this.id,
@@ -104,7 +105,7 @@ Use Case는 incoming adapter에서 입력을 받는다. 이 단계를 'Validate 
 
 마지막 단계는 outgoing 어댑터의 반환값을 출력 객체로 변환하는 것이다.
 
-이러한 단계를 염두에 두고 "송금" Use Case 구현을 살펴보자
+이러한 단계를 염두에 두고 "Send Money" Use Case 구현을 살펴보자
 
 1장. What's Wrong with Layers?에서 논의된 광범위한 서비스의 문제를 피하기 위해 모든 Use Case를 단일 서비스 클래스에 넣는 대신 각 Use Case에 대해 별도의 서비스 클래스를 만든다.
 
@@ -169,7 +170,7 @@ public class SendMoneyCommand {
 }
 ```
 
-송금을 위해서는 소스 및 대상 계정의 ID와 이체할 금액이 필요하다. 어떤 매개변수도 null이 아니어야 하며 금액은 0보다 커야 한다. 이러한 조건 중 하나라도 위반되면 구성 중에 예외를 throw하여 객체 생성을 거부한다.
+송금을 위해서는 원본 및 대상 계정의 ID와 이체할 금액이 필요하다. 어떤 매개변수도 null이 아니어야 하며 금액은 0보다 커야 한다. 이러한 조건 중 하나라도 위반되면 구성 중에 예외를 throw하여 객체 생성을 거부한다.
 
 SendMoneyCommand의 필드를 final로 설정해서 불변으로 만든다. 따라서 성공적으로 구성되면 상태가 유효하고 잘못된 값으로 변경할 수 없음을 확인할 수 있다.
 
@@ -200,7 +201,7 @@ public class SendMoneyCommand extends SelfValidating<SendMoneyCommand> {
     this.targetAccountId = targetAccountId;
     this.money = money;
     requireGreaterThan(money, 0);
-    his.validateSelf();
+    this.validateSelf();
   }
 }
 ```
@@ -248,7 +249,7 @@ new SendMoneyCommandBuilder()
 
 빌더가 유효하지 않은 상태의 객체를 생성할 수 없도록 생성자가 유효성 검사를 수행하도록 할 수 있다.
 
-괜찮을까? SendMoneyCommandBuilder에 다른 필드를 추가해야 할 경우 어떻게 되는지 생각해 보자. 우리는 생성자와 빌더에 새 필드를 추가합니다. 그리고 난 뒤, 동료(또는 전화, 이메일, 나비...)가 우리의 생각을 방해합니다. 휴식 후, 코딩으로 돌아가서 작성자를 호출하는 코드에 새 필드를 추가하는 것을 잊을 수 있다.
+괜찮을까? SendMoneyCommandBuilder에 다른 필드를 추가해야 할 경우 어떻게 되는지 생각해 보자. 우리는 생성자와 빌더에 새 필드를 추가한다. 그리고 난 뒤, 동료(또는 전화, 이메일, 나비...)가 우리의 생각을 방해한다. 휴식 후, 코딩으로 돌아가서 작성자를 호출하는 코드에 새 필드를 추가하는 것을 잊을 수 있다.
 
 잘못된 상태에서 변경할 수 없는 개체를 만들려고 시도하는 것에 대해 컴파일러로부터 경고 메시지를 받지 못했다. 물론, 런타임에(아마도 단위 테스트에서) 매개변수를 놓쳤기 때문에 유효성 검사 로직이 활성화되어 오류가 발생하긴 한다.
 
@@ -265,8 +266,8 @@ new SendMoneyCommandBuilder()
 차이점은 "Update Account Details" Use Case에서는 특정 계정을 업데이트할 수 있도록 계정의 ID가 필요하다는 것이다.  
 그리고 "Register Account" Use Case는 소유자에게 할당할 수 있도록 소유자의 ID가 필요할 수 있다.  
 따라서 두 Use Case 간에 동일한 입력 모델을 공유할 경우  
-"Update Account Details" Use Case에 Null 계정 ID를 전달하고  
- "Register Account" Use Case에 Null 소유자 ID를 전달할 수 있어야 한다.
+"Update Account Details" Use Case에 Null값인 계정 ID를 전달하고  
+ "Register Account" Use Case에 Null값인 소유자 ID를 전달할 수 있어야 한다.
 
 불변 Command 객체에서 필드의 유효한 상태로 **Null을 허용하는 것은 그 자체로 코드 스멜**이다.  
 그러나 중요한 것은 서로 ID가 필요 없기 때문에 등록과 업데이트 Use Case 대한 검증은 서로 달라야 한다.  
@@ -280,10 +281,10 @@ new SendMoneyCommandBuilder()
 **비즈니스 규칙은 애플리케이션의 핵심**이며 적절한 주의를 기울여 처리해야 한다.  
 언제 입력 유효성 검사를 처리하고 언제 비즈니스 규칙 유효성 검사를 처리할까?
 
-둘 사이의 매우 실용적인 차이점은 비즈니스 규칙의 유효성을 검증하려면 도메인 모델의 현재 상태에 대한 액세스가 필요하지만 입력의 유효성은 그렇지 않다는 것이다.  
-입력 유효성 검사는 @NotNull 주석으로 했던 것처럼 선언적으로 구현할 수 있지만 비즈니스 규칙에는 더 많은 컨텍스트가 필요하다.
+**둘 사이의 매우 실용적인 차이점은 비즈니스 규칙의 유효성을 검증하려면 도메인 모델의 현재 상태에 대한 액세스가 필요하지만 입력의 유효성은 그렇지 않다는 것이다.  
+입력 유효성 검사는 @NotNull 주석으로 했던 것처럼 선언적으로 구현할 수 있지만 비즈니스 규칙에는 더 많은 컨텍스트가 필요하다.**
 
-입력 유효성 검사는 구문적 유효성 검사이고 비즈니스 규칙은 Use Case의 맥락에서 의미론적 유효성 검사라고 말할 수도 있다.
+**입력 유효성 검사는 구문적 유효성 검사이고 비즈니스 규칙은 Use Case의 맥락에서 의미론적 유효성 검사라고 말할 수도 있다.**
 
 "원본 계정은 초과 인출되어서는 안 됩니다"라는 규칙을 가정해 보자.  
 위의 정의에 따르면 이것은 원본 및 대상 계정이 존재하는지 여부를 확인하기 위해 모델의 현재 상태에 액세스해야 하기 때문에 비즈니스 규칙이다.
@@ -317,7 +318,7 @@ public class Account {
 
 ```
 
-이렇게 하면 비즈니스 규칙을 쉽게 찾고 추론할 수 있습니다. 이 규칙을 준수해야 하는 비즈니스 로직 바로 옆에 있기 때문이다.
+이렇게 하면 비즈니스 규칙을 쉽게 찾고 추론할 수 있다. 이 규칙을 준수해야 하는 비즈니스 로직 바로 옆에 있기 때문이다.
 
 도메인 엔터티에서 비즈니스 규칙의 유효성을 검사할 수 없는 경우 도메인 엔터티에서 작업을 시작하기 전에 Use Case 코드에서 간단히 수행할 수 있다.
 
