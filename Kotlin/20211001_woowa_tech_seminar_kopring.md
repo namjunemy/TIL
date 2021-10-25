@@ -234,7 +234,81 @@
   }
   ```
 
+## Q&A
+
+- data class가 자동으로 만들어주는 함수들은 lombok과 같은 이슈들은 없을까요?
+  - 있다. 뒤에서 더 자세히 설명한다.
+- IntelliJ에서 JPA 엔티티에 data class를 쓰면 성능상 문제가 있을 수 있다고 경고가 뜨는데, Embedded 클래스에서는 괜찮을까요?
+  - 이 역시 뒤에서 설명한다.
+
+## Spring Boot(with Kotlin)
+
+- 아래의 스프링부트 어플리케이션 코틀린 코드는 문제 없는 코드일까?
+
+  ```kotlin
+  import org.springframework.boot.authconfigure.SpringBootApplication
+  import org.springframework.boot.runApplication
   
+  @SpringBootApplication
+  class Application
+  
+  fun main(agrs: Array<String>) {
+    runApplication<Application>(*args)
+  }
+  ```
+
+- 위의 코틀린 파일을 자바 파일로 변환해보면 final class가 된다.
+
+- IDE에서는 @Configuration 클래스는 final class가 되면 안된다며 에러를 뿜는다.
+
+#### final 클래스
+
+- SpringBootApplication 은 @Configuration을 포함하고 스프링은 기본적으로 CGLIB을 사용하여 @Configuration 클래스에 대한 프록시를 생성한다.
+
+- CGLIB은 대상 클래스는 상속하여 프록시를 만든다.
+
+  - final 클래스와 함수는 상속하거나 오버라이드 할 수 없으므로 프록시를 만들 수 없다.
+
+- 상속을 허용하고 오버라이드를 허용하려면 **open 변경자를 추가**해야 한다.
+
+- 스프링 프레임워크 5.2부터 @Configuration의 proxyBeanMethod 옵션을 사용하여 프록시 생성을 비활성화 할 수 있다.
+
+- 아래와 같이 open 변경자를 추가해서 어플리케이션을 띄웠다.
+
+  ```kotlin
+  @SpringBootApplication
+  open class Application
+  ```
+
+- 근데, 우리가 자주 사용하는 @Service, @Controller, @Transactional, @Async, @Cacheable 등의 어노테이션을 붙여서 개발을 한다면 또 final class를 에러를 만나게 될 것이다.
+  - 그러면 위와 같이 CGLIB 프록시가 생성하는 모든 클래스에 open을 붙어줘야할까?
+  - 그러면 코틀린의 매력이 떨어지지 않을까?
+  - 그래서 코틀린에서 컴파일러 플러그인을 제공한다.
+
+#### All-open 컴파일러 플러그인
+
+- 코틀린은 다양한 컴파일러 플러그인을 제공하며 all-open 컴파일러 플러그인은 지정한 어노테이션이 있는 클래스와 모든 멤버에 open 변경자를 추가한다.
+
+- 스프링을 사용하는 경우 all-open 컴파일러 플러그인을 래핑한 kotlin-spring 컴파일러 플러그인을 사용할 수 있다.
+
+- @Component, @Transactional, @Async 등(= 프록시가 필요한 환경) 이 기본적으로 지정된다.
+
+- IntelliJ IDEA에서는 File > Project Structure > Project Settings > Modules > Kotlin > Compiler Plugins에서 **지정된 애너테이션을 확인**할 수 있다.
+
+  ```groovy
+  // Gradle gile
+  plugins {
+    kotlin("plugin.spring") version "1.5.21"
+  }
+  
+  allOpen {
+    annotation("com.my.Annotation")
+  }
+  ```
+
+  
+
+
 
 
 
