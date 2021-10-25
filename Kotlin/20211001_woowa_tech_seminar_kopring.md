@@ -306,7 +306,144 @@
   }
   ```
 
+## 아이템 4. 필드 주입이 필요하면 지연 초기화를 사용 하라
+
+- 생성자를 통해 의존성을 주입하는 것이 가장 좋지만 떄로는 필드를 통해 주입해야 하는 경우도 있다.
+
+- 뒷받침하는 필드(backing field)가 존재하는 프로퍼티는 인스턴스화가 될 때 초기화 되어야 한다. 값이 무조건 있어야 된다는 의미이다.
+
+  - 프로퍼티 = getter, setter, field
+
+- 의존성이 주입될 필드를 널로 초기화할 수 있지만, 널이 될 수 있는 타입은 많은 불편을 초래한다.(뒤에서 부가 설명)
+
+  - null 관련 연산자. null check 등
+
+- 코틀린에서는 lateinit 변경자를 붙이면 프로퍼티를 나중에 초기화할 수 있다. 언어 차원에서 지연 초기화를 지원한다.
+
+- 나중에 초기화하는 프로퍼티는 항상 var여야 한다.
+
+  ```kotlin
+  @Autowired
+  private lateinit var objectMapper: ObjectMapper
+  ```
+
+#### 잭슨 코틀린 모듈
+
+- 잭슨은 기본적으로 역직렬화 과정을 위해 매개변수가 없는 생성자가 필요하다.
+
+- 코틀린에서 매개변수가 없는 생성자를 만들려면 생성자의 모든 매개변수에 기본 인자를 넣어야 한다.
+
+- **잭슨 코틀린 모듈은 매개변수가 없는 생성자가 없더라도 직렬화와 역직렬화를 지원한다.**
+
+  - 잭슨 코틀린 모듈은 스프링 이니셜라이저로 생성된 프로젝트에 기본적으로 포함되어 있다.
+
+- ObjectMapper를 주입받아서 사용하면 코틀린 모듈이 포함되어 있지만, 
+
+- 테스트 코드 등에서 ObjectMapper를 직접 만들어서 사용하면 코틀린 모듈이 포함되어 있지 않다.
+
+  - 아래와 같이 jacksonObjectMapper() 를 사용하거나
+  - ObjectMapper()를 만들고 registerKotlinModule()로 등록해주고 사용해야 한다.
+
+  ```kotlin
+  val mapper1 = jacksonObjectMapper()
+  val mapper2 = ObjectMapper().registerKotlinModule()
+  ```
+
+  ```groovy
+  dependencies {
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+  }
+  ```
+
+- 스프링에서는 **KotlinDetector** 를 사용하여로 코틀린 사용 여부를 판단하여 코틀린 모듈 추가 여부를 결정한다.
+
+#### 코틀린 애너테이션
+
+- 아래의 코틀린 코드에서 amount라는 프로퍼티는
+- **field 이면서 getter, setter, 생성자 parameter 4가지 역할**을 한다.
+- 프로퍼티에 @JsonProperty 를 붙이게되면 기본적으로 필드로 인식하기 때문에, 생성자나 getter로 이 어노테이션을 동작시키고 싶을때 의도와 다르게 동작할 수 있다. 주의하자.
+- 이런 경우 아래와같이 어노테이션 앞에 param이나 get을 추가로 정의한다.
+- 내가 사용하는 라이브러리에 따라서 필드기반, getter기반으로 동작하도록 설정할 수 있다.
+
+```kotlin
+data class CancelRequest(
+ 
+  @param:JsonProperty("imp_uid")
+  @get:JsonProperty("imp_uid")
+  val impUid: String,
   
+  @param:JsonProperty("merchant_uid")
+  @get:JsonProperty("merchant_uid")
+  val merchantUid: String,
+  val amount: Long,
+  val checksum: Long,
+  val reason: String?
+) {
+  constructor(agencyUsageId: String, refund: Refund) : this(
+    agencyUsageId,
+    refund.paymentId,
+    refund.amount,
+    refund.checksum,
+    refund.reason
+  )
+}
+```
+
+## 아이템 5. 변경 가능성을 제한하라
+
+- 코틀린 클래스와 멤버가 final인 것처럼 일단 val로 선언하고 필요할 때 var로 변경한다.
+
+- 스프링 부트 2.2부터  스프링 프로퍼티 클래스에서 생성자 바인딩을 사용할 수 있다.
+
+  - https://www.baeldung.com/configuration-properties-in-spring-boot
+
+- 생성자 바인딩을 사용하려면 @EnableConfigurationProperties 또는 **@ConfigurationPropertiesScan**을 사용하면 된다.
+
+  - @Configuration 선언하지 않아도 됨.(java에서도 동일)
+  - 코틀린을 코틀린 답게 사용하기 위해서 많은 기존의 자바 라이브러리들이 도움을 주고 있다!
+
+  ```kotlin
+  @ConfigurationProperties("application")
+  @ConstructorBinding
+  data class ApplicationProperties(val url: String)
+  
+  @ConfigurationPropertiesScan
+  @SpringBootApplication
+  class Application
+  ```
+
+- 클래스에 개념적으로 동일하지만 하나는 공개된 API의 일부이고 다른 하나는 구현 세부 사항인 두 개의 프로퍼티가 있는 경우 private 프로퍼티 이름의 접두사로 밑줄을 사용한다. 
+
+  - 그리고 이를 **뒷받침하는 프로퍼티(backing property)라고 한다.**
+
+- JVM에서는 기본 getter 및 setter가 있는 private 프로퍼티에 대해 함수 호출 오버헤드를 방지하도록 최적화되어 있다.
+
+  - getter를 두번 호출하거나 하지 않는다.
+
+- 아래에 코드에서 students는 immutable하고, private한 _student는 mutable 하다.
+
+  ```kotlin
+  @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE], orphanRemoval = true)
+  @JoinColumn(name = "session_id", nullable = false)
+  private val _students: MutableSet<Student> = students.toMutableSet()
+  val students: Set<Student>
+      get() = _students
+  ```
+
+- 위의 코드에서 students는 프로퍼티지만 실제로 backing field가 생성되지 않는다.(뒷받침하는 필드. Backing field)
+  - custom한 getter를 만들어 놓았기 때문에 실제로 backing field가 생기지 않는다.
+  - 오히려 _students에 대해 필드가 생기고, JPA에서는 이 필드를 영속화 한다.
+  - 뒤에 JPA 이야기에서 자세히 다룬다.
+
+
+
+
+
+
+
+
 
 
 
