@@ -4,7 +4,7 @@
 >
 > 2022.01.13 ~ 
 
-## 코틀린 Basic
+## 2. 코틀린 Basic
 
 ### 2.1 코틀린에서 널 허용 타입 사용하기
 
@@ -150,9 +150,161 @@
   assertThat(p1, `is`(equalTo(p2)))
   ```
 
+## 3. 코틀린 객체 지향 프로그래밍
 
+- 코틀린의 OOP 특성 중 시간을 들여 살펴볼 가치가 있는 내용을 3장에서 살펴본다.
+- 객체 초기화, getter와 setter, late initialization, lazy initialization, 싱글톤 생성, Nothing 클래스 이해하기
 
+### 3.1 const와 val의 차이 이해하기
 
+- 런타임 보다는 컴파일 타임에 변수가 상수임을 나타내야 한다.
+  - 컴파일 타임에 상수에 const 변경자를 사용한다.
+  - val 키워드는 변수에 한 번 할당되면 변경이 불가능함을 나타내지만 이러한 할당은 실행 시간에 일어난다.
+- 코틀린 키워드 val은 값이 변경 불가능한 변수임을 나타낸다.
+  - 자바에서 final 키뤄드가 같은 목적으로 사용된다.
+  - 코틀린에서 const 변경자도 지원하는 이유는 무엇일까?
+  - 컴파일 타임 상수는 반드시 객체나 동반 객체(companion object ) 선언의 최상위 속성 또는 멤버여야 한다.
+  - 컴파일 타임 상수는 문자열 또는 기본 타입의 래퍼 클래스이며, getter를 가질 수 없다.
+  - 컴파일 시점에 값을 사용할 수 있도록 main 함수를 퐇마한 모든 함수의 바깥쪽에서 할당돼야 한다.
+- 코틀린에서 **val은 키워드**지만 **const는 private, inline 등과 같은 변경자**임에 유의하자
+  - **그런 이유로 const가 val 키워드를 대체하는 것이 아니라 반드시 같이 쓰여야 한다.**
 
+### 3.2 사용자 정의 획득자와 설정자 생성하기
 
+- 값을 할당하거나 리턴하는 방법을 사용자 정의하고 싶다
+
+  - 코틀린 클래스의 속성에 get과 set 함수를 추가한다.
+
+- 코틀린은 특이하게도 모든 것이 기본적으로 public이다.
+
+- **코틀린 클래스에서 필드는 직접 선언할 수 없다.**
+
+  - 아래 Task 클래스에서는 필드처럼 보이는 속성을 정의한 것이다.
+
+- 여러번 읽다 정리해본다 천천히 따라가보자.
+
+- 아래의 Task 클래스는 name과 priority라는 두 가지 속성을 정의한다.
+
+  ```kotlin
+  class Task(val name: String) {
+    val priority = 3
+    // ...
+  }
+  ```
+
+  - 속성 하나는 주 생성자 안에, 하나는 클래스의 최상위 멤버로 선언되었다
+
+  - 이 방식으로 priority를 선언할 때의 단점은 apply 블록을 사용해서 priority에 값을 할당할 수 있지만, 클래스를 인스턴스화할 때 priority에 값을 할당할 수 없다는 것이다.
+
+    ```kotlin
+    var myTask = Tash().apply { priority = 4 }
+    ```
+
+  - 이 방식으로 속성을 정의하면 장점은 쉽게 사용자 정의 획득자와 설정자를 추가할 수 있다는 것이다.
+
+  - 속성 초기화 블록, 획득자, 설정자는 선택사항이다.
+
+  - 속성 타입이 초기값 또는 획득자의 리턴타입에서 추론 가능하다면 속성 타입 또한 선택사항이다.
+
+  - 하지만, 생성자에 선언한 속성에서는 타입 선언이 필수다.
+
+  - isLowPriority를 계산하는 사용자 정의 획득자를 보자
+
+    ```kotlin
+    val isLowPriority
+      get() = priority < 3
+    ```
+
+  - 설명한대로 isLowPriority의 타입은 get() 함수의 리턴 타입으로부터 추론되며, 불리언 타입이다.
+
+  - 사용자 정의 설정자는 속성에 값을 할당할 때마다 사용된다.
+
+  - Priority 값이 반드시 1과 5사이의 값이 되게 하려면 아래와 같이 사용자 정의 획득자를 사용한다
+
+    ```kotlin
+    var priority = 3
+      set(value) {
+        field = value.coerceIn(1..5)
+      }
+    ```
+
+  - 비로소 public 속성 / private 필드 딜레마의 해법을 살펴봤다.
+
+  - **일반적으로 속성에는 지원필드(backing field)가 필요하지만 코틀린은 자동으로 지원 필드를 생성한다.**
+
+  - 사용자 정의 획득자에서는 **field** 식별자가 코틀린이 생성한 지원 필드를 참조하는 데 사용됐다.
+
+  - field 식별자는 오직 사용자 정의 획득자나 설정자에서만 사용할 수 있다.
+
+  - 속성에서 코틀린이 생성하는 기본 획득자 또는 설정자를 사용하거나 사용자 정의 획득자 또는 설정자에서 field 속성을 통해 지원 필드를 참조하는 경우에는 코틀린이 지원 필드를 생성한다. 이는 위에 정의한 파생 속성 isLowPriority에는 지원 필드가 없다는 뜻이다.
+
+  - 이 예제를 완성하기 위해 생성자를 통해 우선순위를 할당하고 싶다고 가정하자.
+
+  - 이를 수행하는 한 가지 방법은 var 또는 val 키워드를 생략함으로써 속성이 아닌 생성자 파라미터를 사용하는 것이다.
+
+    ```kotlin
+    class Task(val name: String, _priority: Int = DEFAULT_PRIORITY) {
+      companion object {
+        const val MIN = 1
+        const val MAX = 5
+        const val DEFAULT = 3
+      }
+      
+      var priority = validPriority(_priority)
+        set(value) {
+          field = validPriority(value)
+        }
+      
+      private fun validPriority(p: Int) = p.coerceIn(Min, MAX)
+    }
+    ```
+
+  - 파라미터 _priority는 속성이 아니라 생성자의 인자일 뿐이다.
+
+  - 이 인자는 실제 priority 속성을 초기화하는데 사용되고 사용자 정의 설정자는 우선순위 값을 원하는 범위로 강제하기 위해서 그 값이 변경될 때마다 실행된다.
+
+  - 사용자 정의 설정자에서 value는 임의의 명칭임을 유의하자.
+
+  - 다른 함수 파라미터처럼 원하는 이름으로 바꿀 수 있다.
+
+### 3.3 데이터 클래스 정의하기
+
+- Equals, hashCode, toString 등이 완벽하게 갖춰진 엔티티를 나타내는 클래스를 생성하고 싶다.
+
+  - 클래스를 정의할 때 data 키워드를 사용한다.
+
+- 코틀린은 데이터를 담는 특정 클래스의 용도를 나타내기 위해서 data 키워드를 제공한다.
+
+- 클래스 정의에 data를 추가하면 코틀린 컴파일러는 일관된 equals와 hashCode gkatn, 클래스와 속성 값을 보여주는 toString 함수, copy 함수와 구조분해를 위한 component 함수 등 일련의 함수를 생성한다.
+
+- 코틀린 컴파일러는 주 생성자에 선언된 속성을 바탕으로 equals와 hashCode 함수를 생성한다. 
+
+- data 클래스의 copy는 깊은 복사가 아니라 얕은 복사를 수행한다는 점에 유의하자
+
+  - 두개의 OrderItem은 같은 Product를 공유하고 있다.
+
+  ```kotlin
+  //class
+  data class OrderItem(val product: Product, val quantity: Int)
+  
+  //test
+  @Test
+  fun `data copy function is shallow`() {
+    val item1 = OrderItem(Product("baseball", 10.0), 5)
+    val item2 = item1.copy()
+    
+    assertAll(
+      {assertTrue(item1 == item2)},
+      {assertFalse(item1 === item2)},
+      {assertTrue(item1.product == item2.product)},
+      {assertTrue(item1.product === item2.product)}
+    )
+  }
+  ```
+
+  
+
+  
+
+  
 
