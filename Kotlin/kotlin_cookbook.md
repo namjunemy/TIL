@@ -302,9 +302,200 @@
   }
   ```
 
-  
+### 3.4 지원 속성 기법
 
-  
+- 클래스의 속성을 클라이언트에게 노출하고 싶지만 해당 속성을 초기화하거나 읽는 방법을 제어해야 한다
 
-  
+  - 같은 타입의 속성을 하나 더 정의하고 사용자 정의 획득자와 설정자를 이용해 원하는 속성에 접근한다
+
+- Customer 클래스가 있고 고객 메세지 목록 또는 고객에 관련된 메모를 보고싶다고 가정하자
+
+  - 고객 인스턴스를 생성할 때마다 모든 메세지를 불러올 필요는 없지만 예제는 작성해보자
+
+    ```kotlin
+    class Customer(val name: String) {
+      private val _messages: List<String>? = null // 널 허용 private 속성 초기화
+      
+      val messages: List<String>  // 불러올 속성
+        get() {										// private 함수
+          if (_messages == null) {
+            _messages = loadMessage()
+          }
+          return _messages!!
+        }
+      
+      private fun loadMessges(): MutableList<String> =
+        mutableListOf(
+          "Initial contact",
+          "Convinced them to use Kotlin",
+          "Sold training class. Sweet."
+        ).also { println("Loaded messages") }
+    }
+    ```
+
+- 고객 메시지에 접근하기
+
+  ```kotlin
+  @Test
+  fun `void messages`() {
+    val customer = Customer("Fred").apply { messages }  // messages 처음 로딩
+    assertEquals(3, customer.messages.size)							// messages에 다시 접근, 로딩됨
+  }
+  ```
+  - _messages는 private이기 때문에 생성자 속성을 사용해서 messages를 불러올 수 없다
+  - 위와 같이 messages를 바로 불러오려면 apply 함수를 사용한다
+  - apply 블록에서 messages 호출은 messages를 불러오고 로딩 완료 정보를 출력하는 getter를 호출한다
+  - 두 번째로 messages 속성에 접근할 때 messages는 로딩됐기 때문에 로딩 완료 정보 메세지를 출력하지 않는다
+  - 위의 예제는 설명에 유용하지만 지연 로딩(**lazy loading**)을 어렵게 구현한 것이다.
+
+- 아래와 같이 코틀린 내장 lazy 대리자 함수를 사용하면 더 쉬운 방법으로 코드를 구현할 수 있다.
+
+  ```kotlin
+  class Customer(val name: String) {
+    val messages: List<String> by lazy { loadMessages() }
+    
+    private fun loadMessages(): MutableList<String> =
+      mutableListOf(
+        "Initial contact",
+        "Convinced them to use Kotlin",
+        "Sold training class. Sweet."
+      ).also { println("Loaded messages") }
+  }
+  ```
+
+- 하지만, 속성 초기화를 강제하기 위한 private 지원 필드(backing field)의 사용은 유용한 방법이다.
+
+  - _priority 속성은 실제 클래스 속성이 아니라 오직 생성자 인자임을 나타내는 val로 명시되지 않았음에 유의하자
+
+  - 제어하고 싶은 priority 속성은 생성자 인자를 바탕으로 해당 속성 값을 할당하는 사용자 정의 설정자를 가진다
+
+  - 지원 속성(Backing property) 기법은 코틀린 클래스에서 자주 볼 수 있으므로 동작 방식을 알아 두는 것이 좋다
+
+    ```kotlin
+    class Task(val name: String, _priority: Int = DEFAULT_PRIORITY) {
+      companion object {
+        const val MIN = 1
+        const val MAX = 5
+        const val DEFAULT = 3
+      }
+      
+      var priority = validPriority(_priority)
+        set(value) {
+          field = validPriority(value)
+        }
+      
+      private fun validPriority(p: Int) = p.coerceIn(Min, MAX)
+    }
+    ```
+
+### 3.5 연산자 중복
+
+- 라이브러리에 정의된 클래스와 더불어 +, * 와 같은 연산자를 사용할 수 있는 클라이언트를 만들고 싶다
+  - 코틀린의 연산자 중복(overloading) 메커니즘을 사용해서 +, * 등의 연산자와 연관된 함수를 구현 한다.
+
+### 3.6 나중 초기화를 위해 lateinit 사용하기
+
+- 생성자에 속성 초기화를 위한 정보가 충분하지 않으면 해당 속성을 널 비허용 속성으로 만들고 싶다
+
+  - 속성에 lateinit 변경자를 사용한다.
+  - lateinit은 꼭 필요한 경우만 사용하자. 이 장에서 설명하는 의존성 주입의 경우 유용하지만 일반적으로 가능하다면 lazy 같은 대안을 먼저 고려하자
+
+- 널 비허용으로 선언된 클래스 속성은 생성자에서 초기화되어야 한다
+
+  - 스프링 프레임워크나 유닛테스트의 설정 메소드 안에서 속성에 할당할 값의 정보가 충분하지 않은 경우가 있다
+
+  - 예를 들어 스프링은 애플리케이션 컨텍스트로 부터 의존성에 값을 할당하기 위해 @Autowired를 사용한다. 값은 인스턴스가 이미 생성된 후에 설정되므로 해당 값을 lateinit으로 표기해야 한다.
+
+    ```kotlin
+    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+    class OfficerControllerTests {
+      @Autowired
+      lateinit var client: WebTestClient // 오토와이어링에 의한 초기화
+      
+      @Autowired
+      lateinit var repository: OfficerRepository
+      
+      @Before
+      fun setUp() {
+        repository.addTestData() // setUp 함수에서 repository 사용
+      }
+      
+      @Test
+      fun `GET to route returns all officers in db`() {
+        client.get().uri("/route") // 테스트에서 client 사용
+          ...
+      } 
+    }
+    ```
+
+- lateinit 변경자는 클래스 몸체에서맘 선언되고 사용자 정의 획득자와 설정자가 없는 var 속성에서만 사용할 수 있다
+
+- 코틀린 1.2부터 최상위 속성과 지역 변수에서도 lateinit을 사용 가능하다
+
+- lateinit을 사용할 수 있는 속성 타입은 널 할당이 불가능한 타입이어야 하며 기본 타입에는 lateinit을 사용할 수 없다
+
+- lateinit을 추가하면 해당 변수가 처음 사용되기 전에 초기화 할 수 있다.
+
+- 초기화 하기 전에 실패하면 UninitializedPropertyAccessException 을 던진다
+
+- 속성 레퍼런스의 isInitialized를 사용해서 해당 속성의 초기화 여부를 확인할 수 있다.
+
+- **lateinit과 lazy의 차이**
+
+  - lateinit은 위의 제약사항과 함께 var 속성에 사용된다. Lazy 대리자는 속성에 처음 접근할 때 평가되는 람다를 받는다.
+  - 초기화 비용이 높은데 lazy를 사용한다면 초기화는 반드시 실패한다
+  - lazy는 val 속성에 사용할 수 있는 반면 lateinit은 var 속성에만 적용할 수 있다
+  - lateinit 속성은 속성에 접근할 수 있는 모든 곳에서 초기화할 수 있기 때문에 앞의 예제에서처럼 객체 바깥에서도 초기화할 수 있다.
+
+### 3.7 equals 재정의를 위해 안전 타입 변환, 레퍼런스 동등, 엘비스 사용하기
+
+- 논리적으로 동등한 인스턴스인지를 확인하도록 클래스의 equals 메소드를 잘 구현하고 싶다.
+  - 레퍼런스 동등 연산자(===), 안전 타입 변환 함수(as?), 엘비스 연산자(?:)를 다 같이 사용한다.
+- 모든 객체자향 언어는 객체 동일(equivalence)과 객체 동등(equality) 개념이 있다.
+  - 자바에서는 두개의 등호연산자(==)가 서로 다른 레퍼런스에 같은 객체가 할당 됐는지 확인하는데 사용된다.
+  - 반면에 Object 클래스 일부인 equals 메소드는 재정의되어 두 객체의 동등 여부를 확인하기 위해 사용된다.
+  - **코틀린에서 == 연산자는 자동으로 equals 함수를 호출한다.**
+- 코틀린의 여러 가지 장점을 가지고 있는 간단하고 우아한 equals 구현에 주목하자
+  - 먼저 ===으로 레퍼런스 동등성을 확인
+  - 그다음 인자를 원하는 탑으로 변환하거나 널을 리턴하는 안전 타입 변환 연산자 as?를 사용
+  - 안전 타입 변환 연산자가 널을 리턴하면 같은 클래스의 인스턴스가 아니브로 동등일 수 없기 때문에 엘비스 연산자 ?:는 false를 리턴
+  - 마지막으로 equals 함수의 마지막 줄은 현재 인스턴스의 version 속성이 other 객체의 version 속성과 동등 여부를 검사해 결과를 리턴
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
