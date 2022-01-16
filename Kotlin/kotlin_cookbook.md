@@ -540,13 +540,80 @@
     val x = null
     ```
 
-    
+## 4. 함수형 프로그래밍
 
-    
+- 함수형 프로그래밍 이라는 용어는 불변성(immutability)을 선호하고
+- 순수 함수를 사용하는 경우에 동시성을 쉽게 구현할 수 있으며
+- 반복보다는 변형(transformation)을 사용하고
+- 조건문 보다는 필터를 사용하는 코딩 스타일을 지칭한다
+- 5,6,13장과 같은 레시피에 등장하는 map과 filter 같은 함수형 프로그래밍에 사용되는 여러 코틀린 함수를 설명한다.
+- 자바와 대조적으로 독특한 꼬리 재귀나 다소 다르게 구현된 fold 또는 reduce 같은 코틀린 함수를 알아본다
 
-    
+### 4.1 알고리즘에서 fold 사용하기
 
-    
+- 반복 알고리즘을 함수형 방식으로 구현하고 싶다
+
+  - fold 함수를 사용해 시퀀스나 컬렉션을 하나의 값으로 축약(reduce) 시킨다
+
+- fold 함수의 문법
+
+  - fold는 2개의 인자를 받는다
+  - 첫번째는 누적자의 초기값
+  - 두번째는 두개의 인자를 받아 누적자를 위해 새로운 값을 리턴하는 함수다.
+
+  ```kotlin
+  inline fun <R> Iterable<T>.fold(
+    initlal: R,
+    operation: (acc: R, T) -> R
+  ): R
+  ```
+
+- fold를 사용해서 정수의 합 계산하기
+
+  ```kotlin
+  fun sum(vararg nums: Int) = nums.fold(0) { acc, n -> acc + n}
+  ```
+
+### 4.2 reduce 함수를 사용해 축약하기
+
+- 비어있지 않은 컬렉션의 값을 축약하고 싶지만, 누적자의 초기값을 설정하고 싶지 않다
+
+  - fold 대신 reduce 연산을 사용한다
+
+- reduce 함수의 시그니처
+
+  ```kotlin
+  inline fun <S, T : S> Iterable<T>.reduce(
+    operation: (acc: S, T) -> S
+  )
+  ```
+
+- reduce 함수의 구현은
+
+  - 비어있는 컬렉션은 예외를 발생시키고
+  - 누적자는 컬렉션의 첫 번째 원소로 초기화 된다.
+
+- reduce를 이용한 합의 구현
+
+  ```kotlin
+  fun sumReduce(vararg nums: Int) = nums.reduce { acc, i -> acc + i}
+  ```
+
+- 자바의 reduce -> 코틀린 fold or reduce. 사용할 때 잘 선택해야 한다.
+
+### 4.3 꼬리 재귀 적용하기
+
+- 재귀 프로세스를 실행하는 데 필요한 메모리를 최소화하고 싶다.
+  - 꼬리 재귀(tail recursion)를 사용해 프로세스 알고리즘을 표현하고 해당 함수에 tailrec 키워드를 추가한다.
+- 필요할 때 학습하자.
+
+
+
+
+
+
+
+
 
 
 
