@@ -450,18 +450,103 @@
 ### 3.7 equals 재정의를 위해 안전 타입 변환, 레퍼런스 동등, 엘비스 사용하기
 
 - 논리적으로 동등한 인스턴스인지를 확인하도록 클래스의 equals 메소드를 잘 구현하고 싶다.
+
   - 레퍼런스 동등 연산자(===), 안전 타입 변환 함수(as?), 엘비스 연산자(?:)를 다 같이 사용한다.
+
 - 모든 객체자향 언어는 객체 동일(equivalence)과 객체 동등(equality) 개념이 있다.
+
   - 자바에서는 두개의 등호연산자(==)가 서로 다른 레퍼런스에 같은 객체가 할당 됐는지 확인하는데 사용된다.
   - 반면에 Object 클래스 일부인 equals 메소드는 재정의되어 두 객체의 동등 여부를 확인하기 위해 사용된다.
   - **코틀린에서 == 연산자는 자동으로 equals 함수를 호출한다.**
+
 - 코틀린의 여러 가지 장점을 가지고 있는 간단하고 우아한 equals 구현에 주목하자
+
   - 먼저 ===으로 레퍼런스 동등성을 확인
   - 그다음 인자를 원하는 탑으로 변환하거나 널을 리턴하는 안전 타입 변환 연산자 as?를 사용
   - 안전 타입 변환 연산자가 널을 리턴하면 같은 클래스의 인스턴스가 아니브로 동등일 수 없기 때문에 엘비스 연산자 ?:는 false를 리턴
   - 마지막으로 equals 함수의 마지막 줄은 현재 인스턴스의 version 속성이 other 객체의 version 속성과 동등 여부를 검사해 결과를 리턴
 
+- hasCode의 구현은 간단하다
 
+  ```kotlin
+  class Customer(val name: String) {
+    override fun equals(other: Any?) Boolean {
+      if (this === other) return true
+      val otherCustomer = (other as? Customer) ?: return false
+      return this.name == otherCustomer.name
+    }
+    
+    override fun hasnCode() = name.hashCode()
+  }
+  ```
+
+### 3.8 싱글톤 생성하기
+
+- 클래스 하나당 인스턴스는 딱 하나만 존재하게 만들고 싶다
+
+  - class 대신 object 키워드를 사용한다
+
+- 코틀린에서 싱글톤 구현은 class 대신 object 키워드를 사용하기만 하면 된다
+
+  - 이를 객체 선언(object declaration)이라고 한다.
+
+  ```kotlin
+  object MySingleton {
+    val myProperty = 3
+    
+    fun myFunction() = "Hello"
+  }
+  ```
+
+  - 코틀린에서 싱글톤 멤버에 접근하기
+
+    ```kotlin
+    MySingleton.myFunction()
+    MySingleton.myProperty
+    ```
+
+  - 자바에서 코틀린 싱글톤 멤버에 접근하기
+
+    ```kotlin
+    MySingleton.INSTANCE.myFunction();
+    MySingleton.INSTANCE.getMyProperty();
+    ```
+
+### 3.9 Nothing에 관한 야단법석
+
+- Nothing 클래스를 사용법에 맞게 적절하게 사용하고 싶다.
+
+  - 절대 리턴하지 않는 함수에 Nothing을 사용한다.
+
+- Nothing은 클래스 안에서도 인스턴스화하지 않는다. 따라서 Nothing의 인스턴스는 존재하지 않는다.
+
+  ```kotlin
+  package kotlin
+  
+  public class Nothing private constructor()
+  ```
+
+- 결코 존재할 수 없는 값을 나타내기 위해 Nothing을 사용할 수 있다.
+
+  - 리턴 없이 예외 던지는 함수의 리턴 타입에 Nothing을 사용한다.
+
+    ```kotlin
+    fun doNothing(): Nothing = throw Exception("Nothing at all")
+    ```
+
+  - 구체적인 타입 없이 변수에 널 할당하는 경우 컴파일러가 추론하는 변수의 타입은 Nothing?이다.
+
+    ```kotlin
+    val x = null
+    ```
+
+    
+
+    
+
+    
+
+    
 
 
 
