@@ -342,6 +342,7 @@
     assertEquals(3, customer.messages.size)							// messages에 다시 접근, 로딩됨
   }
   ```
+
   - _messages는 private이기 때문에 생성자 속성을 사용해서 messages를 불러올 수 없다
   - 위와 같이 messages를 바로 불러오려면 apply 함수를 사용한다
   - apply 블록에서 messages 호출은 messages를 불러오고 로딩 완료 정보를 출력하는 getter를 호출한다
@@ -607,11 +608,384 @@
   - 꼬리 재귀(tail recursion)를 사용해 프로세스 알고리즘을 표현하고 해당 함수에 tailrec 키워드를 추가한다.
 - 필요할 때 학습하자.
 
+## 5. 컬렉션
 
+- 코틀린은 자바처럼 다수의 객체를 담기 웨해 타입을 명시한 컬렉션을 사용한다
+- 하지만 코틀린은 자바와는 다르게 중개자의 역할을 하는 스트림을 거치지 않고 여러가지 흥미로운 메소드를 컬렉션 클래스에 직접 추가 한다.
 
+### 5.1 배열 다루기
 
+- arrayOf 함수를 이용해 배열을 만들고 Array 클래스에 들어 있는 속성과 메소드를 이용해 배열에 들어 있는 값을 다룬다
 
+- arrayOf라는 이름의 간단한 팩토리 메소드를 제공한다.
 
+- 배열에 접근할 때 사용하는 문법은 자바와 똑같지만, 코틀린에서 Array는 클래스다.
+
+  ```kotlin
+  val strings = arrayOf("this", "is", "an", "array", "of", "strings")
+  ```
+
+- 널로만 채워진 배열을 생성할 수 있다.
+
+  - 하지만, 컴파일러는 개발자가 어떤 타입의 레퍼런스를 배열에 추가하려는지 알아야 하기 때문에 특정 타입을 선택해야 한다.
+
+  - emptyArray 팩토리 메소드도 동일한 벙법으로 동작한다.
+
+    ```kotlin
+    val nullStringArray = arrayOfNulls<String>(5)
+    ```
+
+- Array 클래스에는 public 생성자가 하나만 있다. 생성자는 두 인자를 받는다
+
+  - Int 타입의 size
+  - init, 즉 (Int) -> T 타입의 람다
+
+- Array 클래스 생성자의 두 번째 인자인 람다는 배열을 생설할 때 인덱스마다 호출된다.
+
+  ```kotlin
+  val squares = Array(5) { i -> (i * i).toString() }
+  // 결과는 {"0", "1", "4", "9", "16"}
+  ```
+
+- 접근시 squares[1] 처럼 대괄호를 사용해 접근할 때 호출되는 public 연산자 메소드 get과 set이 정의 되어 있다.
+
+- 코틀린에는 오토박싱과 언박싱 비용을 방지할 수 있는 기본 타입을 나타내는 클래스가 있다.
+
+  - booleanArrayOf, byteArrayOf, shortArrayOf, charArrayOf, intArrayOf, longArrayOf, floatArrayOf, doubleArrayOf 함수는 예상하는 것 처럼 연관된 타입 배열을 생성한다.
+
+- 코틀린에는 명시적인 기본 타입은 없지만, 감ㅅ이 널 허용인 경우 Integer와 Double 같은 자바 래퍼 클래스를 사용하고,
+
+- 널 비허용 값인 경우는 int와 double 같은 기본 타입을 사용한다.
+
+- Array의 **indices 속성**을 사용하면 인덱스 값을 알 수 있다.
+
+  ```kotlin
+  val strings = arrayOf("this", "is", "an", "array", "of", "strings")
+  val indices = strings.indices
+  assertThat(indices, contains(0,1,2,3,4,5))
+  ```
+
+- 배열의 인덱스 값도 같이 사용해서 for-in 루프를 순회하고 싶다면 withIndex 함수를 사용하자
+
+  ```kotlin
+  fun <T> Array<out T>.withIndex(): Iterable<IndexedValue<T>>
+  
+  data class IndexedValue<out T>(public val index: Int, public val value: T)
+  ```
+
+  - withIndex함수에 선언된 IndexedValue는 index와 value 속성을 가진 데이터 클래스다.
+
+  ```kotlin
+  val strings = arrayOf("this", "is", "an", "array", "of", "strings")
+  for ((index, value) in strings.withIndex()) {
+    ...
+  }
+  ```
+
+### 5.2 컬렉션 생성하기
+
+- **listOf, setOf, mapOf** 처럼 **변경 불가능한 컬렉션**을 생성하기 위해 만들어진 함수나
+- **mutableListOf, mutableSetOf, mutableMapOf** 처럼 **변경 가능한 컬렉션**을 생성하기 위해 고안된 함수 중 하나를 사용한다.
+- 기본적으로 코틀린 컬렉션은 불변이다. 원소를 추가하거나 제거하는 메소드를 지원하지 않는다.
+- 변경하는 메소드는 mutableXXX 인터페이스에 들어 있다.
+
+### 5.3 컬렉션에서 읽기 전용 뷰 생성하기
+
+- 변경 가능한 리스트, 셋, 맵이 있을 때 해당 컬렉션의 읽기 전용 버전을 생성하고 싶다.
+
+- toList, toSet, toMap 메소드를 사용해 새로운 읽기 전용 컬렉션을 생성하자.
+
+  - List, Set, Map 타입의 변수에 기존 컬렉션을 할당한다
+
+- 변경이 가능한 읽기 전용 버전을 생성하는 방법은 두 가지다.
+
+  ```kotlin
+  // toList 호출
+  val readOnlyNumList: List<Int> = mutableNums.toList()
+  
+  // List 타입 레퍼런스에 가변 리스트 할당
+  val readOnlySameList: List<Int> = mutableNums
+  ```
+
+- 내용은 같지만 더 이상 같은 객체를 나타내지 않는다.
+
+### 5.4 컬렉션에서 맵 만들기
+
+- 키 리스트가 있을 때 각각의 키와 생성한 값을 연관시켜서 맵을 만들 때
+
+  - associateWith 함수에 각 키에 대해 실행되는 람다를 제공해 사용한다
+
+- associate 사용
+
+  ```kotlin
+  val keys = 'a'...'f'
+  val map = keys.associate { it to it.toString().repeat(5).capitalize() }
+  
+  // {a=Aaaaa, b=Bbbbb, c=Ccccc, d=Ddddd, e=Eeeee}
+  ```
+
+- associateWith 사용
+
+  ```kotlin
+  val keys = 'a'...'f'
+  val map = keys.associateWith { it.toString().repeat(5).capitalize() }
+  ```
+
+### 5.5 컬렉션이 빈 경우 기본값 리턴하기
+
+- 컬렉션 처리시 컬렉션의 모든 원소가 선택에서 제외되지만 기본 응답을 리턴하고 싶다
+
+  - ifEmpty와 ifBlank 함수를 사용해 기본값을 리턴한다
+
+  ```kotlin
+  // 빈 컬렉션에 기본 리스트를 제공
+  products.filter {it.onSale}
+    .map { it.name }
+    .ifEmpty{ listOf("none") }
+    .joinToString(seperator = ", ")
+  
+  // 빈 문자열에 기본 문자열을 제공
+  products.filter {it.onSale}
+    .map { it.name }
+    .joinToString(seperator = ", ")
+    .ifEmpty { "none" }
+  ```
+
+- 코틀린도 Optional을 지원하지만, 특정 값을 리턴하는 방법도 있다.
+
+### 5.6 주어진 범위로 값 제한하기
+
+- 주어진 값이 특정 범위 안에 들면 해당 값을 리턴하고 그렇지 않다면 범위의 최솟값 또는 최댓값을 리턴하고 싶다
+
+  - Kotlin.ranges의 **coerceIn 함수**를 범위 인자 또는 구체적인 최소, 최댓값과 함께 사용한다.
+
+- 이 함수는 min과 max 사이의 값은 해당 값을 리턴하고, 그렇지 않다면 경계 값을 리턴한다.
+
+- 범위로 지정
+
+  ```kotlin
+  val range = 3..8
+  
+  assertThat(5, `is`(5.coreceIn(range)))
+  assertThat(range.start, `is`(1.coreceIn(range)))        //3
+  assertThat(range.endInclusive, `is`(9.coreceIn(range))) //8
+  ```
+
+- 최솟값, 최댓값으로 지정
+
+  ```kotlin
+  val min = 2
+  val max = 6
+  
+  assertThat(5, `is`(5.coreceIn(min, max)))
+  assertThat(min, `is`(1.coreceIn(min, max)))
+  assertThat(max, `is`(9.coreceIn(min, max)))
+  ```
+
+### 컬렉션을 윈도우로 처리하기
+
+- 값 컬렉션이 주어진 경우 컬렉션을 횡단하는 작은 윈도우를 이용해 컬렉션을 처리하고 싶다
+
+- 컬렉션을 같은 크기로 나누고 싶다면 chunked 함수를 사용
+
+- 정해진 간격으로 컬렉션을 따라 움직이는 블록을 원한다면 windowed 함수를 사용
+
+- chunked
+
+  - 컬렉션을 주어진 크기 또는 그보다 더 작게 리스트의 리스트로 분할한다.
+
+    ```kotlin
+    val range = 0..10
+    
+    val chunked = range.chunked(3)
+    assertThat(chunked, contains(listOf(0,1,2), listOf(3,4,5), listOf(6,7,8), listOf(9, 10)))
+    
+    assertThat(range.chunked(3) { it.sum() }, `is`(listOf(3, 12, 21, 19)))
+    assertThat(range.chunked(3) { it.average() }, `is`(listOf(1.0, 4.0, 7.0, 9.5)))
+    ```
+
+- windowed
+
+  ```kotlin
+  public fun <T> Iterable<T>.chunked(size: Int): List<List<T>> {
+    return windowed(size, size, partialWindows = true)
+  }
+  ```
+
+  - 세 개의 인자를 받고 그 중 2개의 인자는 선택사항
+
+    - size : 각 윈도우에 포함될 원소의 개수
+    - step : 각 단계마다 전진할 원소의 개수
+    - partialWindows : 나뉘어 있는 마지막 윈도우 원소 개수가 모자랄 경우 유지할지 여부를 결정. 기본값 false
+
+    ```kotlin
+    val range = 0..10
+    
+    assertThat(range.windowed(3,3) { it.sum() }, `is`(listOf(3, 12, 21)))
+    assertThat(range.windowed(3,3) { it.average() }, `is`(listOf(1.0, 4.0, 7.0)))
+    
+    // 1칸 씩 전진
+    assertThat(
+      range.windowed(3,1),
+      contains(
+        listOf(0,1,2), listOf(1,2,3), listOf(2,3,4),
+        listOf(3,4,5), listOf(4,5,6), listOf(5,6,7),
+        listOf(6,7,8), listOf(7,8,9), listOf(8,9,10)
+      )
+    )
+    ```
+
+### 5.8 리스트 구조 분해하기
+
+- 리스트 원소에 접근할 수 있게 구조 분해
+
+- 최대 5개의 원소를 가진 그룹에 리스트를 할당한다.
+
+  - 현재 List 클래스는 처음 다섯 원소의 component 함수만 정의되어 있다. 추후 코틀린 버전에서 변경 될 수 있다.
+
+  ```kotlin
+  val list = listOf("a", "b", "c", "d", "e", "f", "g")
+  
+  val (a, b, c, d, e) = list
+  ```
+
+- 구조 분해는 componentN 함수의 존재에 의존한다. List 클래스에는 component1 ~ component5의 구현이 들어있기 때문에 위의 코드가 동작했다.
+
+### 5.9 다수의 속성으로 정렬하기
+
+- sortedWith와 comparedBy 함수를 사용한다.
+
+- 연이은 속성으로 골프 선수 정렬하기
+
+  ```kotlin
+  val sortedGolfer = golfers.sortedWith(
+    comparedBy({ it.score }, { it.last }, { it.first })
+  )
+  ```
+
+- comparedBy는 Comparator를 생성하고 sortedWith 함수는 Comparator를 인자로 받는다.
+
+  - comparedBy의 흥미로운 점을 Comparable 속성을 추출하는 선택자 목록을 제공한다 는 것과 차례차례 Comparator를 생성한다는 것이다.
+
+    ```kotlin
+    val comparator = compareBy<Golfer>(Golfer::score)
+      .thenBy(Golfer::last)
+      .thenBy(Golfer::first)
+    
+    golfer.sortedWith(comparator)
+    ```
+
+- **sortedWith, sortBy는 변경 가능 컬렉션을 요구한다.**
+
+### 5.10 사용자 정의 이터레이터 정의하기
+
+- 컬렉션을 감싼 클래스를 손쉽게 순회하고 싶다.
+
+- next와 hasNext 함수를 모두 구현한 이터레이터를 리턴하는 연산자 함수를 정의한다.
+
+- 팀에 속한 선수 순회하기
+
+  ```kotlin
+  val team = Team("member")
+  team.addPlayer(Player("A"), Player("B"), Player("C"), Player("D"))
+  
+  for (player in team.players) {
+    ...
+  }
+  ```
+
+- 직접 팀을 순회하기
+
+  ```kotlin
+  operator fun Team.iterator() : Iterator<Player> = players.iterator()
+  
+  for (player in team) {
+    ...
+  }
+  ```
+
+- Iterable 인터페이스를 구현한 팀 클래스 내부에서 iterator를 오버라이드해서 함수를 확장할 수 있다.
+
+### 5.11 타입으로 컬렉션을 필터링하기
+
+- filterIsInstance 또는 filterIsInstanceTo 확장 함수를 사용해서 특정 타입의 원소로만 구성된 새 컬렉션을 생성하고 싶다.
+
+- 아래의 코드에서 필터링 연산은 동작하지만 strings 변수의 추론 타입은 List\<Any\>이기 때문에, 개별 원소를 String으로 타입 변환하지 않는다.
+
+  ```kotlin
+  val strings = list.filter { it is String }
+  
+  for (s in strings) {
+    // s.length -> 컴파일 되지 않는다. 타입이 삭제됨.
+  }
+  ```
+
+- is확인을 추가하거나 filterIsInstance 함수를 대신 사용할 수 있다.
+
+  - filterIsInstance 함수는 구체적인 타입을 사용하기 깨문에 필터링 결과 컬렉션의 타입을 안다.
+  - 따라서 원소의 속성을 사용하기 전에 타입을 확인할 필요가 없다.
+
+  ```kotlin
+  val strings = list.filterIsInstance<String>()
+  
+  assertThat(strings, containsInAnyOrder("a", "b"))
+  ```
+
+- filterIsInstanceTo
+
+  - 이 함수의 인자는 MutableCollection 이므로 원하는 컬렉션의 타입을 명시해 해당 타입의 인스턴스로 컬렉션을 채울 수 있다.
+
+  ```kotlin
+  val list = listOf("a", LocalDate.now(), 3, 4, "b")
+  val strings = list.filterIsInstanceTo(mutableListOf<String>())
+  
+  assertThat(strings, containsInAnyOrder("a", "b"))
+  ```
+
+### 5.12 범위를 수열로 만들기
+
+- 범위를 순회하고 싶지만 범위가 간단한 정수 또는 문자열로 구성되어 있지 않을때
+
+- 사용자 정의 수열(progression)을 생성한다.
+
+- 코틀린에서는 1..5  처럼 IntRange를 인스턴스화 하는 2개의 점 연산자를 통해 범위를 생선한다.
+
+- 두 끝점은 모두 범위에 포함된다.
+
+- LocalDate 으로 살펴보는 범위 연산자
+
+  ```kotlin
+  val startDate = LocalDate.now()
+  val midDate = startDate.plusDays(3)
+  val endDate = midDate.plusDays(5)
+  
+  val dateRange = startDate..endDate
+  
+  assertAll(
+    { assertTrue(startDate in dateRange) },
+    { assertTrue(midDate in dateRange) },
+    { assertTrue(endDate in dateRange) },
+    { assertTrue(endDate.plusDays(1) !in dateRange) }
+  )
+  ```
+
+  - 위의 코드는 잘 동작하지만, 이 범위를 순회하려고하면 컴파일 에러가 난다.
+  - 범위가 수열이 아니라는 문제가 있다.
+  - 사용자 정의 수열은 코틀린 표준 라이버브리의 IntProgression, LongProgression, CharProgression처럼 Iterable 인터페이스를 구현해야 한다.
+
+- 구현해서 쓰자.
+
+  - LocalDate를 위한 수열 LocalDateProgression 
+    - Iterable\<LocalDate\> 와 ClosedRange\<LocalDate\> 를 구현
+  - LocalDateProgressionIterator 
+    - iterator() 구현을 위해 클래스를 만들고 날짜를 순회하도록 내부적으로 next와 hasNext를 구현한다.
+    - LocalDateProgression에서 LocalDateProgressionIterator 를 사용해 iterable을 구현한다.
+  - LocalDate의 rangeTo 함수를 확장한다.
+    - LocalDateProgression
+
+- 두개의 클래스와 1개의 확장함수를 사용해서 원하는 클래스에 패턴을 복제해서 사용
+
+  
 
 
 
