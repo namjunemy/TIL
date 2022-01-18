@@ -653,7 +653,7 @@
 
   - booleanArrayOf, byteArrayOf, shortArrayOf, charArrayOf, intArrayOf, longArrayOf, floatArrayOf, doubleArrayOf 함수는 예상하는 것 처럼 연관된 타입 배열을 생성한다.
 
-- 코틀린에는 명시적인 기본 타입은 없지만, 감ㅅ이 널 허용인 경우 Integer와 Double 같은 자바 래퍼 클래스를 사용하고,
+- 코틀린에는 명시적인 기본 타입은 없지만, 값이 널 허용인 경우 Integer와 Double 같은 자바 래퍼 클래스를 사용하고,
 
 - 널 비허용 값인 경우는 int와 double 같은 기본 타입을 사용한다.
 
@@ -782,7 +782,7 @@
   assertThat(max, `is`(9.coreceIn(min, max)))
   ```
 
-### 컬렉션을 윈도우로 처리하기
+### 5.7 컬렉션을 윈도우로 처리하기
 
 - 값 컬렉션이 주어진 경우 컬렉션을 횡단하는 작은 윈도우를 이용해 컬렉션을 처리하고 싶다
 
@@ -985,13 +985,173 @@
 
 - 두개의 클래스와 1개의 확장함수를 사용해서 원하는 클래스에 패턴을 복제해서 사용
 
+## 6. 시퀀스
+
+- 자바 스트림과 코틀린 시퀀스 사이의 유사점과 차이점을 살펴 본다
+- 컬렉션에서는 처리는 즉시 발생한다.
+- 컬렉션의 map이나 filter가 호출될 때 컬렉션의 모든 원소는 즉시 처리 된다.
+- 반면에 **시퀀스는 지연처리 된다.**
+- 데이터를 처리하기 위해 시퀀스를 사용하면 각각의 원소는 자신의 다음 원소가 처리되기 전에 전체 파이프라인을 완료 한다.
+- 지연 처리 방식은 데이터가 많거나 first 같은 쇼트 서킷 연산의 경우에 도움이 되고, 원하는 값을 찾았을 때 시퀀스를 종료할 수 있게 도와준다.
+
+### 6.1 지연 시퀀스 사용하기
+
+- 특정 조건을 만족시키는 데 필요한 최소량의 데이터만 처리하고 싶다
+
+  - 코틀린 시퀀스를 쇼트 서킷 함수와 함께 사용 한다.
+
+- 예제. 3으로 나누어지는 첫 번째 배수 찾기
+
+  - map, filter, first
+
+    ```kotlin
+    (100 until 200)
+      .map { it * 2 }           // 1. 100번
+      .filter { it % 3 == 0 }   // 2. 100번
+      .first()
+    ```
+
+  - map, first
+
+    ```kotlin
+    (100 until 200)
+      .map { it * 2 }           // 1. 100번
+      .filter { it % 3 == 0 }   // 2. 3번
+      .first()
+    ```
+
+  - asSequence, map, first(filter & first도 상관 없음)
+
+    ```kotlin
+    (100 until 200)
+      .asSequence()
+      .map { it * 2 }          // 1-1. 1번, 2-1. 1번, 3-1. 1번
+      .first { it % 3 == 0 }   // 1-2. 1번, 2-2. 1번, 3-2. 1번
+                               // 6번째 연산에서 조건 만족해서 결과 리턴
+    ```
+
+- 시퀀스가 비어 있다면 first는 예외를 던진다.
+
+- 시퀀스가 Nullable이라면 first 대신 firstOfNull을 사용해야 한다.
+
+- 최종 연산 없이는 시퀀스가 데이터를 처리하지 않는다.
+
+  - 연쇄 함수로 구성된 파이프라인에서 최종 연산을 호출해야만 데이터를 처리한다.
+
+### 6.2 시퀀스 생성하기
+
+- 원소가 있다면 sequenceOf를
+
+- Iterable이 있다면 asSequence를 사용한다.
+
+- 그 외에는 시퀀스 생성기 generateSequence를 사용한다.
+
+  - 주어진 정수 다음에 나오는 소수 찾기
+
+    ```kotlin
+    fun nextPrime(num: Int) = 
+      generateSequence(num + 1) { it + 1}
+        .first(Int::isPrime)
+    ```
+
+### 6.3 무한 시퀀스 다루기
+
+- 널을 리턴하는 시퀀스 생성기를 사용하거나, 시퀀스 확장 함수 중에서 takeWhile 같은 함수를 사용하자
+
+- 처음 N개의 소수 찾기
+
+  - 2부터 시작하는 소수의 무한 시퀀스를 6.2에서 본 nextPrime()을 통해 만들고
+
+  - 요청한 수 만큼만 원소를 가져오는 take(). 상태가 없는 중간 연산이다
+
+  - 최종 연산 toList()
+
+    ```kotlin
+    fun firstNPrimes(count: Int) = 
+      generateSequence(2, ::nextPrime)
+        .take(count)
+        .toList()
+    ```
+
+- 무한 시퀀스를 잘라내고 싶다면, 마지막에 null을 리턴하는 생성 함수를 사용하면 된다.
+
+  - **null은 시퀀스를 종료한다.**
+
+    ```kotlin
+    fun firstNPrimes(max: Int) = 
+      generateSequence(2) { n -> if (n < max) nextPrime(n) else null }
+        .toList()
+        .dropLast(1)
+    ```
+
+- 그러나 null을 리턴하는 함수보다 takeWhile을 사용하는 것이 더 쉽다.
+
+  ```kotlin
+  fun firstNPrimes(max: Int) = 
+    generateSequence(2, ::nextPrime)
+      .takeWhile { it < max }
+      .toList()
+  ```
+
+### 6.4 시퀀스에서 yield하기
+
+- 시퀀스에서 값을 생성하고 싶다면, yield suspend 함수와 함께 sequence를 사용
+
+- sequence 함수의 시그니처
+
+  - sequence 함수의 경우 필요한 때 yield해 값을 생성하는 람다를 제공해야 한다.
+
+  ```kotlin
+  fun <T> sequence(
+    block: suspend SequenceScope<T>.() -> Unit  //Java = void, Kotlin = Unit
+  ): Sequence<T>
+  ```
+
+- 공식 문서의 피보나치 수열 예제
+
+  - 새로운 원소가 생성될 때마다 yield 함수는 Pair의 첫번째 원소를 리턴한다.
+
+  ```kotlin
+  fun fibonacciSequence() = sequence {
+    var terms = Pair(0,1)
   
+    while (true) {
+      yield(terms.first)
+      terms = terms.second to terms.first + terms.second
+    }
+  }
+  ```
 
+- yield 함수는 이터에리터에 값을 제공하고 다음 값을 요청할 때까지 값 생성을 중단한다.
 
+  - sequence()를 사용하는 쪽에서 take()로 값을 요청 한다.
 
+- 따라서, yield는 suspend 함수가 생성한 시퀀스 안에서 각각의 값을 출력하는데 사용된다.
 
+  ```kotlin
+  val fibs = fibonacciSequence()
+    .take(10)
+    .toList()
+  
+  assertEquals(listOf(0, 1, 1, 2, 3, 5, 8, 13, 21, 34), fibs)
+  ```
 
+- yieldAll은 다수의 값을 이터레이터에 넘겨준다
 
+  - 아래 함수로 시퀀스를 생성하고, take 함수로 원하는 원소만큼 얻는다.
+
+  ```kotlin
+  val sequence = sequence {
+    val start = 0;
+    yield(start)
+    yield(1..5 step 2)
+    yield(generateSequence(8) { it * 3 }) // 무한시퀀스
+  }
+  
+  // 0, 1, 3, 5, 8, 24, 72, ....
+  ```
+
+  
 
 
 
