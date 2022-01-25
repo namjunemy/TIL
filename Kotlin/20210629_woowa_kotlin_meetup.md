@@ -2,9 +2,9 @@
 
 > 사내 코틀린 밋업을 정리한 내용
 
-## 처음 자바에서 코틀린으로 변경하고 느꼈던 점
+## 1. 처음 자바에서 코틀린으로 변경하고 느꼈던 점
 
-> 라이브 선물 스쿼드/박정운님(안드로이드 개발자)
+> 라이브 선물 스쿼드/박정운님
 
 ### 1. Null을 다시 생각하게 됨
 
@@ -254,13 +254,506 @@ val jungwoon = Person(
 )
 ```
 
+## 코틀린 스타일 테스트 코드 작성하기
 
+> Reference
+>
+> - 공통시스템개발팀/김규남님 밋업 발표
+>
+> - https://kotlinlang.org/docs/home.html
+> - https://developer.android.com/kotlin/style-guide
 
+### 코틀린 스타일의 테스트 코드?
 
+- 코틀린을 사용해도 Junit, assertion, Mockito 등을 그대로 사용할 수 있지 않나? 
+- 있다.
+- 그런데, Junit, assertion, Mockito를 사용하면 리시버, 람다 등을 활용해 중괄호 `{}` 를 사용하는 코틀린 스타일의 코드 작성이 어렵다.
+  - [Type safe builders](https://play.kotlinlang.org/byExample/09_Kotlin_JS/06_HtmlBuilder?_gl=1*scn3we*_ga*MTExMjE5OTk1NC4xNjExNjY4NzEx*_ga_J6T75801PF*MTYyNDM2NTA0Mi4xMDguMC4xNjI0MzY1MDQyLjA.&_ga=2.54260653.40338281.1624343617-1112199954.1611668711)
+  - [Kotlin Standard Library](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-list/#kotlin.collections.List)
+  - [Kotlin Scope Functions (let, also, apply, run ..)](https://kotlinlang.org/docs/scope-functions.html)
 
+- Junit, assertion, Mockito 사용
 
+  ```kotlin
+  @Test
+  fun `아이디로 유저 조회시 유저가 반환된다`() {
+    val expectedUser = User(name = "NJ")
+    given(userRepository.findById(1L)).willReturn(expectedUser)
+    
+    val searchedUser = userService.getById(1L)
+    
+    assertThat(searchedUser.name).isEqualTo(expectedUser.name)
+  }
+  ```
 
+- Kotest, Kotest Assertion, Mockk 사용
 
+  - given -> every
+  - willReturn -> answers 
+  - isEqualTo -> shouldBe
+    - 두개의 변수 가운데 오는 함수를 **Infix Function** 이라고 한다.
 
+  ```kotlin
+  "아이디로 유저 조회시 유저가 반환된다" {
+    val expectedUser = User(name = "NJ")
+    every { userRepository.findById(1L) } answers { expectedUser }
+    
+    val searchedUser = userService.getById(1L)
+    
+    searchedUser.name shouldBe expectedUser.name
+  }
+  
+  "1과 2를 더하면 3이 반환된다" {
+    val result = sut.calculate("1 + 2")
+    
+    result shouldBe 3
+  }
+  ```
 
+### 코틀린 스타일로 작성하면 뭐가 좋나요?
+
+- 장점
+  - 코틀린 스타일의 코드와 자바 스타일의 테스트 코드의 혼재 방지
+  - Kotest 등 프레임워크의 강력한 기능 활용 가능
+    - Kotest Test Frameworks(Describe Spec. Behavior Spec 등)
+- 단점
+  - 새로운 프렘워크, 라이브러리(Kotest, Mockk)에 대한 약간의 러닝커브 존재
+  - 일부 이슈 존재
+    - [Why is mocking so slow to start in Kotlin?](https://stackoverflow.com/questions/62208145/why-is-mocking-so-slow-to-start-in-kotlin)
+      - mockk의 byteBuddy 사용으로 로딩속도 문제
+
+- 발표자 의견
+  - 무조건 Kotest나 Mockk 등을 도입하기 보다는 프로젝트 시작 단계에서 팀의 코틀린 숙련도나 상황을 고려하자
+
+### 코틀린에서 사용하는 테스트 도구들
+
+- Kotest
+- Mockk
+- MockkBean, Spek
+
+### Kotest
+
+- 코틀린 진영에서 가장 많이 사용하는 테스트 프레임워크
+- 코틀린 DSL 스타일을 통한 테스트 작성 지원
+- 다양한 테스트를 위한 레이아웃 제공
+  - String Spec, Annotation Spec, Describe Spec
+- https://github.com/kotest/kotest
+
+- **Annotation Spec**
+
+  - 기존 Junit과 가장 유사한 방식의 레이아웃
+
+    ```kotlin
+    internal class CalculatorAnnotationSpec: AnnotationSpec() {
+        private val sut = Calculator()
+      
+        private val calculations = listOf(
+            "1 + 3 * 5" to 20.0,
+            "2 - 8 / 3 - 3" to -5.0,
+            "1 + 2 + 3 + 4 + 5" to 15.0
+        )
+        private val blanks = listOf("", " ", "    ")
+        private val invalidInputs = listOf("1 & 2", "1 + 5 % 1")
+    
+        @Test
+        fun `1과 2를 더하면 3이 반환된다`() {
+            val result = sut.calculate("1 + 2")
+    
+            result shouldBe 3
+        }
+    
+        @Test
+        fun `식을 입력하면, 해당하는 결과값이 반환된다`() {
+            calculations.forAll { (expression, answer) ->
+                val result = sut.calculate(expression)
+    
+                result shouldBe answer
+            }
+        }
+    
+        @Test
+        fun `입력값이 null 이거나 빈 공백 문자일 경우 IllegalArgumentException 예외를 던진다`() {
+            blanks.forAll {
+                shouldThrow<IllegalArgumentException> {
+                    sut.calculate(it)
+                }
+            }
+        }
+    
+        @Test
+        fun `사칙연산 기호 이외에 다른 문자가 연산자로 들어오는 경우 IllegalArgumentException 예외를 던진다 `() {
+            invalidInputs.forAll {
+                shouldThrow<IllegalArgumentException> {
+                    sut.calculate(it)
+                }
+            }
+        }
+    }
+    
+    ```
+
+- **String Spec**
+
+  - Test 어노테이션 없고, 문자열과 중괄호로 간단하게 사용할 수 있는 테스트 레이아웃
+
+    ```kotlin
+    internal class CalculatorStringSpec : StringSpec({
+        val sut = Calculator()
+    
+        "1과 2를 더하면 3이 반환된다" {
+            val result = sut.calculate("1 + 2")
+    
+            result shouldBe 3
+        }
+    
+        "식을 입력하면, 해당하는 결과값이 반환된다" {
+            val inputs = listOf(
+                "1 + 3 * 5" to 20.0,
+                "2 - 8 / 3 - 3" to -5.0,
+                "1 + 2 + 3 + 4 + 5" to 15.0
+            )
+    
+            inputs.forAll { (expression, answer) ->
+                val result = sut.calculate(expression)
+    
+                result shouldBe answer
+            }
+    
+        }
+    
+        "입력값이 null 이거나 빈 공백 문자일 경우 IllegalArgumentException 예외를 던진다" {
+            val inputs = listOf("", " ", "    ")
+    
+            inputs.forAll {
+                shouldThrow<IllegalArgumentException> {
+                    sut.calculate(it)
+                }
+            }
+        }
+    
+        "사칙연산 기호 이외에 다른 문자가 연산자로 들어오는 경우 IllegalArgumentException 예외를 던진다" {
+            val inputs = listOf("1 & 2", "1 + 5 % 1")
+    
+            inputs.forAll {
+                shouldThrow<IllegalArgumentException> {
+                    sut.calculate(it)
+                }
+            }
+        }
+    })
+    
+    ```
+
+- **Behavior Spec**
+
+  - Given, When, Then 패턴의 테스트를 코틀린 DSL을 이용해 블럭 단위로 정의한다.
+
+  - 실제로 테스트 결과에서도 given, when, then이 계층단위로 나누어져서 표시된다.
+
+    ```kotlin
+    internal class CalculatorBehaviorSpec : BehaviorSpec({
+        val sut = Calculator()
+      
+        given("calculate") {
+            val expression = "1 + 2"
+            `when`("1과 2를 더하면") {
+                val result = sut.calculate(expression)
+                then("3이 반환된다") {
+                    result shouldBe 3
+                }
+            }
+    
+            val calculations = listOf(
+                "1 + 3 * 5" to 20.0,
+                "2 - 8 / 3 - 3" to -5.0,
+                "1 + 2 + 3 + 4 + 5" to 15.0
+            )
+            `when`("수식을 입력하면") {
+                then("해당하는 결과값이 반환된다") {
+                    calculations.forAll { (expression, answer) ->
+                        val result = sut.calculate(expression)
+    
+                        result shouldBe answer
+                    }
+                }
+            }
+    
+            val blanks = listOf("", " ", "    ")
+            `when`("입력값이 null이거나 빈 값인 경우") {
+                then("IllegalArgumentException 예외를 던진다"){
+                    blanks.forAll {
+                        shouldThrow<IllegalArgumentException> {
+                            sut.calculate(it)
+                        }
+                    }
+                }
+            }
+    
+            val invalidInputs = listOf("1 & 2", "1 + 5 % 1")
+            `when`("사칙연산 기호 이외에 다른 연산자가 들어오는 경우") {
+                then("IllegalArgumentException 예외를 던진다"){
+                    invalidInputs.forAll {
+                        shouldThrow<IllegalArgumentException> {
+                            sut.calculate(it)
+                        }
+                    }
+                }
+            }
+        }
+    })
+    ```
+
+- **Describe Spec**
+
+  - Junit5로 계층 구조 테스트 작성하기(with DCI 패턴)
+
+    - https://johngrib.github.io/wiki/junit5-nested/
+
+  - Describe(설명대상), Context(상황), It(결과) 패턴의 테스트를 코틀린 DSL을 이용해 정의한다.
+
+  - 실제로 테스트 결과에서도 DCI가 계층단위로 나누어져서 표시된다.
+
+    ```kotlin
+    internal class CalculatorDescribeSpec : DescribeSpec({
+        val sut = Calculator()
+    
+        describe("calculate") {
+            context("식이 주어지면") {
+                val inputs = listOf(
+                    "1 + 3 * 5" to 20.0,
+                    "2 - 8 / 3 - 3" to -5.0,
+                    "1 + 2 + 3 + 4 + 5" to 15.0
+                )
+    
+                it("해당 식에 대한 결과값이 반환된다") {
+                    inputs.forAll { (expression, data) ->
+                        val result = sut.calculate(expression)
+    
+                        result shouldBe data
+                    }
+                }
+            }
+    
+            context("0으로 나누는 경우") {
+                it("Infinity를 반환한다") {
+                    val result = sut.calculate("1 / 0")
+    
+                    result shouldBe Double.POSITIVE_INFINITY
+                }
+            }
+    
+            context("입력값이 null이거나 공백인 경우") {
+                val blanks = listOf("", " ", "      ")
+                it("IllegalArgumentException 예외를 던진다") {
+                    blanks.forAll {
+                        shouldThrow<IllegalArgumentException> {
+                            sut.calculate(it)
+                        }
+                    }
+                }
+            }
+    
+            context("사칙연산 기호 이외에 다른 문자가 연산자로 들어오는 경우") {
+                val invalidInputs = listOf("1 & 2", "1 + 5 % 1")
+                it("IllegalArgumentException 예외를 던진다") {
+                    invalidInputs.forAll {
+                        shouldThrow<IllegalArgumentException> {
+                            sut.calculate(it)
+                        }
+                    }
+                }
+            }
+        }
+    })
+    ```
+
+- **Spec with @SpringBootTest**
+
+  - @SpringBootTest를 사용한 통합 테스트에도 Kotest 테스트 레이아웃 적용 가능
+
+  - `testImplementation("io.kotest:kotest-extensions-spring")` 의존성 추가 필요
+
+  - init 블럭안에 들어가야 하지만 충분히 사용하기에 매력적이다.
+
+    ```kotlin
+    @SpringBootTest
+    internal class CalculatorSpringBootSpec : DescribeSpec() {
+        override fun extensions() = listOf(SpringExtension)
+    
+        @Autowired
+        private lateinit var calculatorService: CalculatorService
+    
+        init {
+            this.describe("calculate") {
+                context("식이 주어지면") {
+                    val inputs = listOf(
+                        "1 + 3 * 5" to 20.0,
+                        "2 - 8 / 3 - 3" to -5.0,
+                        "1 + 2 + 3 + 4 + 5" to 15.0
+                    )
+                    it("해당 식에 대한 결과값이 반환된다") {
+                        inputs.forAll { (expression, data) ->
+                            val result = calculatorService.calculate(expression)
+    
+                            result shouldBe data
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+- Kotest Isolation Mode
+
+  - 테스트 간의 격리 모드를 지정한다
+  - 기본 값 사용시 **Mocking 등에 의해 충돌**이 발생할 수 있다
+  - Kotest Isolation Mode
+    - SingleInstance - Default
+    - InstancePerTest
+    - InstancePerLeaf
+  - 테스트 간 완전한 격리를 위해서는 **InstancePerLeaf** 를 사용하자
+    - Leaf - it 블럭과 같은 가장 말단에서의 격리를 의미한다.
+
+### Mockk
+
+- 코틀린 진영의 Mock 프레인워크
+
+- https://mockk.io/
+
+- 코틀린 DSL 스타일로 mocking rksmd
+
+- 일부 키워드가 다르지만 Mockito와 큰 차이는 없다
+
+  ```kotlin
+  // Mockito
+  given(userRepository.findById(1L)).willReture(expectedUser)
+  
+  // Mockk
+  every { userRepository.findById(1L) } answer { expectedUser }
+  ```
+
+- 기본적인 사용법
+
+  - 모의 객체 생성
+
+    - mockk 함수는 타입 파라미터를 이용해서 생성할 모의 객체의 타입을 전달받는다.
+
+    - 변수나 프로퍼티의 타입이 명시적으로 정의되어 있으면 타입 추론이 가능하므로 생략해도 된다.
+
+      ```kotlin
+      // 1. mockk<타입>()
+      private val mockValidator1 = mockk<CreationValidator>()
+      
+      // 2. 타입 추론
+      private val mockValidator2 : CreationValidator = mockk()
+      ```
+
+  - Answer 정의
+
+    - io.mockk.every 함수를 사용하면 된다.
+
+      ```kotlin
+      @Test
+      fun someMockTest() {
+          every { mock.someMethod(1) } returns "OK" // "OK" 리턴
+          every { mock.someMethod(2) } throws SomeException() // 익셉션 발생
+          every { mock.call() } just Runs // Unit 함수 실행
+          
+          assertEquals("OK", mock.someMethod(1))
+          assertThrows<SomeException> { mock.someMethod(2) }
+      }
+      ```
+
+  - Argument matching
+
+    - 의의 인자 값과 일치하도록 설정하려면 any()를 사용한다.
+
+      ```kotlin
+      @Test
+      fun someMockTest() {
+          every { mock.anyMethod(any(), 3) } returns "OK"
+          
+          assertEquals("OK", mock.anyMethod(10, 3))
+      }
+      ```
+
+  - Relaxed mock
+
+    - MockK는 호출 대상에 대한 스텁 정의를 하지 않으면 오류를 발생한다.
+
+      ```kotlin
+      val mock = mockk<Some>()
+      
+      mock.someMethod(1) // --> io.mockk.MockKException: no answer found for: Some(#1).someMethod(1)
+      ```
+
+    - 이를 완화하는 방법은 Relaxed mock을 생성하는 것이다. 
+
+    - mockk()의 relaxed 파라미터 값을 true로 전달하면 Relaxed mock을 생성할 수 있다.
+
+      ```kotlin
+      val mock = mockk<Some>(relaxed = true)
+      mock.someMethod(1) // --> 0 리턴
+      ```
+
+  - 함수 호출 여부 검증
+
+    - io.mockk.verify 함수를 사용해서 호출 여부를 검증할 수 있다.
+
+      ```kotlin
+      val mock = mockk<Some>(relaxed = true)
+      
+      mock.someMethod(1)
+      mock.anyMethod(1, 3)
+      
+      verify { mock.someMethod(1) }
+      verify { mock.anyMethod(any(), 3) }
+      ```
+
+  - 인자 캡처
+
+    - 인자를 캡처하고 싶을 땐 slot()과 capture()를 사용한다.
+
+      ```kotlin
+      val mock = mockk<Some>()
+      
+      val argSlot = slot<Int>()
+      every { mock.someMethod(capture(argSlot)) } returns 3
+      
+      mock.someMethod(5)
+      
+      val realArg = argSlot.captured
+      assertEquals(5, realArg)
+      ```
+
+### SpringMockk
+
+- 기존에 사용하던 @MockBean과 @SpyBean을 대체할 수 있다.
+
+- @MockkBean, @SpykBean 으로 사용
+
+- https://github.com/Ninja-Squad/springmockk
+
+- https://mockk.io/
+
+  ```kotlin
+  @ExtendWith(SpringExtension::class)
+  @WebMvcTest
+  class GreetingControllerTest {
+    @MockkBean
+    private lateinit var greetingService: GreetingService
+    
+    @Autowired
+    private lateinit var controller: GreetingController
+    
+    @Test
+    fun `should greet by delegating to the greeting service`() {
+      every { greetingService.greet("NJ") } returns "Hi NJ"
+      
+      assertThat(controller.greet("NJ")).isEqualTo("Hi John")
+      verify { greetingService.greet(NJ) }
+    }
+  }
+  ```
 

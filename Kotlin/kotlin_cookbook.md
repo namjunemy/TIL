@@ -610,7 +610,7 @@
 
 ## 5. 컬렉션
 
-- 코틀린은 자바처럼 다수의 객체를 담기 웨해 타입을 명시한 컬렉션을 사용한다
+- 코틀린은 자바처럼 다수의 객체를 담기 위해 타입을 명시한 컬렉션을 사용한다
 - 하지만 코틀린은 자바와는 다르게 중개자의 역할을 하는 스트림을 거치지 않고 여러가지 흥미로운 메소드를 컬렉션 클래스에 직접 추가 한다.
 
 ### 5.1 배열 다루기
@@ -1151,9 +1151,127 @@
   // 0, 1, 3, 5, 8, 24, 72, ....
   ```
 
+## 7. 영역 함수
+
+- 객체 컨텍스트 안에서 코드 블록을 실행할 목적으로 만든 함수
+- let, run, apply, also 에 대하여
+
+### 7.1 apply로 객체 생성 후에 초기화
+
+- 객체를 사용하기 전에 생성자 인자만으로는 할 수 없는 초기화 작업에 apply 함수를 사용한다.
+
+- 객체에 적용할 수 있는 영역 함수apply는 this를 전달하고 this를 리턴하는 확장 함수다
+
+  ```kotlin
+  inline fun <T> T.apply(block: T.() -> Unit): T
+  ```
+
+- JdbcTemplate 예제
+
+  - 엔티티를 저장하는 동안 db가 기본키를 생성한다면, 제공된 객체가 새로운 키로 갱신 되어야 한다. 
+    - executeAndReturnKey 사용.
+  - officer 인스턴스가 apply에 this로 전달 되기 때문에 블록 안에서 rank 같은 속성에 접근할 수 있고
+  - id 속성은 apply 블록 안에서 갱신 된 후 Officer가 리턴 된다.
+
+  ```kotlin
+  @Repository
+  class JdbcOfficerDAO(private val jdbcTemplate: JdbcTemplate) {
+    private val insertOfficer = SimpleJdbcInsert(jdbcTemplate)
+      .withTableName("OFFICERS")
+      .usingGeneratedKeyColumns("id")
+    
+    fun save(officer: Officer) =
+      officer.apply {
+        id = insertOfficer.executeAndReturnKey(
+          mapOf("rank" to rank,
+                "first_name" to first,
+                "last_name" to last))
+      }
+  }
+  ```
+
+- **apply는 이미 인스턴스화된 객체의 추가 설정을 위해 사용하는 가장 일반적인 방법**이다.
+
+### 7.2 부수 효과를 위한 also 사용
+
+- 코드 흐름을 방해받지 않고 다른 동작을 하고 싶을 때 also 함수를 사용 한다.
+
+- also 함수 시그니처
+
+  - block 인자를 실행 시킨 후에 자신을 리턴한다
+
+    ```kotlin
+    public inline fun <T> T.also(block: (T) -> Unit): T
+    ```
+
+- 일반적으로 객체에 함수 호출을 연쇄시키기 위해 사용된다.
+
+  ```kotlin
+  createBook()
+    .also { println(it) }
+    .also { Logger.getAnonymousLogger().info(it.toString()) }
+  ```
+
+### 7.3 let 함수와 엘비스 연산자 사용
+
+- 레퍼런스가 Null 일때 기본값을 리턴하고 싶다면
+
+  - 엘비스 연산자를 결합한 안전 호출 연산자와 함께 let 영역 함수를 사용하자
+
+- let 함수 시그니처
+
+  - 가장 중요한 점은 let 함수는 컨텍스트 객체가 아닌 **블록의 결과를 리턴한다**는 것
+
+    ```kotlin
+    public inline fun <T, R> T.let(block: (T) -> R): R
+    ```
+
+  - 그러므로 let은 map처럼 동작한다.
+
+- 문자열 대문자 변경과 문자열 처리, Nullable 처리
+
+  ```kotlin
+  fun processNullableString(str: String?) = 
+    str?.let {    //안전 호출 연산자와 let 같이 사용
+      when {
+        it.isEmpty() -> "Empty"
+        it.isBlank() -> "Blank"
+        else -> it.capitalize()
+      }
+    } ?: "Null"  //널처리 엘비스 연산자
+  ```
+
+### 7.4 임시 변수로 let 사용하기
+
+- 연산 결과를 임시 변수에 할당하지 않고 처리하고 싶을 때
+
+  - 연산에 let 호출은 연쇄하고
+  - let에 제공한 람다 또는 함수 레퍼런스 안에서 그 결과를 처리한다
+
+- let 사용 이전
+
+  - 출력을 위해 변수 할당
+
+  ```kotlin
+  val numbers = mutableListOf("one", "two", "three", "four", "five")
+  val resultList = numbers.map { it.length }.filter { it > 3 }
+  println(resultList)
+  ```
+
+- let 사용
+
+  ```kotlin
+  val numbers = mutableListOf("one", "two", "three", "four", "five")
+  numbers.map { it.length }
+    .filter { it > 3 }
+    .let {
+      println(it)
+      ...
+    }
+    // 또는 메서드 레퍼런스 사용 => .let(::println)
+  ```
+
   
-
-
 
 
 

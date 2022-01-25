@@ -437,7 +437,17 @@ data class CancelRequest(
   - 오히려 _students에 대해 필드가 생기고, JPA에서는 이 필드를 영속화 한다.
   - 뒤에 JPA 이야기에서 자세히 다룬다.
 
+## Q&A
 
+
+
+## Persistence(with Kotlin)
+
+
+
+
+
+## LGTM!!
 
 
 
