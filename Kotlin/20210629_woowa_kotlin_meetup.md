@@ -617,11 +617,11 @@ val jungwoon = Person(
 
 ### Mockk
 
-- 코틀린 진영의 Mock 프레인워크
+- 코틀린 진영의 Mock 라이브러리
 
 - https://mockk.io/
 
-- 코틀린 DSL 스타일로 mocking rksmd
+- 코틀린 DSL 스타일로 mocking 가능
 
 - 일부 키워드가 다르지만 Mockito와 큰 차이는 없다
 
@@ -751,7 +751,7 @@ val jungwoon = Person(
     fun `should greet by delegating to the greeting service`() {
       every { greetingService.greet("NJ") } returns "Hi NJ"
       
-      assertThat(controller.greet("NJ")).isEqualTo("Hi John")
+      assertThat(controller.greet("NJ")).isEqualTo("Hi NJ")
       verify { greetingService.greet(NJ) }
     }
   }
